@@ -370,6 +370,18 @@
             animation: fadeInUp 1s var(--transition-cinematic) 0.8s forwards;
         }
 
+        .hero-bottom-rail {
+            position: absolute;
+            left: 5vw;
+            right: 5vw;
+            bottom: 2.1rem;
+            z-index: 11;
+            display: none;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
         .hero-cta {
             position: absolute;
             bottom: 5vw;
@@ -1135,11 +1147,38 @@
             }
 
             .hero-content {
-                margin-bottom: 8.1rem;
+                padding-bottom: 5.4rem;
             }
 
-            .hero-cta {
-                bottom: 9.3rem;
+            .hero-content .hero-subtitle,
+            .hero > .hero-cta {
+                display: none;
+            }
+
+            .hero-bottom-rail {
+                display: flex;
+            }
+
+            .hero-bottom-rail .hero-subtitle {
+                margin-top: 0;
+                font-size: 0.75rem;
+                line-height: 1;
+                opacity: 1;
+                transform: none;
+                animation: none;
+            }
+
+            .hero-bottom-rail .hero-cta {
+                position: static;
+                bottom: auto;
+                right: auto;
+                display: flex;
+                align-items: baseline;
+                font-size: 0.75rem;
+                line-height: 1;
+                opacity: 1;
+                transform: none;
+                animation: none;
             }
 
             .nav-links {
@@ -1220,16 +1259,12 @@
                 font-size: clamp(3rem, 12vw, 6rem);
             }
 
-            .hero-subtitle {
-                font-size: 0.75rem;
-                line-height: 1;
+            .hero-content {
+                padding-bottom: 5rem;
             }
 
-            .hero-cta {
-                bottom: 9.55rem;
-                font-size: 0.75rem;
-                line-height: 1;
-                transform: translateY(-1px);
+            .hero-bottom-rail {
+                bottom: 1.9rem;
             }
 
             .gallery-item {
@@ -1321,6 +1356,13 @@
             <span>Scroll</span>
             <span class="line"></span>
         </a>
+        <div class="hero-bottom-rail">
+            <p class="hero-subtitle">Afro Futuristik</p>
+            <a href="#music" class="hero-cta">
+                <span>Scroll</span>
+                <span class="line"></span>
+            </a>
+        </div>
     </section>
 
     <!-- Music Section -->
@@ -1463,7 +1505,7 @@
                 <img src="https://res.cloudinary.com/dzgqzeebg/image/upload/v1772656624/the_ghost_iarpxf.jpg" alt="Featured 3">
                 <div class="featured-overlay">
                     <span class="featured-label">Partnership</span>
-                    <span class="featured-title">HolyGhost Chooses Rikka</span>
+                    <span class="featured-title">HolyGhost — Rikka</span>
                 </div>
             </div>
         </div>
