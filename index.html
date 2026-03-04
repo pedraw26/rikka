@@ -1138,7 +1138,7 @@
             }
 
             .hero-cta {
-                bottom: 8.1rem;
+                bottom: 9.3rem;
             }
 
             .hero-subtitle {
@@ -1229,6 +1229,10 @@
 
             .hero-subtitle {
                 font-size: 0.75rem;
+            }
+
+            .hero-cta {
+                bottom: 9.55rem;
             }
 
             .gallery-item {
@@ -1681,6 +1685,17 @@
 
         window.addEventListener('scroll', () => {
             const currentScrollY = window.scrollY;
+            const isMobile = window.innerWidth <= 768;
+
+            if (isMobile) {
+                if (currentScrollY > 40) {
+                    navbar.classList.add('hidden');
+                } else {
+                    navbar.classList.remove('hidden');
+                }
+                lastScrollY = currentScrollY;
+                return;
+            }
 
             if (currentScrollY > lastScrollY && currentScrollY > 100) {
                 navbar.classList.add('hidden');
@@ -1725,6 +1740,8 @@
         const playIcon = playBtn.querySelector('.play-icon');
         const pauseIcon = playBtn.querySelector('.pause-icon');
         const progressBar = document.getElementById('progress-bar');
+        const baseVolume = 1;
+        const fadeDuration = 8;
 
         const syncPlayerUI = () => {
             const isPlaying = !audioPlayer.paused;
@@ -1753,6 +1770,9 @@
 
         playBtn.addEventListener('click', function() {
             if (audioPlayer.paused) {
+                if (audioPlayer.currentTime < (audioPlayer.duration || Infinity) - fadeDuration) {
+                    audioPlayer.volume = baseVolume;
+                }
                 audioPlayer.play();
             } else {
                 audioPlayer.pause();
@@ -1763,11 +1783,20 @@
         audioPlayer.addEventListener('timeupdate', function() {
             const progress = audioPlayer.duration ? (audioPlayer.currentTime / audioPlayer.duration) * 100 : 0;
             progressBar.style.width = progress + '%';
+
+            if (!audioPlayer.duration || audioPlayer.muted) return;
+            const remaining = audioPlayer.duration - audioPlayer.currentTime;
+            if (remaining <= fadeDuration && remaining > 0) {
+                audioPlayer.volume = Math.max(0, Math.min(baseVolume, (remaining / fadeDuration) * baseVolume));
+            } else if (remaining > fadeDuration && audioPlayer.volume !== baseVolume) {
+                audioPlayer.volume = baseVolume;
+            }
         });
 
         // Reset icon when audio ends
         audioPlayer.addEventListener('ended', function() {
             progressBar.style.width = '0%';
+            audioPlayer.volume = baseVolume;
             syncPlayerUI();
         });
 
