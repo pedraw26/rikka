@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIKKA | Official Artist Site</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --text-primary: #f0f0f0;
+            --text-secondary: #888888;
+            --accent: #333333;
+            --white: #ffffff;
+            --transition-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --transition-cinematic: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        body.site-locked {
+            overflow: hidden;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 10px;
+            height: 10px;
+            background: var(--white);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.3s var(--transition-smooth), opacity 0.3s;
+            mix-blend-mode: difference;
+            display: none;
+        }
+
+        @media (pointer: fine) {
+            body {
+                cursor: none;
+            }
+            .cursor {
+                display: block;
+            }
+        }
+
+        .cursor.hover {
+            transform: scale(4);
+        }
+
+        .cursor.hover::after {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            border: 1px solid var(--white);
+            border-radius: 50%;
+        }
+
+        /* Preloader */
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.8s var(--transition-smooth), visibility 0.8s;
+        }
+
+        .preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .password-gate {
+            position: fixed;
+            inset: 0;
+            z-index: 9996;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+
+        .password-gate.is-visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .password-gate-card {
+            width: min(88vw, 360px);
+            border: none;
+            background: transparent;
+            padding: 0;
+        }
+
+        .password-gate-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .password-gate-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .password-gate-input {
+            width: 100%;
+            background: #0a0a0a;
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 0;
+            padding: 0.78rem 0.9rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.75rem;
+            outline: none;
+        }
+
+        .password-gate-input:focus {
+            border-color: rgba(255, 255, 255, 0.35);
+        }
+
+        .password-gate-button {
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background: transparent;
+            color: var(--white);
+            font-size: 0.7rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            padding: 0.72rem 0.9rem;
+            cursor: pointer;
+            transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+        }
+
+        .password-gate-button:hover {
+            border-color: rgba(255, 255, 255, 0.35);
+        }
+
+        .password-gate-error {
+            min-height: 1.2rem;
+            margin-top: 0.6rem;
+            color: #ff7676;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .preloader-content {
+            text-align: center;
+        }
+
+        .preloader-text {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+        }
+
+        .preloader-counter {
+            font-family: 'Cinzel', serif;
+            font-size: 4rem;
+            font-weight: 300;
+        }
+
+        /* Grain Overlay */
+        .grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem 5vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            mix-blend-mode: difference;
+            transition: transform 0.5s var(--transition-smooth);
+        }
+
+        nav.hidden {
+            transform: translateY(-100%);
+        }
+
+        .logo {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            font-weight: 500;
+            letter-spacing: 0.3em;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            position: relative;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--white);
+            transition: width 0.4s var(--transition-smooth);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            width: 100%;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            padding: 5vw;
+            overflow: hidden;
+        }
+
+        .hero-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* Desktop hero image - landscape */
+        .hero-image.desktop {
+            background-image: url('/Users/pedrogomes/.minimax-agent/projects/21/image_1772622530256.png');
+        }
+
+        /* Mobile hero image - portrait 9:16 */
+        .hero-image.mobile {
+            background-image: url('/Users/pedrogomes/.minimax-agent/projects/21/image_1772622530368.png');
+            display: none;
+        }
+
+        /* Show mobile image on smaller screens */
+        @media (max-width: 768px) {
+            .hero-image.desktop {
+                display: none;
+            }
+            .hero-image.mobile {
+                display: block;
+            }
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, var(--bg-primary) 0%, transparent 60%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+        }
+
+        .hero-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(4rem, 15vw, 12rem);
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            line-height: 0.9;
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeInUp 1.2s var(--transition-cinematic) 0.5s forwards;
+        }
+
+        .hero-subtitle {
+            font-size: 0.9rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-top: 2rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s var(--transition-cinematic) 0.8s forwards;
+        }
+
+        .hero-cta {
+            position: absolute;
+            bottom: 5vw;
+            right: 5vw;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--white);
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeIn 1s var(--transition-cinematic) 1.2s forwards;
+        }
+
+        .hero-cta .line {
+            width: 60px;
+            height: 1px;
+            background: var(--white);
+            transition: width 0.4s var(--transition-smooth);
+        }
+
+        .hero-cta:hover .line {
+            width: 100px;
+        }
+
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Sections */
+        section {
+            padding: 8rem 5vw;
+        }
+
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 400;
+            margin-bottom: 4rem;
+            letter-spacing: 0.1em;
+        }
+
+        /* Music Section */
+        .music {
+            background: var(--bg-primary);
+        }
+
+        .release {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 4rem;
+            margin-bottom: 6rem;
+            align-items: center;
+        }
+
+        .release-image {
+            width: 100%;
+            aspect-ratio: 1;
+            overflow: hidden;
+        }
+
+        .release-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s var(--transition-cinematic);
+        }
+
+        .release:hover .release-image img {
+            transform: scale(1.05);
+        }
+
+        .release-info {
+            padding: 2rem 0;
+        }
+
+        .release-year {
+            font-size: 0.8rem;
+            letter-spacing: 0.3em;
+            color: var(--text-secondary);
+        }
+
+        .release-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: 400;
+            margin: 1rem 0;
+        }
+
+        .release-description {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            max-width: 500px;
+        }
+
+        .release-links {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .release-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--white);
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: opacity 0.3s;
+        }
+
+        .release-link:hover {
+            opacity: 0.7;
+        }
+
+        .release-link svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Music Player Card - Minimal Design */
+        .music-player-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem 0;
+        }
+
+        .main-music-card {
+            background: #0a0a0a;
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .album-art-container {
+            flex-shrink: 0;
+        }
+
+        .album-art {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #1a1a1a;
+        }
+
+        .album-art img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .track-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .track-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.25rem;
+        }
+
+        .artist-name {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+        }
+
+        .volume-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .volume-bars {
+            display: flex;
+            gap: 3px;
+            align-items: flex-end;
+            height: 24px;
+        }
+
+        .volume-bars .bar {
+            width: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            animation: volumeBar 0.8s ease-in-out infinite;
+        }
+
+        .volume-bars .bar:nth-child(1) { height: 30%; animation-delay: 0s; }
+        .volume-bars .bar:nth-child(2) { height: 50%; animation-delay: 0.1s; }
+        .volume-bars .bar:nth-child(3) { height: 70%; animation-delay: 0.2s; }
+        .volume-bars .bar:nth-child(4) { height: 100%; animation-delay: 0.3s; }
+        .volume-bars .bar:nth-child(5) { height: 60%; animation-delay: 0.4s; }
+        .volume-bars .bar:nth-child(6) { height: 40%; animation-delay: 0.5s; }
+
+        @keyframes volumeBar {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.7); }
+        }
+
+        .play-button {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--white);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .play-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .play-button svg {
+            fill: #0a0a0a;
+        }
+
+        .play-button .pause-icon {
+            fill: #0a0a0a;
+            margin-left: 0;
+            display: none;
+        }
+
+        /* Video Section */
+            display: none;
+        }
+
+        #play-toggle:checked + .track-info .icon-pause {
+            display: block;
+        }
+
+        .control-button.d {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+        }
+
+        /* Video Section */
+        .video-section {
+            background: var(--bg-secondary);
+            padding-top: 6rem;
+            padding-bottom: 6rem;
+        }
+
+        .divider-player-section {
+            padding: 0;
+            background: transparent;
+        }
+
+        .music-player-divider {
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            border-top: 1px solid rgba(255, 255, 255, 0.18);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(10, 10, 10, 0.92);
+            padding: 1.2rem 5vw;
+        }
+
+        .music-player-row {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.25rem;
+        }
+
+        .music-player-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .music-player-divider .album-art {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .music-player-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .music-player-title {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .music-player-artist {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: #888;
+        }
+
+        .music-player-progress {
+            width: 100%;
+            height: 3px;
+            background: #333;
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: #fff;
+            border-radius: 2px;
+            transition: width 0.1s linear;
+        }
+
+        .music-player-divider .play-button {
+            width: 44px;
+            height: 44px;
+            margin-left: 1rem;
+            flex-shrink: 0;
+        }
+
+        .music-player-divider .play-button .play-icon {
+            margin-left: 2px;
+        }
+
+        .video-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .video-wrapper {
+            width: 100%;
+            padding-top: 56.25%;
+            position: relative;
+            background: var(--bg-primary);
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            letter-spacing: 0.1em;
+        }
+
+        /* Gallery Section */
+        .gallery {
+            background: var(--bg-primary);
+            padding-bottom: 0;
+        }
+
+        .gallery-wrapper {
+            display: flex;
+            gap: 2rem;
+            overflow-x: auto;
+            padding: 2rem 0 4rem;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            cursor: grab;
+        }
+
+        .gallery-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        .gallery-wrapper:active {
+            cursor: grabbing;
+        }
+
+        .gallery-item {
+            flex: 0 0 auto;
+            width: clamp(300px, 40vw, 500px);
+            aspect-ratio: 4/3;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s var(--transition-cinematic);
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s var(--transition-smooth);
+        }
+
+        .gallery-item:hover .gallery-caption {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .gallery-caption span {
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        /* Featured Section */
+        .featured {
+            background: var(--bg-secondary);
+        }
+
+        .featured-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .featured-item {
+            aspect-ratio: 16/9;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .featured-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s var(--transition-cinematic);
+        }
+
+        .featured-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .featured-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+        }
+
+        .featured-label {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .featured-title {
+            display: block;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+        }
+
+        .featured-subtitle {
+            display: block;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        /* Streaming Section */
+        .streaming {
+            background: var(--bg-primary);
+            text-align: center;
+        }
+
+        .streaming-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            margin-bottom: 3rem;
+            letter-spacing: 0.1em;
+        }
+
+        .streaming-links {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .streaming-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            color: var(--white);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .streaming-link:hover {
+            opacity: 0.7;
+        }
+
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s var(--transition-smooth);
+        }
+
+        .streaming-link:hover .icon-box {
+            border-color: var(--white);
+            transform: scale(1.1);
+        }
+
+        .icon-box svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .streaming-link span {
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-secondary);
+            padding: 6rem 5vw 3rem;
+            text-align: center;
+        }
+
+        .footer-statement {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            line-height: 1.5;
+            margin-bottom: 3rem;
+            letter-spacing: 0.1em;
+        }
+
+        .footer-email {
+            display: inline-block;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-bottom: 3rem;
+            transition: color 0.3s;
+        }
+
+        .footer-email:hover {
+            color: var(--white);
+        }
+
+        .footer-socials {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 4rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-socials a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .footer-socials a:hover {
+            color: var(--white);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--accent);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .back-to-top {
+            color: var(--text-secondary);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: color 0.3s;
+        }
+
+        .back-to-top:hover {
+            color: var(--white);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .release {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .release-image {
+                max-width: 500px;
+            }
+
+            .featured-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1.5rem 5vw;
+            }
+
+            .nav-links {
+                gap: 1.5rem;
+            }
+
+            .nav-links a {
+                font-size: 0.65rem;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            section {
+                padding: 5rem 5vw;
+            }
+
+            .release-links {
+                gap: 1rem;
+            }
+
+            .streaming-links {
+                gap: 2rem;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .music-player-divider {
+                padding: 1rem 5vw;
+            }
+
+            .music-player-row {
+                gap: 0.9rem;
+            }
+
+            .music-player-divider .album-art {
+                width: 44px;
+                height: 44px;
+            }
+
+            .music-player-divider .play-button {
+                width: 40px;
+                height: 40px;
+                margin-left: 0.5rem;
+            }
+
+            .password-gate-card {
+                width: min(90vw, 330px);
+                padding: 0;
+            }
+
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: clamp(3rem, 12vw, 6rem);
+            }
+
+            .hero-subtitle {
+                font-size: 0.75rem;
+            }
+
+            .gallery-item {
+                width: 85vw;
+            }
+
+            .icon-box {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        /* Scroll animations */
+        .section-title,
+        .release,
+        .video-container,
+        .gallery-item,
+        .featured-item,
+        .streaming-title,
+        .streaming-links,
+        .footer-statement,
+        .footer-email,
+        .footer-socials {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s var(--transition-cinematic);
+        }
+
+        .section-title.visible,
+        .release.visible,
+        .video-container.visible,
+        .gallery-item.visible,
+        .featured-item.visible,
+        .streaming-title.visible,
+        .streaming-links.visible,
+        .footer-statement.visible,
+        .footer-email.visible,
+        .footer-socials.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="site-locked">
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+
+    <!-- Grain Overlay -->
+    <div class="grain"></div>
+
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="preloader-content">
+            <div class="preloader-text">RIKKA</div>
+            <div class="preloader-counter">0%</div>
+        </div>
+    </div>
+
+    <div class="password-gate is-visible" id="password-gate" aria-hidden="false">
+        <div class="password-gate-card">
+            <h2 class="password-gate-title">Private Access</h2>
+            <p class="password-gate-subtitle">Enter Password</p>
+            <input class="password-gate-input" id="password-input" type="password" autocomplete="current-password" placeholder="PASSWORD" />
+            <button class="password-gate-button" id="password-submit" type="button">Unlock</button>
+            <p class="password-gate-error" id="password-error"></p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="#" class="logo">RIKKA</a>
+        <ul class="nav-links">
+            <li><a href="#music">Music</a></li>
+            <li><a href="#featured">Featured</a></li>
+            <li><a href="#connect">Links</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-image desktop"></div>
+        <div class="hero-image mobile"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Rikka</h1>
+            <p class="hero-subtitle">Afro Futuristik</p>
+        </div>
+        <a href="#music" class="hero-cta">
+            <span>Scroll</span>
+            <span class="line"></span>
+        </a>
+    </section>
+
+    <!-- Music Section -->
+    <section class="music" id="music">
+        <h2 class="section-title">Releases</h2>
+
+        <div class="release">
+            <div class="release-image">
+                <img src="/Users/pedrogomes/Documents/Layer 31 copyyyy.jpg" alt="Afro Futuristik">
+            </div>
+            <div class="release-info">
+                <span class="release-year">2026</span>
+                <h3 class="release-title">Afro Futuristik</h3>
+                <p class="release-description">A timeless bridge between the sea and the African diaspora, where ancestral rhythms meet futuristic sound. An exploration of heritage, identity, and the journey across oceans.</p>
+                <div class="release-links">
+                    <a href="#" class="release-link">
+                        <svg viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                        Spotify
+                    </a>
+                    <a href="#" class="release-link">
+                        <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                        Apple Music
+                    </a>
+                    <a href="#" class="release-link">
+                        <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        YouTube
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="release">
+            <div class="release-image">
+                <img src="/Users/pedrogomes/.minimax-agent/projects/22/deus_e_porta.png" alt="Deus é Porta">
+            </div>
+            <div class="release-info">
+                <span class="release-year">Coming Soon</span>
+                <h3 class="release-title">Deus é Porta</h3>
+                <p class="release-description">A spiritual bridge between heaven, earth, and the story of overcoming challenges. Where faith meets rhythm and heritage meets the future.</p>
+                <div class="release-links">
+                    <a href="#" class="release-link">
+                        <svg viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                        Spotify
+                    </a>
+                    <a href="#" class="release-link">
+                        <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                        Apple Music
+                    </a>
+                    <a href="#" class="release-link">
+                        <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        YouTube
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Divider Player Section -->
+    <section class="video-section divider-player-section" id="video">
+        <h2 class="section-title" style="display: none;">Featured Video</h2>
+        <div class="video-container" style="display: none;">
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="RIKKA - Starlight (Official Video)" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="video-title">Starlight (Official Video)</div>
+        </div>
+        <div class="music-player-divider">
+            <audio id="audio-player" src="https://res.cloudinary.com/dzgqzeebg/video/upload/v1772626227/afro_fut_nqiv3o.wav" autoplay muted></audio>
+            <div class="music-player-row">
+                <div class="music-player-meta">
+                    <div class="album-art">
+                        <img src="/Users/pedrogomes/.minimax-agent/projects/22/image_1772625703828.png" alt="Album Art" />
+                    </div>
+                    <div class="music-player-details">
+                        <div class="music-player-title">Afro Futuristik</div>
+                        <div class="music-player-artist">RIKKA</div>
+                        <div class="music-player-progress">
+                            <div id="progress-bar"></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="play-button" id="play-btn" type="button" aria-label="Play or pause track">
+                    <svg class="play-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16">
+                        <path d="M11.596 8.697l-6.363 3.692c-.54.314-1.233-.065-1.233-.696V4.308c0-.63.693-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393"/>
+                    </svg>
+                    <svg class="pause-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16">
+                        <path d="M3 2h4v12H3zM9 2h4v12H9z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery" id="gallery" style="display: none;">
+        <h2 class="section-title">Gallery</h2>
+        <div class="gallery-wrapper">
+            <div class="gallery-item">
+                <img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&q=80" alt="Live Performance">
+                <div class="gallery-caption"><span>Live Performance</span></div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&q=80" alt="Studio Session">
+                <div class="gallery-caption"><span>Studio Session</span></div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&q=80" alt="Festival Performance">
+                <div class="gallery-caption"><span>Festival Performance</span></div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&q=80" alt="Backstage">
+                <div class="gallery-caption"><span>Backstage</span></div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=800&q=80" alt="Photoshoot">
+                <div class="gallery-caption"><span>Editorial</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Section -->
+    <section class="featured" id="featured">
+        <h2 class="section-title">Featured</h2>
+        <div class="featured-grid">
+            <div class="featured-item">
+                <img src="/Users/pedrogomes/.minimax-agent/projects/25/my_inspirations.png" alt="Featured 1">
+                <div class="featured-overlay">
+                    <span class="featured-label">Story</span>
+                    <span class="featured-title">Pain to Purpose</span>
+                </div>
+            </div>
+            <div class="featured-item">
+                <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&q=80" alt="Featured 2">
+                <div class="featured-overlay">
+                    <span class="featured-label">Interview</span>
+                    <span class="featured-title">Behind the Scenes</span>
+                </div>
+            </div>
+            <div class="featured-item">
+                <img src="https://res.cloudinary.com/dzgqzeebg/image/upload/v1772426168/hf_20260301_214454_187f349f-7937-44a6-be8f-aab1a2322ca4_bu9k9l.jpg" alt="Featured 3">
+                <div class="featured-overlay">
+                    <span class="featured-label">Partnership</span>
+                    <span class="featured-title">Rikka's New ArtDirector (Pedraw)</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Streaming Section -->
+    <section class="streaming" id="connect">
+        <h2 class="streaming-title">Listen &amp; Connect</h2>
+        <div class="streaming-links">
+            <a href="#" class="streaming-link">
+                <div class="icon-box">
+                    <svg viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                </div>
+                <span>Spotify</span>
+            </a>
+            <a href="#" class="streaming-link">
+                <div class="icon-box">
+                    <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                </div>
+                <span>Apple Music</span>
+            </a>
+            <a href="#" class="streaming-link">
+                <div class="icon-box">
+                    <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                </div>
+                <span>YouTube</span>
+            </a>
+            <a href="#" class="streaming-link">
+                <div class="icon-box">
+                    <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                </div>
+                <span>Instagram</span>
+            </a>
+            <a href="#" class="streaming-link">
+                <div class="icon-box">
+                    <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+                </div>
+                <span>TikTok</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p class="footer-statement">A vida é uma fortuna</p>
+        <a href="mailto:hello@fortunarecords.com" class="footer-email">hello@fortunarecords.com</a>
+        <div class="footer-socials" style="display: none;">
+            <a href="#">Instagram</a>
+            <a href="#">Twitter</a>
+            <a href="#">TikTok</a>
+            <a href="#">Spotify</a>
+            <a href="#">YouTube</a>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2024 RIKKA. All rights reserved.</span>
+            <a href="#" class="back-to-top">Back to top</a>
+        </div>
+    </footer>
+
+    <script>
+        // Preloader
+        const body = document.body;
+        const preloader = document.querySelector('.preloader');
+        const counter = document.querySelector('.preloader-counter');
+        const passwordGate = document.getElementById('password-gate');
+        const passwordInput = document.getElementById('password-input');
+        const passwordSubmit = document.getElementById('password-submit');
+        const passwordError = document.getElementById('password-error');
+        const SITE_PASSWORD = 'rikka';
+        let hasInteracted = false;
+        let count = 0;
+
+        const showPasswordGate = () => {
+            preloader.classList.add('hidden');
+            setTimeout(() => passwordInput.focus(), 120);
+        };
+
+        const unlockSite = () => {
+            passwordGate.classList.remove('is-visible');
+            passwordGate.setAttribute('aria-hidden', 'true');
+            body.classList.remove('site-locked');
+            passwordError.textContent = '';
+            passwordInput.value = '';
+        };
+
+        const submitPassword = () => {
+            if (passwordInput.value.trim().toLowerCase() === SITE_PASSWORD) {
+                hasInteracted = true;
+                audioPlayer.muted = false;
+                audioPlayer.play().catch(function(error) {
+                    console.log('Playback blocked:', error);
+                });
+                unlockSite();
+                return;
+            }
+            passwordError.textContent = 'Wrong password. Try again.';
+            passwordInput.select();
+        };
+
+        passwordSubmit.addEventListener('click', submitPassword);
+        passwordInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') submitPassword();
+        });
+
+        function updateCounter() {
+            if (count < 100) {
+                count += Math.random() * 15;
+                if (count > 100) count = 100;
+                counter.textContent = Math.floor(count) + '%';
+                setTimeout(updateCounter, 100);
+            } else {
+                setTimeout(() => {
+                    showPasswordGate();
+                }, 500);
+            }
+        }
+
+        updateCounter();
+
+        // Custom Cursor
+        const cursor = document.querySelector('.cursor');
+        const links = document.querySelectorAll('a, .gallery-item, .featured-item');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX - 5 + 'px';
+            cursor.style.top = e.clientY - 5 + 'px';
+        });
+
+        links.forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                cursor.classList.add('hover');
+            });
+            link.addEventListener('mouseleave', () => {
+                cursor.classList.remove('hover');
+            });
+        });
+
+        // Smooth Scroll for Navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Back to top
+        document.querySelector('.back-to-top').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Scroll Reveal Animation
+        const revealElements = document.querySelectorAll('.section-title, .release, .video-container, .gallery-item, .featured-item, .streaming-title, .streaming-links, .footer-statement, .footer-email, .footer-socials');
+
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+
+            revealElements.forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < windowHeight - elementVisible) {
+                    el.classList.add('visible');
+                }
+            });
+        };
+
+        // Initial check
+        setTimeout(revealOnScroll, 100);
+        window.addEventListener('scroll', revealOnScroll);
+
+        // Navbar Hide/Show on Scroll
+        let lastScrollY = window.scrollY;
+        const navbar = document.querySelector('nav');
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                navbar.classList.add('hidden');
+            } else {
+                navbar.classList.remove('hidden');
+            }
+
+            lastScrollY = currentScrollY;
+        });
+
+        // Gallery drag scroll
+        const gallery = document.querySelector('.gallery-wrapper');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        gallery.addEventListener('mousedown', (e) => {
+            isDown = true;
+            startX = e.pageX - gallery.offsetLeft;
+            scrollLeft = gallery.scrollLeft;
+        });
+
+        gallery.addEventListener('mouseleave', () => {
+            isDown = false;
+        });
+
+        gallery.addEventListener('mouseup', () => {
+            isDown = false;
+        });
+
+        gallery.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - gallery.offsetLeft;
+            const walk = (x - startX) * 2;
+            gallery.scrollLeft = scrollLeft - walk;
+        });
+
+        // Audio Player Functionality
+        const audioPlayer = document.getElementById('audio-player');
+        const playBtn = document.getElementById('play-btn');
+        const playIcon = playBtn.querySelector('.play-icon');
+        const pauseIcon = playBtn.querySelector('.pause-icon');
+        const progressBar = document.getElementById('progress-bar');
+
+        const syncPlayerUI = () => {
+            const isPlaying = !audioPlayer.paused;
+            playIcon.style.display = isPlaying ? 'none' : 'block';
+            pauseIcon.style.display = isPlaying ? 'block' : 'none';
+            playBtn.setAttribute('aria-pressed', String(isPlaying));
+        };
+
+        // Start playback as soon as page loads (muted for browser compatibility)
+        audioPlayer.muted = true;
+        audioPlayer.play().catch(function(error) {
+            console.log('Autoplay prevented:', error);
+        });
+
+        // Remove muted attribute on first user interaction to enable sound
+        const enableAudioOnFirstInteraction = function() {
+            if (hasInteracted || body.classList.contains('site-locked')) return;
+            hasInteracted = true;
+            document.removeEventListener('click', enableAudioOnFirstInteraction);
+            audioPlayer.muted = false;
+            audioPlayer.play().catch(function(error) {
+                console.log('Autoplay prevented:', error);
+            });
+        };
+        document.addEventListener('click', enableAudioOnFirstInteraction);
+
+        playBtn.addEventListener('click', function() {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+        });
+
+        // Update progress bar as song plays
+        audioPlayer.addEventListener('timeupdate', function() {
+            const progress = audioPlayer.duration ? (audioPlayer.currentTime / audioPlayer.duration) * 100 : 0;
+            progressBar.style.width = progress + '%';
+        });
+
+        // Reset icon when audio ends
+        audioPlayer.addEventListener('ended', function() {
+            progressBar.style.width = '0%';
+            syncPlayerUI();
+        });
+
+        audioPlayer.addEventListener('play', syncPlayerUI);
+        audioPlayer.addEventListener('pause', syncPlayerUI);
+        syncPlayerUI();
+    </script>
+</body>
+</html>
