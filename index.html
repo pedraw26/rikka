@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>RIKKA | Official Artist Site</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,6 +27,8 @@
 
         html {
             scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
         }
 
         body {
@@ -311,8 +313,9 @@
         /* Show mobile image on smaller screens */
         @media (max-width: 768px) {
             .hero {
-                height: 92svh;
-                min-height: 92svh;
+                height: 74svh;
+                min-height: 74svh;
+                max-height: 760px;
             }
 
             .hero-image.desktop {
@@ -322,15 +325,15 @@
             .hero-image.mobile {
                 display: block;
                 background-size: 100% auto !important;
-                background-position: center top !important;
+                background-position: center 8% !important;
                 background-color: #0a0a0a;
             }
         }
 
         @media (max-width: 480px) {
             .hero {
-                height: 88svh;
-                min-height: 88svh;
+                height: 68svh;
+                min-height: 68svh;
             }
         }
 
