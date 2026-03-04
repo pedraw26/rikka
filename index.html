@@ -109,7 +109,7 @@
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
-            transition: opacity 0.35s ease, visibility 0.35s ease;
+            transition: none;
         }
 
         .password-gate.is-visible {
@@ -149,7 +149,7 @@
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 0;
             padding: 0.78rem 0.9rem;
-            font-size: 0.85rem;
+            font-size: 16px;
             letter-spacing: 0.08em;
             margin-bottom: 0.75rem;
             outline: none;
@@ -1405,7 +1405,6 @@
 
         const showPasswordGate = () => {
             preloader.classList.add('hidden');
-            setTimeout(() => passwordInput.focus(), 120);
         };
 
         const unlockSite = () => {
@@ -1419,6 +1418,7 @@
         const submitPassword = () => {
             if (passwordInput.value.trim().toLowerCase() === SITE_PASSWORD) {
                 hasInteracted = true;
+                passwordInput.blur();
                 audioPlayer.muted = false;
                 audioPlayer.play().catch(function(error) {
                     console.log('Playback blocked:', error);
