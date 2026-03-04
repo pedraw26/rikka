@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RIKKA | Official Artist Site</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23ff1493'/%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -363,16 +364,20 @@
             letter-spacing: 0.3em;
             text-transform: uppercase;
             color: var(--text-secondary);
-            margin-top: 2rem;
             opacity: 0;
             transform: translateY(30px);
             animation: fadeInUp 1s var(--transition-cinematic) 0.8s forwards;
         }
 
+        .hero-bottom-row {
+            margin-top: 2rem;
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
         .hero-cta {
-            position: absolute;
-            bottom: 5vw;
-            right: 5vw;
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -1133,20 +1138,20 @@
                 padding: 1.5rem 5vw;
             }
 
+            .hero {
+                height: 94svh;
+            }
+
             .hero-content {
-                margin-bottom: 8.1rem;
+                margin-bottom: 6.6rem;
             }
 
-            .hero-cta {
-                bottom: 9.3rem;
-            }
-
-            .hero-subtitle {
-                margin-top: 1.2rem;
+            .hero-bottom-row {
+                margin-top: 1.15rem;
             }
 
             .music {
-                padding-top: 1.4rem;
+                padding-top: 0.8rem;
             }
 
             .nav-links {
@@ -1231,10 +1236,6 @@
                 font-size: 0.75rem;
             }
 
-            .hero-cta {
-                bottom: 9.55rem;
-            }
-
             .gallery-item {
                 width: 85vw;
             }
@@ -1276,7 +1277,7 @@
         }
     </style>
 </head>
-<body class="site-locked">
+<body>
     <!-- Custom Cursor -->
     <div class="cursor"></div>
 
@@ -1291,7 +1292,7 @@
         </div>
     </div>
 
-    <div class="password-gate is-visible" id="password-gate" aria-hidden="false">
+    <div class="password-gate" id="password-gate" aria-hidden="true">
         <div class="password-gate-card">
             <h2 class="password-gate-title">ACCE$$</h2>
             <p class="password-gate-subtitle">Enter Password</p>
@@ -1318,12 +1319,14 @@
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1 class="hero-title">Rikka</h1>
-            <p class="hero-subtitle">Afro Futuristik</p>
+            <div class="hero-bottom-row">
+                <p class="hero-subtitle">Afro Futuristik</p>
+                <a href="#music" class="hero-cta">
+                    <span>Scroll</span>
+                    <span class="line"></span>
+                </a>
+            </div>
         </div>
-        <a href="#music" class="hero-cta">
-            <span>Scroll</span>
-            <span class="line"></span>
-        </a>
     </section>
 
     <!-- Music Section -->
@@ -1463,10 +1466,10 @@
                 </div>
             </div>
             <div class="featured-item">
-                <img src="https://res.cloudinary.com/dzgqzeebg/image/upload/v1772653579/xxxxUntitled-11_copy_o8up68.jpg" alt="Featured 3">
+                <img src="https://res.cloudinary.com/dzgqzeebg/image/upload/v1772656624/the_ghost_iarpxf.jpg" alt="Featured 3">
                 <div class="featured-overlay">
                     <span class="featured-label">Partnership</span>
-                    <span class="featured-title">HollyGhost Chooses Rikka</span>
+                    <span class="featured-title">HolyGhost Chooses Rikka</span>
                 </div>
             </div>
         </div>
@@ -1513,8 +1516,11 @@
         <div class="newsletter-card">
             <h3 class="newsletter-title">Never Miss A Drop</h3>
             <p class="newsletter-copy">Join the early list for release drops, exclusive snippets, and live mix updates.</p>
-            <form class="newsletter-form" id="newsletter-form">
-                <input class="newsletter-input" id="newsletter-email" type="email" placeholder="Enter email" required>
+            <form class="newsletter-form" id="newsletter-form" action="https://formsubmit.co/rikkarecords@gmail.com" method="POST">
+                <input type="hidden" name="_subject" value="RIKKA Newsletter Signup">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_next" value="https://pedraw26.github.io/rikka/?subscribed=1#newsletter">
+                <input class="newsletter-input" id="newsletter-email" type="email" name="email" placeholder="Enter email" required>
                 <button class="newsletter-button" type="submit">Subscribe</button>
             </form>
             <label class="newsletter-consent" for="newsletter-consent">
@@ -1552,11 +1558,20 @@
         const passwordSubmit = document.getElementById('password-submit');
         const passwordError = document.getElementById('password-error');
         const SITE_PASSWORD = 'rikka';
+        const PASSWORD_GATE_ENABLED = false;
         let hasInteracted = false;
         let count = 0;
 
         const showPasswordGate = () => {
             preloader.classList.add('hidden');
+            if (!PASSWORD_GATE_ENABLED) {
+                body.classList.remove('site-locked');
+                tryAutoplay();
+                return;
+            }
+            body.classList.add('site-locked');
+            passwordGate.classList.add('is-visible');
+            passwordGate.setAttribute('aria-hidden', 'false');
         };
 
         const unlockSite = () => {
@@ -1643,20 +1658,16 @@
             });
         });
 
-        // Newsletter submit interaction
+        // Newsletter status
         const newsletterForm = document.getElementById('newsletter-form');
         const newsletterEmail = document.getElementById('newsletter-email');
         const newsletterSuccess = document.getElementById('newsletter-success');
         if (newsletterForm && newsletterEmail && newsletterSuccess) {
-            newsletterForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                if (!newsletterForm.checkValidity()) {
-                    newsletterForm.reportValidity();
-                    return;
-                }
+            const isSubscribed = new URLSearchParams(window.location.search).get('subscribed') === '1';
+            if (isSubscribed) {
                 newsletterForm.style.display = 'none';
                 newsletterSuccess.style.display = 'block';
-            });
+            }
         }
 
         // Scroll Reveal Animation
@@ -1743,6 +1754,13 @@
         const baseVolume = 1;
         const fadeDuration = 8;
 
+        function tryAutoplay() {
+            audioPlayer.muted = true;
+            audioPlayer.play().catch(function() {
+                // Retry silently when media becomes ready/visible.
+            });
+        }
+
         const syncPlayerUI = () => {
             const isPlaying = !audioPlayer.paused;
             playIcon.style.display = isPlaying ? 'none' : 'block';
@@ -1751,9 +1769,14 @@
         };
 
         // Start playback as soon as page loads (muted for browser compatibility)
-        audioPlayer.muted = true;
-        audioPlayer.play().catch(function(error) {
-            console.log('Autoplay prevented:', error);
+        tryAutoplay();
+        audioPlayer.addEventListener('canplay', function() {
+            if (audioPlayer.paused) tryAutoplay();
+        }, { once: true });
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && audioPlayer.paused && !hasInteracted) {
+                tryAutoplay();
+            }
         });
 
         // Remove muted attribute on first user interaction to enable sound
@@ -1761,12 +1784,14 @@
             if (hasInteracted || body.classList.contains('site-locked')) return;
             hasInteracted = true;
             document.removeEventListener('click', enableAudioOnFirstInteraction);
+            document.removeEventListener('touchstart', enableAudioOnFirstInteraction);
             audioPlayer.muted = false;
             audioPlayer.play().catch(function(error) {
                 console.log('Autoplay prevented:', error);
             });
         };
         document.addEventListener('click', enableAudioOnFirstInteraction);
+        document.addEventListener('touchstart', enableAudioOnFirstInteraction, { passive: true });
 
         playBtn.addEventListener('click', function() {
             if (audioPlayer.paused) {
