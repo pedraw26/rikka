@@ -1138,22 +1138,6 @@
                 padding: 1.5rem 5vw;
             }
 
-            .hero {
-                height: 94svh;
-            }
-
-            .hero-content {
-                margin-bottom: 6.6rem;
-            }
-
-            .hero-bottom-row {
-                margin-top: 1.15rem;
-            }
-
-            .music {
-                padding-top: 0.8rem;
-            }
-
             .nav-links {
                 gap: 1.5rem;
             }
@@ -1516,17 +1500,14 @@
         <div class="newsletter-card">
             <h3 class="newsletter-title">Never Miss A Drop</h3>
             <p class="newsletter-copy">Join the early list for release drops, exclusive snippets, and live mix updates.</p>
-            <form class="newsletter-form" id="newsletter-form" action="https://formsubmit.co/rikkarecords@gmail.com" method="POST">
-                <input type="hidden" name="_subject" value="RIKKA Newsletter Signup">
-                <input type="hidden" name="_captcha" value="false">
-                <input type="hidden" name="_next" value="https://pedraw26.github.io/rikka/?subscribed=1#newsletter">
+            <form class="newsletter-form" id="newsletter-form">
                 <input class="newsletter-input" id="newsletter-email" type="email" name="email" placeholder="Enter email" required>
                 <button class="newsletter-button" type="submit">Subscribe</button>
+                <label class="newsletter-consent" for="newsletter-consent">
+                    <input id="newsletter-consent" name="consent" type="checkbox" required>
+                    <span>I agree to receive email updates from Rikka. You can unsubscribe any time.</span>
+                </label>
             </form>
-            <label class="newsletter-consent" for="newsletter-consent">
-                <input id="newsletter-consent" type="checkbox" required>
-                <span>I agree to receive email updates from Rikka. You can unsubscribe any time.</span>
-            </label>
             <p class="newsletter-success" id="newsletter-success">Email sent. Check your inbox for confirmation.</p>
         </div>
     </section>
@@ -1658,16 +1639,49 @@
             });
         });
 
-        // Newsletter status
+        // Newsletter submit (inline, no redirect)
         const newsletterForm = document.getElementById('newsletter-form');
         const newsletterEmail = document.getElementById('newsletter-email');
         const newsletterSuccess = document.getElementById('newsletter-success');
         if (newsletterForm && newsletterEmail && newsletterSuccess) {
-            const isSubscribed = new URLSearchParams(window.location.search).get('subscribed') === '1';
-            if (isSubscribed) {
-                newsletterForm.style.display = 'none';
+            newsletterForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                if (!newsletterForm.checkValidity()) {
+                    newsletterForm.reportValidity();
+                    return;
+                }
+
+                const submitBtn = newsletterForm.querySelector('.newsletter-button');
+                if (submitBtn) submitBtn.disabled = true;
+                newsletterSuccess.textContent = 'Sending...';
                 newsletterSuccess.style.display = 'block';
-            }
+
+                const formData = new FormData();
+                formData.append('email', newsletterEmail.value.trim());
+                formData.append('consent', 'true');
+                formData.append('_subject', 'RIKKA Newsletter Signup');
+                formData.append('_captcha', 'false');
+
+                try {
+                    const res = await fetch('https://formsubmit.co/ajax/rikkarecords@gmail.com', {
+                        method: 'POST',
+                        headers: { 'Accept': 'application/json' },
+                        body: formData
+                    });
+                    const data = await res.json().catch(() => ({}));
+
+                    if (!res.ok || data.success === 'false') {
+                        throw new Error(data.message || 'Submission failed');
+                    }
+
+                    newsletterForm.style.display = 'none';
+                    newsletterSuccess.textContent = "You're in! We'll send you new drops and updates first.";
+                } catch (err) {
+                    newsletterSuccess.textContent = 'Could not submit now. Please try again.';
+                    newsletterSuccess.style.display = 'block';
+                    if (submitBtn) submitBtn.disabled = false;
+                }
+            });
         }
 
         // Scroll Reveal Animation
