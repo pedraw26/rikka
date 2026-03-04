@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RIKKA | Official Artist Site</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,8 +27,6 @@
 
         html {
             scroll-behavior: smooth;
-            -webkit-text-size-adjust: 100%;
-            text-size-adjust: 100%;
         }
 
         body {
@@ -312,28 +310,12 @@
 
         /* Show mobile image on smaller screens */
         @media (max-width: 768px) {
-            .hero {
-                height: 74svh;
-                min-height: 74svh;
-                max-height: 760px;
-            }
-
             .hero-image.desktop {
                 display: none;
             }
 
             .hero-image.mobile {
                 display: block;
-                background-size: 100% auto !important;
-                background-position: center 8% !important;
-                background-color: #0a0a0a;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero {
-                height: 68svh;
-                min-height: 68svh;
             }
         }
 
@@ -632,19 +614,70 @@
             display: none;
         }
 
-        /* Video Section */
+        /* Mobile Nav Hamburger */
+        .nav-hamburger {
             display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 4px;
+            background: none;
+            border: none;
         }
 
-        #play-toggle:checked + .track-info .icon-pause {
+        .nav-hamburger span {
             display: block;
+            width: 24px;
+            height: 1px;
+            background: var(--white);
+            transition: all 0.3s var(--transition-smooth);
         }
 
-        .control-button.d {
-            width: 40px;
-            height: 40px;
-            border: 1px solid var(--accent);
-            border-radius: 50%;
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.97);
+            z-index: 999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2.5rem;
+        }
+
+        .mobile-menu.open {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            color: var(--white);
+            text-decoration: none;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s var(--transition-cinematic) forwards;
+        }
+
+        .mobile-menu a:nth-child(1) { animation-delay: 0.1s; }
+        .mobile-menu a:nth-child(2) { animation-delay: 0.2s; }
+        .mobile-menu a:nth-child(3) { animation-delay: 0.3s; }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 2rem;
+            right: 5vw;
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
         }
 
         /* Video Section */
@@ -1053,11 +1086,11 @@
             }
 
             .nav-links {
-                gap: 1.5rem;
+                display: none;
             }
 
-            .nav-links a {
-                font-size: 0.65rem;
+            .nav-hamburger {
+                display: flex;
             }
 
             .logo {
@@ -1119,6 +1152,7 @@
 
             .gallery-item {
                 width: 85vw;
+                min-width: unset;
             }
 
             .icon-box {
@@ -1191,7 +1225,20 @@
             <li><a href="#featured">Featured</a></li>
             <li><a href="#connect">Links</a></li>
         </ul>
+        <button class="nav-hamburger" id="hamburger-btn" aria-label="Open menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <button class="mobile-menu-close" id="mobile-menu-close" aria-label="Close menu">&times;</button>
+        <a href="#music" class="mobile-nav-link">Music</a>
+        <a href="#featured" class="mobile-nav-link">Featured</a>
+        <a href="#connect" class="mobile-nav-link">Links</a>
+    </div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -1394,7 +1441,7 @@
     <!-- Footer -->
     <footer>
         <p class="footer-statement">A vida é uma fortuna</p>
-        <a href="mailto:hello@fortunarecords.com" class="footer-email">hello@fortunarecords.com</a>
+        <a href="/cdn-cgi/l/email-protection#5038353c3c3f10363f2224253e312235333f2234237e333f3d" class="footer-email"><span class="__cf_email__" data-cfemail="e78f828b8b88a78188959392898695828488958394c984888a">[email&#160;protected]</span></a>
         <div class="footer-socials" style="display: none;">
             <a href="#">Instagram</a>
             <a href="#">Twitter</a>
@@ -1408,7 +1455,7 @@
         </div>
     </footer>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // Preloader
         const body = document.body;
         const preloader = document.querySelector('.preloader');
@@ -1619,15 +1666,26 @@
             progressBar.style.width = progress + '%';
         });
 
-        // Reset icon when audio ends
-        audioPlayer.addEventListener('ended', function() {
-            progressBar.style.width = '0%';
-            syncPlayerUI();
+        // Hamburger Menu
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuClose = document.getElementById('mobile-menu-close');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+        hamburgerBtn.addEventListener('click', () => {
+            mobileMenu.classList.add('open');
+            body.style.overflow = 'hidden';
         });
 
-        audioPlayer.addEventListener('play', syncPlayerUI);
-        audioPlayer.addEventListener('pause', syncPlayerUI);
-        syncPlayerUI();
+        const closeMobileMenu = () => {
+            mobileMenu.classList.remove('open');
+            body.style.overflow = '';
+        };
+
+        mobileMenuClose.addEventListener('click', closeMobileMenu);
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', closeMobileMenu);
+        });
     </script>
 </body>
 </html>
