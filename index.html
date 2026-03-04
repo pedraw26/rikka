@@ -310,11 +310,20 @@
 
         /* Show mobile image on smaller screens */
         @media (max-width: 768px) {
+            .hero {
+                height: 100dvh;
+                min-height: 100svh;
+            }
+
             .hero-image.desktop {
                 display: none;
             }
+
             .hero-image.mobile {
                 display: block;
+                background-size: contain;
+                background-position: center top;
+                background-color: #0a0a0a;
             }
         }
 
