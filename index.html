@@ -364,20 +364,16 @@
             letter-spacing: 0.3em;
             text-transform: uppercase;
             color: var(--text-secondary);
+            margin-top: 2rem;
             opacity: 0;
             transform: translateY(30px);
             animation: fadeInUp 1s var(--transition-cinematic) 0.8s forwards;
         }
 
-        .hero-bottom-row {
-            margin-top: 2rem;
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            gap: 1rem;
-        }
-
         .hero-cta {
+            position: absolute;
+            bottom: 5vw;
+            right: 5vw;
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -1303,14 +1299,12 @@
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1 class="hero-title">Rikka</h1>
-            <div class="hero-bottom-row">
-                <p class="hero-subtitle">Afro Futuristik</p>
-                <a href="#music" class="hero-cta">
-                    <span>Scroll</span>
-                    <span class="line"></span>
-                </a>
-            </div>
+            <p class="hero-subtitle">Afro Futuristik</p>
         </div>
+        <a href="#music" class="hero-cta">
+            <span>Scroll</span>
+            <span class="line"></span>
+        </a>
     </section>
 
     <!-- Music Section -->
