@@ -311,8 +311,8 @@
         /* Show mobile image on smaller screens */
         @media (max-width: 768px) {
             .hero {
-                height: 100dvh;
-                min-height: 100svh;
+                height: 92svh;
+                min-height: 92svh;
             }
 
             .hero-image.desktop {
@@ -321,9 +321,16 @@
 
             .hero-image.mobile {
                 display: block;
-                background-size: contain;
-                background-position: center top;
+                background-size: 100% auto !important;
+                background-position: center top !important;
                 background-color: #0a0a0a;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero {
+                height: 88svh;
+                min-height: 88svh;
             }
         }
 
