@@ -1023,33 +1023,33 @@
             letter-spacing: 0.04em;
         }
 
-        .newsletter-consent {
+        .newsletter-consent-wrap {
             margin-top: 0.75rem;
-            color: rgba(255, 255, 255, 0.55);
-            font-size: 0.72rem;
-            line-height: 1.5;
-            text-align: left;
             display: flex;
             align-items: flex-start;
             gap: 0.55rem;
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
         }
 
-        .newsletter-consent input[type="checkbox"] {
-            margin-top: 0.15rem;
-            width: 14px;
-            height: 14px;
+        .newsletter-consent-wrap input[type="checkbox"] {
+            margin-top: 0.1rem;
+            width: 18px;
+            height: 18px;
             accent-color: #ffffff;
             flex-shrink: 0;
             -webkit-appearance: checkbox;
             appearance: auto;
             cursor: pointer;
+            pointer-events: auto;
         }
 
-        .newsletter-consent span {
+        .newsletter-consent {
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 0.72rem;
+            line-height: 1.5;
+            text-align: left;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
             flex: 1;
         }
 
@@ -1558,10 +1558,10 @@
             <form class="newsletter-form" id="newsletter-form">
                 <input class="newsletter-input" id="newsletter-email" type="email" name="email" placeholder="Enter email" required>
                 <button class="newsletter-button" type="submit">Subscribe</button>
-                <label class="newsletter-consent">
-                    <input id="newsletter-consent" name="consent" type="checkbox" required>
-                    <span>I agree to receive email updates from Rikka. You can unsubscribe any time.</span>
-                </label>
+                <div class="newsletter-consent-wrap">
+                    <input id="newsletter-consent" name="consent" type="checkbox">
+                    <label class="newsletter-consent" for="newsletter-consent">I agree to receive email updates from Rikka. You can unsubscribe any time.</label>
+                </div>
             </form>
             <p class="newsletter-success" id="newsletter-success">Email sent. Check your inbox for confirmation.</p>
         </div>
@@ -1701,10 +1701,14 @@
         const newsletterConsent = document.getElementById('newsletter-consent');
         const newsletterSuccess = document.getElementById('newsletter-success');
         if (newsletterForm && newsletterEmail && newsletterSuccess && newsletterConsent) {
+            newsletterForm.setAttribute('novalidate', 'novalidate');
+
             newsletterForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                if (!newsletterForm.checkValidity()) {
-                    newsletterForm.reportValidity();
+                if (!newsletterEmail.value.trim() || !newsletterEmail.checkValidity()) {
+                    newsletterSuccess.textContent = 'Please enter a valid email address.';
+                    newsletterSuccess.style.display = 'block';
+                    newsletterEmail.focus();
                     return;
                 }
                 if (!newsletterConsent.checked) {
