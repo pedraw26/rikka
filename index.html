@@ -370,18 +370,6 @@
             animation: fadeInUp 1s var(--transition-cinematic) 0.8s forwards;
         }
 
-        .hero-bottom-rail {
-            position: absolute;
-            left: 5vw;
-            right: 5vw;
-            bottom: 2.1rem;
-            z-index: 11;
-            display: none;
-            align-items: baseline;
-            justify-content: space-between;
-            gap: 1rem;
-        }
-
         .hero-cta {
             position: absolute;
             bottom: 5vw;
@@ -1146,21 +1134,29 @@
                 padding: 1.5rem 5vw;
             }
 
+            .hero {
+                --hero-meta-bottom: 9.4rem;
+            }
+
             .hero-content {
-                padding-bottom: 5.4rem;
+                position: absolute;
+                left: 5vw;
+                right: 5vw;
+                bottom: var(--hero-meta-bottom);
+                width: auto;
+                margin-bottom: 0;
+                padding-bottom: 3.2rem;
             }
 
-            .hero-content .hero-subtitle,
-            .hero > .hero-cta {
-                display: none;
+            .hero-title {
+                margin: 0;
             }
 
-            .hero-bottom-rail {
-                display: flex;
-            }
-
-            .hero-bottom-rail .hero-subtitle {
-                margin-top: 0;
+            .hero-subtitle {
+                position: absolute;
+                left: 0;
+                bottom: 0;
+                margin: 0;
                 font-size: 0.75rem;
                 line-height: 1;
                 opacity: 1;
@@ -1168,14 +1164,12 @@
                 animation: none;
             }
 
-            .hero-bottom-rail .hero-cta {
-                position: static;
-                bottom: auto;
-                right: auto;
-                display: flex;
-                align-items: baseline;
+            .hero-cta {
+                bottom: var(--hero-meta-bottom);
+                right: 5vw;
                 font-size: 0.75rem;
                 line-height: 1;
+                align-items: center;
                 opacity: 1;
                 transform: none;
                 animation: none;
@@ -1255,16 +1249,21 @@
         }
 
         @media (max-width: 480px) {
+            .hero {
+                --hero-meta-bottom: 9.45rem;
+            }
+
             .hero-title {
                 font-size: clamp(3rem, 12vw, 6rem);
             }
 
             .hero-content {
-                padding-bottom: 5rem;
+                bottom: var(--hero-meta-bottom);
+                padding-bottom: 3rem;
             }
 
-            .hero-bottom-rail {
-                bottom: 1.9rem;
+            .hero-cta {
+                bottom: var(--hero-meta-bottom);
             }
 
             .gallery-item {
@@ -1356,13 +1355,6 @@
             <span>Scroll</span>
             <span class="line"></span>
         </a>
-        <div class="hero-bottom-rail">
-            <p class="hero-subtitle">Afro Futuristik</p>
-            <a href="#music" class="hero-cta">
-                <span>Scroll</span>
-                <span class="line"></span>
-            </a>
-        </div>
     </section>
 
     <!-- Music Section -->
