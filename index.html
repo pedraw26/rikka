@@ -654,6 +654,36 @@
             background: transparent;
         }
 
+        /* ── RIKKA Widget ── */
+        .rk-widget { width: 100%; overflow: hidden; font-family: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; }
+        .rk-now-playing { background: #111; padding: 28px 5vw 24px; display: flex; gap: 20px; align-items: center; position: relative; }
+        .rk-album-art { width: 160px; height: 160px; border-radius: 6px; overflow: hidden; flex-shrink: 0; }
+        .rk-album-art img { width: 100%; height: 100%; object-fit: cover; }
+        .rk-track-info { flex: 1; min-width: 0; }
+        .rk-track-title { font-size: 28px; font-weight: 600; letter-spacing: -0.3px; color: #f5e6d8; margin-bottom: 4px; }
+        .rk-artist-name { font-size: 14px; color: #f5e6d8; display: flex; align-items: center; gap: 6px; }
+        .rk-verified { width: 16px; height: 16px; background: #1d9bf0; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .rk-verified svg { width: 10px; height: 10px; fill: #fff; }
+        .rk-controls { background: #111; padding: 0 5vw 28px; }
+        .rk-controls-row { display: flex; align-items: center; gap: 12px; }
+        .rk-btn { background: none; border: none; cursor: pointer; color: #e8d5c4; display: flex; align-items: center; justify-content: center; padding: 4px; }
+        .rk-btn:hover { color: #fff; }
+        .rk-btn svg { width: 20px; height: 20px; fill: currentColor; }
+        .rk-progress-bar { flex: 1; height: 3px; background: #444; border-radius: 2px; position: relative; cursor: pointer; }
+        .rk-progress-fill { position: absolute; left: 0; top: 0; width: 0%; height: 100%; background: #fa2d48; border-radius: 2px; pointer-events: none; }
+        .rk-time { font-size: 13px; color: #e8d5c4; min-width: 38px; text-align: center; }
+        .rk-play-btn { width: 58px; height: 58px; background: #fff !important; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-left: auto; flex-shrink: 0; }
+        .rk-play-btn svg { width: 22px; height: 22px; fill: #000; margin-left: 2px; }
+        .rk-play-btn:hover { transform: scale(1.05); }
+        .rk-track-list { margin-top: 0; }
+        .rk-track-item { display: flex; align-items: center; padding: 16px 5vw; background: #111; cursor: pointer; border-bottom: 1px solid #1a1a1a; }
+        .rk-track-item:hover { background: #1a1a1a; }
+        .rk-track-num { font-size: 14px; color: #888; width: 28px; text-align: center; flex-shrink: 0; }
+        .rk-track-details { flex: 1; min-width: 0; }
+        .rk-track-item-title { font-size: 15px; font-weight: 500; letter-spacing: -0.1px; color: #f5e6d8; margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
+        .rk-track-dur { font-size: 13px; color: #888; flex-shrink: 0; margin-left: 16px; }
+        .rk-pill { display: inline-block; font-size: 7px; font-weight: 600; color: #fff; background: #d94452; border: none; border-radius: 3px; padding: 5px 12px; margin-left: 8px; vertical-align: middle; letter-spacing: 0.5px; text-transform: uppercase; }
+
         .music-player-divider {
             width: 100vw;
             margin-left: calc(-50vw + 50%);
@@ -1430,38 +1460,38 @@
         </div>
     </section>
 
-    <!-- Divider Player Section -->
+    <!-- Music Widget Section -->
     <section class="video-section divider-player-section" id="video">
-        <h2 class="section-title" style="display: none;">Featured Video</h2>
-        <div class="video-container" style="display: none;">
-            <div class="video-wrapper">
-                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="RIKKA - Starlight (Official Video)" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-            <div class="video-title">Starlight (Official Video)</div>
-        </div>
-        <div class="music-player-divider">
-            <audio id="audio-player" src="https://res.cloudinary.com/dzgqzeebg/video/upload/v1772626227/afro_fut_nqiv3o.wav" autoplay muted></audio>
-            <div class="music-player-row">
-                <div class="music-player-meta">
-                    <div class="album-art">
-                        <img src="https://res.cloudinary.com/dzgqzeebg/image/upload/v1772635256/IMG_1395_bpam1y.jpg" alt="Album Art" />
-                    </div>
-                    <div class="music-player-details">
-                        <div class="music-player-title">Afro Futuristik</div>
-                        <div class="music-player-artist">RIKKA</div>
-                        <div class="music-player-progress">
-                            <div id="progress-bar"></div>
-                        </div>
-                    </div>
+        <audio id="audio-player" preload="metadata" src="https://res.cloudinary.com/dzgqzeebg/video/upload/v1772626227/afro_fut_nqiv3o.wav"></audio>
+        <div class="rk-widget">
+            <div class="rk-now-playing">
+
+                <div class="rk-album-art"><img src="https://res.cloudinary.com/dzgqzeebg/image/upload/v1772744421/rikissima_copy_utslko.jpg" alt="Afro Futuristik album art"></div>
+                <div class="rk-track-info">
+                    <div class="rk-track-title">Afro Futuristik</div>
+                    <div class="rk-artist-name">RIKKA <span class="rk-verified"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span></div>
                 </div>
-                <button class="play-button" id="play-btn" type="button" aria-label="Play or pause track">
-                    <svg class="play-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16">
-                        <path d="M11.596 8.697l-6.363 3.692c-.54.314-1.233-.065-1.233-.696V4.308c0-.63.693-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393"/>
-                    </svg>
-                    <svg class="pause-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16">
-                        <path d="M3 2h4v12H3zM9 2h4v12H9z"/>
-                    </svg>
-                </button>
+            </div>
+            <div class="rk-controls">
+                <div class="rk-controls-row">
+                    <button class="rk-btn" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+                    <div class="rk-progress-bar" id="rk-progressBar"><div class="rk-progress-fill" id="rk-progressFill"></div></div>
+                    <button class="rk-btn" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+                    <span class="rk-time" id="rk-time">00:00</span>
+                    <button class="rk-btn rk-play-btn" id="rk-play-btn" aria-label="Play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+                </div>
+            </div>
+            <div class="rk-track-list">
+                <div class="rk-track-item" id="rk-track1">
+                    <span class="rk-track-num">1</span>
+                    <div class="rk-track-details"><div class="rk-track-item-title">Afro Futuristik</div></div>
+                    <span class="rk-track-dur">03:05</span>
+                </div>
+                <div class="rk-track-item">
+                    <span class="rk-track-num">2</span>
+                    <div class="rk-track-details"><div class="rk-track-item-title">Deus é Porta <span class="rk-pill">PRE-RELEASE</span></div></div>
+                    <span class="rk-track-dur">03:11</span>
+                </div>
             </div>
         </div>
     </section>
@@ -1600,8 +1630,9 @@
         const passwordInput = document.getElementById('password-input');
         const passwordSubmit = document.getElementById('password-submit');
         const passwordError = document.getElementById('password-error');
-        const SITE_PASSWORD = 'boss';
-        const PASSWORD_GATE_ENABLED = true;
+        const audioPlayer = document.getElementById('audio-player');
+        const SITE_PASSWORD = 'rikka';
+        const PASSWORD_GATE_ENABLED = false;
         let hasInteracted = false;
         let count = 0;
 
@@ -1694,13 +1725,16 @@
         });
 
         // Back to top
-        document.querySelector('.back-to-top').addEventListener('click', function(e) {
-            e.preventDefault();
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
+        const backToTop = document.querySelector('.back-to-top');
+        if (backToTop) {
+            backToTop.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
             });
-        });
+        }
 
         // Newsletter submit (inline, no redirect)
         const newsletterForm = document.getElementById('newsletter-form');
@@ -1842,117 +1876,102 @@
             gallery.scrollLeft = scrollLeft - walk;
         });
 
-        // Audio Player Functionality
-        const audioPlayer = document.getElementById('audio-player');
-        const playBtn = document.getElementById('play-btn');
-        const playIcon = playBtn.querySelector('.play-icon');
-        const pauseIcon = playBtn.querySelector('.pause-icon');
-        const progressBar = document.getElementById('progress-bar');
-        const baseVolume = 1;
-        const fadeDuration = 8;
-        let fadeTimer = null;
+        // Audio Player Functionality (RIKKA Widget)
+        const rkPlayBtn = document.getElementById('rk-play-btn');
+        const rkProgressBar = document.getElementById('rk-progressBar');
+        const rkProgressFill = document.getElementById('rk-progressFill');
+        const rkTimeDisplay = document.getElementById('rk-time');
+        const rkTrack1 = document.getElementById('rk-track1');
+        const FADE_DURATION = 5;
 
-        const updateFadeVolume = () => {
-            if (!Number.isFinite(audioPlayer.duration) || audioPlayer.duration <= 0) return;
-            const remaining = audioPlayer.duration - audioPlayer.currentTime;
-            if (remaining <= fadeDuration && remaining > 0) {
-                audioPlayer.volume = Math.max(0, Math.min(baseVolume, (remaining / fadeDuration) * baseVolume));
-            } else if (remaining > fadeDuration && audioPlayer.volume !== baseVolume) {
-                audioPlayer.volume = baseVolume;
-            }
-        };
+        const rkPlaySVG = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+        const rkPauseSVG = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
 
-        const startFadeMonitor = () => {
-            if (fadeTimer) clearInterval(fadeTimer);
-            fadeTimer = setInterval(updateFadeVolume, 120);
-        };
-
-        const stopFadeMonitor = () => {
-            if (fadeTimer) {
-                clearInterval(fadeTimer);
-                fadeTimer = null;
-            }
-        };
+        function rkFormatTime(sec) {
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+        }
 
         function tryAutoplay() {
             if (PASSWORD_GATE_ENABLED) return;
             audioPlayer.muted = true;
-            audioPlayer.play().catch(function() {
-                // Retry silently when media becomes ready/visible.
-            });
+            audioPlayer.play().catch(function() {});
         }
 
-        const syncPlayerUI = () => {
-            const isPlaying = !audioPlayer.paused;
-            playIcon.style.display = isPlaying ? 'none' : 'block';
-            pauseIcon.style.display = isPlaying ? 'block' : 'none';
-            playBtn.setAttribute('aria-pressed', String(isPlaying));
-        };
-
-        // Start playback as soon as page loads (muted for browser compatibility)
         if (!PASSWORD_GATE_ENABLED) tryAutoplay();
         audioPlayer.addEventListener('canplay', function() {
             if (!PASSWORD_GATE_ENABLED && audioPlayer.paused) tryAutoplay();
         }, { once: true });
         document.addEventListener('visibilitychange', function() {
-            if (!PASSWORD_GATE_ENABLED && !document.hidden && audioPlayer.paused && !hasInteracted) {
-                tryAutoplay();
-            }
+            if (!PASSWORD_GATE_ENABLED && !document.hidden && audioPlayer.paused && !hasInteracted) tryAutoplay();
         });
 
-        // Remove muted attribute on first user interaction to enable sound
         const enableAudioOnFirstInteraction = function() {
             if (hasInteracted || body.classList.contains('site-locked')) return;
             hasInteracted = true;
             document.removeEventListener('click', enableAudioOnFirstInteraction);
             document.removeEventListener('touchstart', enableAudioOnFirstInteraction);
             audioPlayer.muted = false;
-            audioPlayer.play().catch(function(error) {
-                console.log('Autoplay prevented:', error);
-            });
+            audioPlayer.play().catch(function(error) { console.log('Autoplay prevented:', error); });
         };
         document.addEventListener('click', enableAudioOnFirstInteraction);
         document.addEventListener('touchstart', enableAudioOnFirstInteraction, { passive: true });
 
-        playBtn.addEventListener('click', function() {
+        rkPlayBtn.addEventListener('click', function() {
             if (audioPlayer.paused) {
                 hasInteracted = true;
                 if (audioPlayer.muted) audioPlayer.muted = false;
-                if (audioPlayer.currentTime < (audioPlayer.duration || Infinity) - fadeDuration) {
-                    audioPlayer.volume = baseVolume;
-                }
-                audioPlayer.play().catch(function(error) {
-                    console.log('Playback blocked:', error);
-                });
+                audioPlayer.volume = 1;
+                audioPlayer.play().catch(function(error) { console.log('Playback blocked:', error); });
+                rkPlayBtn.innerHTML = rkPauseSVG;
             } else {
                 audioPlayer.pause();
+                rkPlayBtn.innerHTML = rkPlaySVG;
             }
         });
 
-        // Update progress bar as song plays
-        audioPlayer.addEventListener('timeupdate', function() {
-            const progress = audioPlayer.duration ? (audioPlayer.currentTime / audioPlayer.duration) * 100 : 0;
-            progressBar.style.width = progress + '%';
-            updateFadeVolume();
+        rkTrack1.addEventListener('click', function() {
+            audioPlayer.currentTime = 0;
+            audioPlayer.muted = false;
+            audioPlayer.volume = 1;
+            audioPlayer.play();
+            rkPlayBtn.innerHTML = rkPauseSVG;
         });
 
-        // Reset icon when audio ends
+        audioPlayer.addEventListener('timeupdate', function() {
+            if (audioPlayer.duration) {
+                var pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                rkProgressFill.style.width = pct + '%';
+                rkTimeDisplay.textContent = rkFormatTime(audioPlayer.currentTime);
+                var remaining = audioPlayer.duration - audioPlayer.currentTime;
+                if (remaining <= FADE_DURATION) {
+                    audioPlayer.volume = Math.max(0, remaining / FADE_DURATION);
+                } else if (audioPlayer.volume < 1 && !audioPlayer.muted) {
+                    audioPlayer.volume = 1;
+                }
+            }
+        });
+
         audioPlayer.addEventListener('ended', function() {
-            stopFadeMonitor();
-            progressBar.style.width = '0%';
-            audioPlayer.volume = baseVolume;
-            syncPlayerUI();
+            audioPlayer.volume = 1;
+            rkPlayBtn.innerHTML = rkPlaySVG;
+            rkProgressFill.style.width = '0%';
+            rkTimeDisplay.textContent = '00:00';
         });
 
         audioPlayer.addEventListener('play', function() {
-            startFadeMonitor();
-            syncPlayerUI();
+            rkPlayBtn.innerHTML = rkPauseSVG;
         });
         audioPlayer.addEventListener('pause', function() {
-            stopFadeMonitor();
-            syncPlayerUI();
+            rkPlayBtn.innerHTML = rkPlaySVG;
         });
-        syncPlayerUI();
+
+        rkProgressBar.addEventListener('click', function(e) {
+            var rect = rkProgressBar.getBoundingClientRect();
+            var pct = (e.clientX - rect.left) / rect.width;
+            audioPlayer.currentTime = pct * audioPlayer.duration;
+        });
     </script>
 </body>
 </html>
