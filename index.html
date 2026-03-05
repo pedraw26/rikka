@@ -1032,6 +1032,10 @@
             display: flex;
             align-items: flex-start;
             gap: 0.55rem;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
         }
 
         .newsletter-consent input[type="checkbox"] {
@@ -1040,6 +1044,13 @@
             height: 14px;
             accent-color: #ffffff;
             flex-shrink: 0;
+            -webkit-appearance: checkbox;
+            appearance: auto;
+            cursor: pointer;
+        }
+
+        .newsletter-consent span {
+            flex: 1;
         }
 
         /* Footer */
@@ -1378,7 +1389,7 @@
                         <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
                         Apple Music
                     </a>
-                    <a href="#" class="release-link">
+                    <a href="https://www.youtube.com/@RIKKA_BABY" class="release-link" target="_blank" rel="noopener noreferrer">
                         <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                         YouTube
                     </a>
@@ -1403,7 +1414,7 @@
                         <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
                         Apple Music
                     </a>
-                    <a href="#" class="release-link">
+                    <a href="https://www.youtube.com/@RIKKA_BABY" class="release-link" target="_blank" rel="noopener noreferrer">
                         <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                         YouTube
                     </a>
@@ -1497,7 +1508,7 @@
                 <img src="https://res.cloudinary.com/dzgqzeebg/image/upload/v1772656624/the_ghost_iarpxf.jpg" alt="Featured 3">
                 <div class="featured-overlay">
                     <span class="featured-label">Partnership</span>
-                    <span class="featured-title">HolyGhost — Rikka</span>
+                    <span class="featured-title">hollyGhost™</span>
                 </div>
             </div>
         </div>
@@ -1525,7 +1536,7 @@
                 </div>
                 <span>YouTube</span>
             </a>
-            <a href="https://www.tiktok.com/@erica__fortuna?_r=1&_t=ZN-94PnMD3C4Fq" class="streaming-link" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.instagram.com/erikka_fortuna?igsh=NjNnNDIxd3pmemky&utm_source=qr" class="streaming-link" target="_blank" rel="noopener noreferrer">
                 <div class="icon-box">
                     <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                 </div>
@@ -1547,7 +1558,7 @@
             <form class="newsletter-form" id="newsletter-form">
                 <input class="newsletter-input" id="newsletter-email" type="email" name="email" placeholder="Enter email" required>
                 <button class="newsletter-button" type="submit">Subscribe</button>
-                <label class="newsletter-consent" for="newsletter-consent">
+                <label class="newsletter-consent">
                     <input id="newsletter-consent" name="consent" type="checkbox" required>
                     <span>I agree to receive email updates from Rikka. You can unsubscribe any time.</span>
                 </label>
@@ -1561,7 +1572,7 @@
         <p class="footer-statement">A vida é uma fortuna</p>
         <a href="mailto:hello@fortunarecords.com" class="footer-email">hello@fortunarecords.com</a>
         <div class="footer-socials" style="display: none;">
-            <a href="https://www.tiktok.com/@erica__fortuna?_r=1&_t=ZN-94PnMD3C4Fq" target="_blank" rel="noopener noreferrer">Instagram</a>
+            <a href="https://www.instagram.com/erikka_fortuna?igsh=NjNnNDIxd3pmemky&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
             <a href="#">Twitter</a>
             <a href="https://www.tiktok.com/@erica__fortuna?_r=1&_t=ZN-94PnMD3C4Fq" target="_blank" rel="noopener noreferrer">TikTok</a>
             <a href="#">Spotify</a>
@@ -1583,7 +1594,7 @@
         const passwordSubmit = document.getElementById('password-submit');
         const passwordError = document.getElementById('password-error');
         const SITE_PASSWORD = 'rikka';
-        const PASSWORD_GATE_ENABLED = false;
+        const PASSWORD_GATE_ENABLED = true;
         let hasInteracted = false;
         let count = 0;
 
@@ -1611,6 +1622,7 @@
             if (passwordInput.value.trim().toLowerCase() === SITE_PASSWORD) {
                 hasInteracted = true;
                 passwordInput.blur();
+                audioPlayer.currentTime = 0;
                 audioPlayer.muted = false;
                 audioPlayer.play().catch(function(error) {
                     console.log('Playback blocked:', error);
@@ -1686,12 +1698,19 @@
         // Newsletter submit (inline, no redirect)
         const newsletterForm = document.getElementById('newsletter-form');
         const newsletterEmail = document.getElementById('newsletter-email');
+        const newsletterConsent = document.getElementById('newsletter-consent');
         const newsletterSuccess = document.getElementById('newsletter-success');
-        if (newsletterForm && newsletterEmail && newsletterSuccess) {
+        if (newsletterForm && newsletterEmail && newsletterSuccess && newsletterConsent) {
             newsletterForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 if (!newsletterForm.checkValidity()) {
                     newsletterForm.reportValidity();
+                    return;
+                }
+                if (!newsletterConsent.checked) {
+                    newsletterSuccess.textContent = 'Please confirm the email consent checkbox.';
+                    newsletterSuccess.style.display = 'block';
+                    newsletterConsent.focus();
                     return;
                 }
 
@@ -1702,7 +1721,7 @@
 
                 const formData = new FormData();
                 formData.append('email', newsletterEmail.value.trim());
-                formData.append('consent', 'true');
+                formData.append('consent', String(newsletterConsent.checked));
                 formData.append('_subject', 'RIKKA Newsletter Signup');
                 formData.append('_captcha', 'false');
 
@@ -1811,8 +1830,32 @@
         const progressBar = document.getElementById('progress-bar');
         const baseVolume = 1;
         const fadeDuration = 8;
+        let fadeTimer = null;
+
+        const updateFadeVolume = () => {
+            if (!Number.isFinite(audioPlayer.duration) || audioPlayer.duration <= 0) return;
+            const remaining = audioPlayer.duration - audioPlayer.currentTime;
+            if (remaining <= fadeDuration && remaining > 0) {
+                audioPlayer.volume = Math.max(0, Math.min(baseVolume, (remaining / fadeDuration) * baseVolume));
+            } else if (remaining > fadeDuration && audioPlayer.volume !== baseVolume) {
+                audioPlayer.volume = baseVolume;
+            }
+        };
+
+        const startFadeMonitor = () => {
+            if (fadeTimer) clearInterval(fadeTimer);
+            fadeTimer = setInterval(updateFadeVolume, 120);
+        };
+
+        const stopFadeMonitor = () => {
+            if (fadeTimer) {
+                clearInterval(fadeTimer);
+                fadeTimer = null;
+            }
+        };
 
         function tryAutoplay() {
+            if (PASSWORD_GATE_ENABLED) return;
             audioPlayer.muted = true;
             audioPlayer.play().catch(function() {
                 // Retry silently when media becomes ready/visible.
@@ -1827,12 +1870,12 @@
         };
 
         // Start playback as soon as page loads (muted for browser compatibility)
-        tryAutoplay();
+        if (!PASSWORD_GATE_ENABLED) tryAutoplay();
         audioPlayer.addEventListener('canplay', function() {
-            if (audioPlayer.paused) tryAutoplay();
+            if (!PASSWORD_GATE_ENABLED && audioPlayer.paused) tryAutoplay();
         }, { once: true });
         document.addEventListener('visibilitychange', function() {
-            if (!document.hidden && audioPlayer.paused && !hasInteracted) {
+            if (!PASSWORD_GATE_ENABLED && !document.hidden && audioPlayer.paused && !hasInteracted) {
                 tryAutoplay();
             }
         });
@@ -1853,10 +1896,14 @@
 
         playBtn.addEventListener('click', function() {
             if (audioPlayer.paused) {
+                hasInteracted = true;
+                if (audioPlayer.muted) audioPlayer.muted = false;
                 if (audioPlayer.currentTime < (audioPlayer.duration || Infinity) - fadeDuration) {
                     audioPlayer.volume = baseVolume;
                 }
-                audioPlayer.play();
+                audioPlayer.play().catch(function(error) {
+                    console.log('Playback blocked:', error);
+                });
             } else {
                 audioPlayer.pause();
             }
@@ -1866,25 +1913,25 @@
         audioPlayer.addEventListener('timeupdate', function() {
             const progress = audioPlayer.duration ? (audioPlayer.currentTime / audioPlayer.duration) * 100 : 0;
             progressBar.style.width = progress + '%';
-
-            if (!audioPlayer.duration || audioPlayer.muted) return;
-            const remaining = audioPlayer.duration - audioPlayer.currentTime;
-            if (remaining <= fadeDuration && remaining > 0) {
-                audioPlayer.volume = Math.max(0, Math.min(baseVolume, (remaining / fadeDuration) * baseVolume));
-            } else if (remaining > fadeDuration && audioPlayer.volume !== baseVolume) {
-                audioPlayer.volume = baseVolume;
-            }
+            updateFadeVolume();
         });
 
         // Reset icon when audio ends
         audioPlayer.addEventListener('ended', function() {
+            stopFadeMonitor();
             progressBar.style.width = '0%';
             audioPlayer.volume = baseVolume;
             syncPlayerUI();
         });
 
-        audioPlayer.addEventListener('play', syncPlayerUI);
-        audioPlayer.addEventListener('pause', syncPlayerUI);
+        audioPlayer.addEventListener('play', function() {
+            startFadeMonitor();
+            syncPlayerUI();
+        });
+        audioPlayer.addEventListener('pause', function() {
+            stopFadeMonitor();
+            syncPlayerUI();
+        });
         syncPlayerUI();
     </script>
 </body>
