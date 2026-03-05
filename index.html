@@ -1034,7 +1034,7 @@
             margin-top: 0.1rem;
             width: 18px;
             height: 18px;
-            accent-color: #ffffff;
+            accent-color: #7bcf63;
             flex-shrink: 0;
             -webkit-appearance: checkbox;
             appearance: auto;
@@ -1251,6 +1251,10 @@
 
             .newsletter-form {
                 grid-template-columns: 1fr;
+            }
+
+            .newsletter-input {
+                font-size: 16px;
             }
 
             .newsletter-button {
@@ -1508,7 +1512,7 @@
                 <img src="https://res.cloudinary.com/dzgqzeebg/image/upload/v1772656624/the_ghost_iarpxf.jpg" alt="Featured 3">
                 <div class="featured-overlay">
                     <span class="featured-label">Partnership</span>
-                    <span class="featured-title">hollyGhost™</span>
+                    <span class="featured-title">HollyGhost™</span>
                 </div>
             </div>
         </div>
@@ -1579,7 +1583,7 @@
             <a href="https://www.youtube.com/@RIKKA_BABY" target="_blank" rel="noopener noreferrer">YouTube</a>
         </div>
         <div class="footer-bottom">
-            <span>&copy; 2024 RIKKA. All rights reserved.</span>
+            <span>&copy; 2026 RIKKA. All rights reserved.</span>
             <a href="#" class="back-to-top">Back to top</a>
         </div>
     </footer>
@@ -1699,9 +1703,18 @@
         const newsletterForm = document.getElementById('newsletter-form');
         const newsletterEmail = document.getElementById('newsletter-email');
         const newsletterConsent = document.getElementById('newsletter-consent');
+        const newsletterConsentWrap = document.querySelector('.newsletter-consent-wrap');
         const newsletterSuccess = document.getElementById('newsletter-success');
         if (newsletterForm && newsletterEmail && newsletterSuccess && newsletterConsent) {
             newsletterForm.setAttribute('novalidate', 'novalidate');
+
+            if (newsletterConsentWrap) {
+                newsletterConsentWrap.addEventListener('click', function(e) {
+                    if (e.target === newsletterConsent) return;
+                    e.preventDefault();
+                    newsletterConsent.checked = !newsletterConsent.checked;
+                });
+            }
 
             newsletterForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
