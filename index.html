@@ -386,6 +386,53 @@
             animation: fadeIn 1s var(--transition-cinematic) 1.2s forwards;
         }
 
+        .hero-cta .scroll-wrap {
+            position: relative;
+            overflow: hidden;
+            height: 1em;
+            display: inline-block;
+            vertical-align: baseline;
+            line-height: 1;
+        }
+
+        .hero-cta .scroll-wrap::after {
+            content: 'Explore';
+            display: block;
+            height: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+
+        .hero-cta .scroll-default {
+            display: block;
+            line-height: 1;
+            animation: scroll-swap-in 5s ease-in-out infinite;
+        }
+
+        .hero-cta .scroll-swap {
+            position: absolute;
+            left: 0;
+            top: 0;
+            display: block;
+            line-height: 1;
+            white-space: nowrap;
+            animation: scroll-swap-out 5s ease-in-out infinite;
+        }
+
+        @keyframes scroll-swap-in {
+            0%, 40%   { transform: translateY(0); opacity: 1; }
+            45%, 50%  { transform: translateY(-100%); opacity: 0; }
+            50%, 90%  { transform: translateY(100%); opacity: 0; }
+            95%, 100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes scroll-swap-out {
+            0%, 40%   { transform: translateY(100%); opacity: 0; }
+            45%, 50%  { transform: translateY(0); opacity: 1; }
+            50%, 90%  { transform: translateY(0); opacity: 1; }
+            95%, 100% { transform: translateY(-100%); opacity: 0; }
+        }
+
         .hero-cta .line {
             width: 60px;
             height: 1px;
@@ -954,11 +1001,13 @@
             gap: 1rem;
             color: var(--white);
             text-decoration: none;
-            transition: opacity 0.3s;
+            transition: opacity 0.6s ease;
+            position: relative;
+            padding-bottom: 0.6rem;
         }
 
         .streaming-link:hover {
-            opacity: 0.7;
+            opacity: 0.4;
         }
 
         .icon-box {
@@ -1191,7 +1240,10 @@
         }
 
         .buy-coffee {
-            display: block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4em;
             text-align: center;
             margin-top: 3.1rem;
             color: #f5c518;
@@ -1199,41 +1251,12 @@
             font-size: 0.52rem;
             text-transform: uppercase;
             letter-spacing: 0.29em;
-            position: relative;
-            overflow: hidden;
-            height: 1.4em;
+            transition: transform 0.3s ease;
+            width: 100%;
         }
 
-        .buy-coffee .text-default,
-        .buy-coffee .text-hover {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4em;
-            white-space: nowrap;
-        }
-
-        .buy-coffee .text-default {
-            animation: text-swap-in 5s ease-in-out infinite;
-        }
-
-        .buy-coffee .text-hover {
-            position: absolute;
-            left: 50%;
-            animation: text-swap-out 5s ease-in-out infinite;
-        }
-
-        @keyframes text-swap-in {
-            0%, 40%   { transform: translateY(0); opacity: 1; }
-            45%, 50%  { transform: translateY(-100%); opacity: 0; }
-            50%, 90%  { transform: translateY(100%); opacity: 0; }
-            95%, 100% { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes text-swap-out {
-            0%, 40%   { transform: translate(-50%, 100%); opacity: 0; }
-            45%, 50%  { transform: translate(-50%, 0); opacity: 1; }
-            50%, 90%  { transform: translate(-50%, 0); opacity: 1; }
-            95%, 100% { transform: translate(-50%, -100%); opacity: 0; }
+        .buy-coffee:hover {
+            transform: scale(1.15);
         }
 
         .buy-coffee svg {
@@ -1537,7 +1560,7 @@
             <p class="hero-subtitle">Afro Futuristik</p>
         </div>
         <a href="#music" class="hero-cta">
-            <span>Scroll</span>
+            <span class="scroll-wrap"><span class="scroll-default">Scroll</span><span class="scroll-swap">Explore</span></span>
             <span class="line"></span>
         </a>
     </section>
@@ -1736,7 +1759,7 @@
                 <button class="footer-nl-btn" type="submit">Subscribe</button>
             </form>
             <p class="footer-nl-success" id="footer-nl-success"></p>
-            <a href="https://buymeacoffee.com/rikka_baby" target="_blank" rel="noopener noreferrer" class="buy-coffee"><span class="text-default">Support my music <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f5c518" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg></span><span class="text-hover">Buy me a coffee <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f5c518" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg></span></a>
+            <a href="https://buymeacoffee.com/rikka_baby" target="_blank" rel="noopener noreferrer" class="buy-coffee">Support my music <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f5c518" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg></a>
         </div>
         <div class="footer-socials" style="display: none;">
             <a href="https://www.instagram.com/erikka_fortuna?igsh=NjNnNDIxd3pmemky&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
@@ -1831,7 +1854,7 @@
         });
 
         links.forEach(link => {
-            if (link.classList.contains('buy-coffee')) return;
+            if (link.classList.contains('buy-coffee') || link.classList.contains('streaming-link')) return;
             link.addEventListener('mouseenter', () => {
                 cursor.classList.add('hover');
             });
