@@ -1197,7 +1197,41 @@
             font-size: 0.52rem;
             text-transform: uppercase;
             letter-spacing: 0.29em;
-            transition: opacity 0.3s;
+            position: relative;
+            overflow: hidden;
+            height: 1.4em;
+        }
+
+        .buy-coffee .text-default,
+        .buy-coffee .text-hover {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4em;
+            white-space: nowrap;
+        }
+
+        .buy-coffee .text-default {
+            animation: text-swap-in 5s ease-in-out infinite;
+        }
+
+        .buy-coffee .text-hover {
+            position: absolute;
+            left: 50%;
+            animation: text-swap-out 5s ease-in-out infinite;
+        }
+
+        @keyframes text-swap-in {
+            0%, 40%   { transform: translateY(0); opacity: 1; }
+            45%, 50%  { transform: translateY(-100%); opacity: 0; }
+            50%, 90%  { transform: translateY(100%); opacity: 0; }
+            95%, 100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes text-swap-out {
+            0%, 40%   { transform: translate(-50%, 100%); opacity: 0; }
+            45%, 50%  { transform: translate(-50%, 0); opacity: 1; }
+            50%, 90%  { transform: translate(-50%, 0); opacity: 1; }
+            95%, 100% { transform: translate(-50%, -100%); opacity: 0; }
         }
 
         .buy-coffee svg {
@@ -1205,19 +1239,11 @@
             transform-origin: center bottom;
         }
 
-        .buy-coffee:hover svg {
-            animation: coffee-wiggle 0.4s ease-in-out infinite;
-        }
-
         @keyframes coffee-wiggle {
             0%, 80%, 100% { transform: rotate(0deg); }
             85% { transform: rotate(-8deg); }
             90% { transform: rotate(8deg); }
             95% { transform: rotate(-5deg); }
-        }
-
-        .buy-coffee:hover {
-            opacity: 0.85;
         }
 
         .back-to-top {
@@ -1575,7 +1601,7 @@
         <div class="rk-widget">
             <div class="rk-now-playing">
 
-                <div class="rk-album-art"><img src="https://res.cloudinary.com/dzgqzeebg/image/upload/w_400,q_auto:best/v1772797881/afro_futuristik_-_rika_cover_zy3o5n.jpg" alt="Afro Futuristik album art"></div>
+                <div class="rk-album-art"><img src="https://res.cloudinary.com/dzgqzeebg/image/upload/w_400,q_auto:best/v1772744421/rikissima_copy_utslko.jpg" alt="Afro Futuristik album art"></div>
                 <div class="rk-track-info">
                     <div class="rk-track-title">Afro Futuristik</div>
                     <div class="rk-artist-name">RIKKA <span class="rk-verified"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span></div>
@@ -1708,7 +1734,7 @@
                 <button class="footer-nl-btn" type="submit">Subscribe</button>
             </form>
             <p class="footer-nl-success" id="footer-nl-success"></p>
-            <a href="https://buymeacoffee.com/rikka_baby" target="_blank" rel="noopener noreferrer" class="buy-coffee">Buy me a coffee <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f5c518" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px;"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg></a>
+            <a href="https://buymeacoffee.com/rikka_baby" target="_blank" rel="noopener noreferrer" class="buy-coffee"><span class="text-default">Support my music <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f5c518" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg></span><span class="text-hover">Buy me a coffee <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f5c518" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg></span></a>
         </div>
         <div class="footer-socials" style="display: none;">
             <a href="https://www.instagram.com/erikka_fortuna?igsh=NjNnNDIxd3pmemky&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
@@ -1803,6 +1829,7 @@
         });
 
         links.forEach(link => {
+            if (link.classList.contains('buy-coffee')) return;
             link.addEventListener('mouseenter', () => {
                 cursor.classList.add('hover');
             });
