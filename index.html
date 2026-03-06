@@ -427,13 +427,24 @@
         /* Music Section */
         .music {
             background: var(--bg-primary);
+            padding-top: 0px !important;
+        }
+
+        .music .section-title {
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 1025px) {
+            .music .section-title {
+                margin-bottom: 3rem;
+            }
         }
 
         .release {
             display: grid;
             grid-template-columns: 1fr 1.5fr;
-            gap: 4rem;
-            margin-bottom: 6rem;
+            gap: 2.5rem;
+            margin-bottom: 2.5rem;
             align-items: center;
         }
 
@@ -474,7 +485,7 @@
         .release-description {
             color: var(--text-secondary);
             line-height: 1.8;
-            margin-bottom: 2rem;
+            margin-bottom: 1.2rem;
             max-width: 500px;
         }
 
@@ -1089,72 +1100,66 @@
         /* Footer */
         footer {
             background: var(--bg-secondary);
-            padding: 6rem 5vw 3rem;
+            padding: 6rem 5vw 0;
             text-align: center;
         }
 
         .footer-statement {
             font-family: 'Cinzel', serif;
-            font-size: clamp(2rem, 5vw, 4rem);
-            line-height: 1.5;
-            margin-bottom: 3rem;
-            letter-spacing: 0.1em;
+            font-size: clamp(1.8rem, 4.5vw, 3.5rem);
+            line-height: 1.4;
+            letter-spacing: 0.08em;
+            margin-bottom: 2rem;
         }
 
-        .footer-email {
-            display: inline-block;
-            font-size: 1rem;
-            color: var(--text-secondary);
-            text-decoration: none;
-            margin-bottom: 3rem;
-            transition: color 0.3s;
-        }
-
-        .footer-email:hover {
+        .footer-coffee {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
             color: var(--white);
-        }
-
-        .footer-socials {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 4rem;
-            flex-wrap: wrap;
-        }
-
-        .footer-socials a {
-            color: var(--text-secondary);
+            border: 1px solid var(--accent);
+            padding: 0.7rem 2rem;
+            border-radius: 0;
             text-decoration: none;
-            font-size: 0.75rem;
-            letter-spacing: 0.1em;
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
-            transition: color 0.3s;
+            transition: all 0.3s;
+            margin-bottom: 4rem;
         }
 
-        .footer-socials a:hover {
-            color: var(--white);
+        .footer-coffee:hover {
+            border-color: var(--white);
+        }
+
+        .footer-coffee svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
         }
 
         .footer-bottom {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 2rem;
-            border-top: 1px solid var(--accent);
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+            padding: 1.2rem 5vw;
+            margin: 0 -5vw;
+            background: #0a0a0a;
+            font-size: 0.65rem;
+            color: #555;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
         }
 
         .back-to-top {
-            color: var(--text-secondary);
+            color: var(--white);
             text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            transition: color 0.3s;
+            letter-spacing: 0.12em;
+            transition: opacity 0.3s;
         }
 
         .back-to-top:hover {
-            color: var(--white);
+            opacity: 0.6;
         }
 
         /* Responsive */
@@ -1244,9 +1249,7 @@
             }
 
             .footer-bottom {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
+                padding: 1rem 5vw;
             }
 
             .music-player-divider {
@@ -1332,9 +1335,7 @@
         .featured-item,
         .streaming-title,
         .streaming-links,
-        .footer-statement,
-        .footer-email,
-        .footer-socials {
+        .footer-statement {
             opacity: 0;
             transform: translateY(30px);
             transition: all 0.8s var(--transition-cinematic);
@@ -1347,9 +1348,7 @@
         .featured-item.visible,
         .streaming-title.visible,
         .streaming-links.visible,
-        .footer-statement.visible,
-        .footer-email.visible,
-        .footer-socials.visible {
+        .footer-statement.visible {
             opacity: 1;
             transform: translateY(0);
         }
@@ -1585,6 +1584,12 @@
                 </div>
                 <span>TikTok</span>
             </a>
+            <a href="mailto:rikkarecords@gmail.com" class="streaming-link">
+                <div class="icon-box">
+                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                </div>
+                <span>Email</span>
+            </a>
         </div>
     </section>
 
@@ -1607,16 +1612,12 @@
     <!-- Footer -->
     <footer>
         <p class="footer-statement">A vida é uma fortuna</p>
-        <a href="mailto:hello@fortunarecords.com" class="footer-email">hello@fortunarecords.com</a>
-        <div class="footer-socials" style="display: none;">
-            <a href="https://www.instagram.com/erikka_fortuna?igsh=NjNnNDIxd3pmemky&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
-            <a href="#">Twitter</a>
-            <a href="https://www.tiktok.com/@erica__fortuna?_r=1&_t=ZN-94PnMD3C4Fq" target="_blank" rel="noopener noreferrer">TikTok</a>
-            <a href="#">Spotify</a>
-            <a href="https://www.youtube.com/@RIKKA_BABY" target="_blank" rel="noopener noreferrer">YouTube</a>
-        </div>
+        <a href="https://buymeacoffee.com/RIKKA_BABY" target="_blank" class="footer-coffee">
+            <svg viewBox="0 0 24 24"><path d="M18.5 3H6C5.45 3 5 3.45 5 4v1.5c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1zM5 8l1.5 9.5c.15.85.87 1.5 1.73 1.5h7.54c.86 0 1.58-.65 1.73-1.5L19 8H5zm14.5 0c1.38 0 2.5 1.12 2.5 2.5S20.88 13 19.5 13H19l-.3 1.8h.8c.83 0 1.5-.67 1.5-1.5V11c0-.83-.67-1.5-1.5-1.5h-1L19 8h-.5zM6 21h12v-1H6v1z"/></svg>
+            Support the Music
+        </a>
         <div class="footer-bottom">
-            <span>&copy; 2026 RIKKA. All rights reserved.</span>
+            <span>&copy; 2026 RIKKA.</span>
             <a href="#" class="back-to-top">Back to top</a>
         </div>
     </footer>
@@ -1802,7 +1803,7 @@
         }
 
         // Scroll Reveal Animation
-        const revealElements = document.querySelectorAll('.section-title, .release, .video-container, .gallery-item, .featured-item, .streaming-title, .streaming-links, .newsletter-card, .footer-statement, .footer-email, .footer-socials');
+        const revealElements = document.querySelectorAll('.section-title, .release, .video-container, .gallery-item, .featured-item, .streaming-title, .streaming-links, .newsletter-card, .footer-statement');
 
         const revealOnScroll = () => {
             const windowHeight = window.innerHeight;
