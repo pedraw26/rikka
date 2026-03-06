@@ -427,24 +427,13 @@
         /* Music Section */
         .music {
             background: var(--bg-primary);
-            padding-top: 0px !important;
-        }
-
-        .music .section-title {
-            margin-bottom: 1.5rem;
-        }
-
-        @media (min-width: 1025px) {
-            .music .section-title {
-                margin-bottom: 3rem;
-            }
         }
 
         .release {
             display: grid;
             grid-template-columns: 1fr 1.5fr;
-            gap: 2.5rem;
-            margin-bottom: 2.5rem;
+            gap: 4rem;
+            margin-bottom: 6rem;
             align-items: center;
         }
 
@@ -485,7 +474,7 @@
         .release-description {
             color: var(--text-secondary);
             line-height: 1.8;
-            margin-bottom: 1.2rem;
+            margin-bottom: 2rem;
             max-width: 500px;
         }
 
@@ -1100,66 +1089,106 @@
         /* Footer */
         footer {
             background: var(--bg-secondary);
-            padding: 6rem 5vw 0;
+            padding: 6rem 5vw 3rem;
             text-align: center;
         }
 
-        .footer-statement {
+        .footer-newsletter {
+            margin-bottom: 3rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: left;
+        }
+
+        .footer-nl-title {
             font-family: 'Cinzel', serif;
-            font-size: clamp(1.8rem, 4.5vw, 3.5rem);
-            line-height: 1.4;
-            letter-spacing: 0.08em;
-            margin-bottom: 2rem;
-        }
-
-        .footer-coffee {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--white);
-            border: 1px solid var(--accent);
-            padding: 0.7rem 2rem;
-            border-radius: 0;
-            text-decoration: none;
-            font-size: 0.7rem;
-            letter-spacing: 0.12em;
+            font-size: 0.85rem;
+            letter-spacing: 0.15em;
             text-transform: uppercase;
-            transition: all 0.3s;
+            color: var(--text-secondary);
+            margin-bottom: 1.2rem;
+        }
+
+        .footer-nl-form {
+            display: flex;
+            gap: 0;
+        }
+
+        .footer-nl-input {
+            flex: 1;
+            padding: 0.7rem 1rem;
+            background: transparent;
+            border: 1px solid var(--accent);
+            border-right: none;
+            color: var(--white);
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            outline: none;
+        }
+
+        .footer-nl-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .footer-nl-btn {
+            padding: 0.7rem 1.5rem;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--white);
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .footer-nl-btn:hover {
+            background: var(--accent);
+        }
+
+        .footer-nl-success {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.8rem;
+            display: none;
+        }
+
+        .footer-socials {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
             margin-bottom: 4rem;
+            flex-wrap: wrap;
         }
 
-        .footer-coffee:hover {
-            border-color: var(--white);
+        .footer-socials a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: color 0.3s;
         }
 
-        .footer-coffee svg {
-            width: 14px;
-            height: 14px;
-            fill: currentColor;
+        .footer-socials a:hover {
+            color: var(--white);
         }
 
         .footer-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.2rem 5vw;
-            margin: 0 -5vw;
-            background: #0a0a0a;
-            font-size: 0.65rem;
-            color: #555;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
+            display: none;
         }
 
         .back-to-top {
-            color: var(--white);
+            color: var(--text-secondary);
             text-decoration: none;
-            letter-spacing: 0.12em;
-            transition: opacity 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: color 0.3s;
         }
 
         .back-to-top:hover {
-            opacity: 0.6;
+            color: var(--white);
         }
 
         /* Responsive */
@@ -1249,7 +1278,9 @@
             }
 
             .footer-bottom {
-                padding: 1rem 5vw;
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
             }
 
             .music-player-divider {
@@ -1335,7 +1366,9 @@
         .featured-item,
         .streaming-title,
         .streaming-links,
-        .footer-statement {
+        .footer-statement,
+        .footer-email,
+        .footer-socials {
             opacity: 0;
             transform: translateY(30px);
             transition: all 0.8s var(--transition-cinematic);
@@ -1348,7 +1381,9 @@
         .featured-item.visible,
         .streaming-title.visible,
         .streaming-links.visible,
-        .footer-statement.visible {
+        .footer-statement.visible,
+        .footer-email.visible,
+        .footer-socials.visible {
             opacity: 1;
             transform: translateY(0);
         }
@@ -1371,7 +1406,7 @@
 
     <div class="password-gate" id="password-gate" aria-hidden="true">
         <div class="password-gate-card">
-            <h2 class="password-gate-title">ACCE$$</h2>
+            <h2 class="password-gate-title">ACCE$$  DENIED BITX</h2>
             <p class="password-gate-subtitle">Enter Password</p>
             <input class="password-gate-input" id="password-input" type="password" autocomplete="current-password" placeholder="" />
             <button class="password-gate-button" id="password-submit" type="button">Unlock</button>
@@ -1465,7 +1500,7 @@
         <div class="rk-widget">
             <div class="rk-now-playing">
 
-                <div class="rk-album-art"><img src="https://res.cloudinary.com/dzgqzeebg/image/upload/v1772744421/rikissima_copy_utslko.jpg" alt="Afro Futuristik album art"></div>
+                <div class="rk-album-art"><img src="https://res.cloudinary.com/dzgqzeebg/image/upload/w_400,q_auto:best/v1772797881/afro_futuristik_-_rika_cover_zy3o5n.jpg" alt="Afro Futuristik album art"></div>
                 <div class="rk-track-info">
                     <div class="rk-track-title">Afro Futuristik</div>
                     <div class="rk-artist-name">RIKKA <span class="rk-verified"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span></div>
@@ -1584,40 +1619,30 @@
                 </div>
                 <span>TikTok</span>
             </a>
-            <a href="mailto:rikkarecords@gmail.com" class="streaming-link">
-                <div class="icon-box">
-                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-                </div>
-                <span>Email</span>
-            </a>
         </div>
     </section>
 
-    <section class="newsletter" id="newsletter">
-        <div class="newsletter-card">
-            <h3 class="newsletter-title">Never Miss A Drop</h3>
-            <p class="newsletter-copy">Join the early list for release drops, exclusive snippets, and live mix updates.</p>
-            <form class="newsletter-form" id="newsletter-form">
-                <input class="newsletter-input" id="newsletter-email" type="email" name="email" placeholder="Enter email" required>
-                <button class="newsletter-button" type="submit">Subscribe</button>
-                <div class="newsletter-consent-wrap">
-                    <input id="newsletter-consent" name="consent" type="checkbox">
-                    <label class="newsletter-consent" for="newsletter-consent">I agree to receive email updates from Rikka. You can unsubscribe any time.</label>
-                </div>
-            </form>
-            <p class="newsletter-success" id="newsletter-success">Email sent. Check your inbox for confirmation.</p>
-        </div>
-    </section>
+    <!-- Newsletter moved to footer -->
 
     <!-- Footer -->
     <footer>
-        <p class="footer-statement">A vida é uma fortuna</p>
-        <a href="https://buymeacoffee.com/RIKKA_BABY" target="_blank" class="footer-coffee">
-            <svg viewBox="0 0 24 24"><path d="M18.5 3H6C5.45 3 5 3.45 5 4v1.5c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1zM5 8l1.5 9.5c.15.85.87 1.5 1.73 1.5h7.54c.86 0 1.58-.65 1.73-1.5L19 8H5zm14.5 0c1.38 0 2.5 1.12 2.5 2.5S20.88 13 19.5 13H19l-.3 1.8h.8c.83 0 1.5-.67 1.5-1.5V11c0-.83-.67-1.5-1.5-1.5h-1L19 8h-.5zM6 21h12v-1H6v1z"/></svg>
-            Support the Music
-        </a>
+        <div class="footer-newsletter">
+            <p class="footer-nl-title">Never Miss A Drop</p>
+            <form class="footer-nl-form" id="newsletter-form-footer">
+                <input class="footer-nl-input" type="email" name="email" placeholder="Your email" required>
+                <button class="footer-nl-btn" type="submit">Subscribe</button>
+            </form>
+            <p class="footer-nl-success" id="footer-nl-success"></p>
+        </div>
+        <div class="footer-socials" style="display: none;">
+            <a href="https://www.instagram.com/erikka_fortuna?igsh=NjNnNDIxd3pmemky&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
+            <a href="#">Twitter</a>
+            <a href="https://www.tiktok.com/@erica__fortuna?_r=1&_t=ZN-94PnMD3C4Fq" target="_blank" rel="noopener noreferrer">TikTok</a>
+            <a href="#">Spotify</a>
+            <a href="https://www.youtube.com/@RIKKA_BABY" target="_blank" rel="noopener noreferrer">YouTube</a>
+        </div>
         <div class="footer-bottom">
-            <span>&copy; 2026 RIKKA.</span>
+            <span>&copy; 2026 RIKKA. All rights reserved.</span>
             <a href="#" class="back-to-top">Back to top</a>
         </div>
     </footer>
@@ -1737,46 +1762,25 @@
             });
         }
 
-        // Newsletter submit (inline, no redirect)
-        const newsletterForm = document.getElementById('newsletter-form');
-        const newsletterEmail = document.getElementById('newsletter-email');
-        const newsletterConsent = document.getElementById('newsletter-consent');
-        const newsletterConsentWrap = document.querySelector('.newsletter-consent-wrap');
-        const newsletterSuccess = document.getElementById('newsletter-success');
-        if (newsletterForm && newsletterEmail && newsletterSuccess && newsletterConsent) {
-            newsletterForm.setAttribute('novalidate', 'novalidate');
-
-            if (newsletterConsentWrap) {
-                newsletterConsentWrap.addEventListener('click', function(e) {
-                    if (e.target === newsletterConsent) return;
-                    e.preventDefault();
-                    newsletterConsent.checked = !newsletterConsent.checked;
-                });
-            }
-
-            newsletterForm.addEventListener('submit', async function(e) {
+        // Footer newsletter submit
+        const footerNlForm = document.getElementById('newsletter-form-footer');
+        const footerNlSuccess = document.getElementById('footer-nl-success');
+        if (footerNlForm && footerNlSuccess) {
+            footerNlForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                if (!newsletterEmail.value.trim() || !newsletterEmail.checkValidity()) {
-                    newsletterSuccess.textContent = 'Please enter a valid email address.';
-                    newsletterSuccess.style.display = 'block';
-                    newsletterEmail.focus();
+                const emailInput = footerNlForm.querySelector('input[type="email"]');
+                if (!emailInput.value.trim() || !emailInput.checkValidity()) {
+                    footerNlSuccess.textContent = 'Please enter a valid email.';
+                    footerNlSuccess.style.display = 'block';
                     return;
                 }
-                if (!newsletterConsent.checked) {
-                    newsletterSuccess.textContent = 'Please confirm the email consent checkbox.';
-                    newsletterSuccess.style.display = 'block';
-                    newsletterConsent.focus();
-                    return;
-                }
-
-                const submitBtn = newsletterForm.querySelector('.newsletter-button');
+                const submitBtn = footerNlForm.querySelector('.footer-nl-btn');
                 if (submitBtn) submitBtn.disabled = true;
-                newsletterSuccess.textContent = 'Sending...';
-                newsletterSuccess.style.display = 'block';
+                footerNlSuccess.textContent = 'Sending...';
+                footerNlSuccess.style.display = 'block';
 
                 const formData = new FormData();
-                formData.append('email', newsletterEmail.value.trim());
-                formData.append('consent', String(newsletterConsent.checked));
+                formData.append('email', emailInput.value.trim());
                 formData.append('_subject', 'RIKKA Newsletter Signup');
                 formData.append('_captcha', 'false');
 
@@ -1787,23 +1791,19 @@
                         body: formData
                     });
                     const data = await res.json().catch(() => ({}));
-
-                    if (!res.ok || data.success === 'false') {
-                        throw new Error(data.message || 'Submission failed');
-                    }
-
-                    newsletterForm.style.display = 'none';
-                    newsletterSuccess.textContent = "You're in! We'll send you new drops and updates first.";
+                    if (!res.ok || data.success === 'false') throw new Error();
+                    footerNlForm.style.display = 'none';
+                    footerNlSuccess.textContent = "You're in.";
+                    footerNlSuccess.style.display = 'block';
                 } catch (err) {
-                    newsletterSuccess.textContent = 'Could not submit now. Please try again.';
-                    newsletterSuccess.style.display = 'block';
+                    footerNlSuccess.textContent = 'Could not submit. Try again.';
                     if (submitBtn) submitBtn.disabled = false;
                 }
             });
         }
 
         // Scroll Reveal Animation
-        const revealElements = document.querySelectorAll('.section-title, .release, .video-container, .gallery-item, .featured-item, .streaming-title, .streaming-links, .newsletter-card, .footer-statement');
+        const revealElements = document.querySelectorAll('.section-title, .release, .video-container, .gallery-item, .featured-item, .streaming-title, .streaming-links, .footer-newsletter, .footer-socials');
 
         const revealOnScroll = () => {
             const windowHeight = window.innerHeight;
