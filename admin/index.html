@@ -10,19 +10,19 @@
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #060608;
-            --bg-card: #0e0e12;
-            --bg-card-hover: #141418;
-            --border: rgba(255,255,255,0.05);
-            --border-hover: rgba(255,255,255,0.10);
-            --text: #e8e8ed;
-            --text-secondary: #6e6e7a;
-            --text-muted: #3e3e4a;
-            --accent-blue: #6ea8fe;
-            --accent-green: #5ec9a2;
-            --accent-yellow: #e2b45a;
-            --accent-red: #d47b7b;
-            --accent-purple: #9b8ec4;
+            --bg: #08070b;
+            --bg-card: #110f18;
+            --bg-card-hover: #18162a;
+            --border: rgba(139,92,246,0.08);
+            --border-hover: rgba(139,92,246,0.15);
+            --text: #eae6f3;
+            --text-secondary: #6e6a80;
+            --text-muted: #3d3952;
+            --accent-blue: #8b5cf6;
+            --accent-green: #2dd4bf;
+            --accent-yellow: #f472b6;
+            --accent-red: #ef6461;
+            --accent-purple: #f5a623;
             --radius: 14px;
             --radius-sm: 8px;
         }
@@ -363,7 +363,7 @@
         }
         .country-bar {
             height: 100%;
-            background: var(--accent-blue);
+            background: var(--accent-green);
             border-radius: 3px;
             transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
@@ -423,7 +423,7 @@
         .heatmap-cell {
             aspect-ratio: 1;
             border-radius: 3px;
-            background: rgba(110, 168, 254, 0.06);
+            background: rgba(139, 92, 246, 0.08);
             min-height: 14px;
             transition: background 0.3s ease;
         }
@@ -894,14 +894,14 @@ function renderVisitorsChart(data) {
             labels,
             datasets: [{
                 data: counts,
-                borderColor: '#6ea8fe',
-                backgroundColor: 'rgba(110, 168, 254, 0.06)',
+                borderColor: '#8b5cf6',
+                backgroundColor: 'rgba(139, 92, 246, 0.08)',
                 borderWidth: 2,
                 fill: true,
                 tension: 0.4,
                 pointRadius: 0,
                 pointHoverRadius: 5,
-                pointHoverBackgroundColor: '#6ea8fe',
+                pointHoverBackgroundColor: '#8b5cf6',
                 pointHoverBorderColor: '#fff',
                 pointHoverBorderWidth: 2
             }]
@@ -994,7 +994,7 @@ function renderDeviceChart(data) {
     data.forEach(d => { devices[d.device_type || 'desktop'] = (devices[d.device_type || 'desktop'] || 0) + 1; });
     const total = data.length || 1;
 
-    const colors = { mobile: '#5ec9a2', desktop: '#6ea8fe', tablet: '#e2b45a' };
+    const colors = { mobile: '#2dd4bf', desktop: '#8b5cf6', tablet: '#f5a623' };
     const labels = Object.keys(devices);
     const values = Object.values(devices);
     const bgColors = labels.map(l => colors[l] || '#666');
@@ -1117,7 +1117,7 @@ function renderHeatmap(data) {
         for (let h = 0; h < 24; h++) {
             const intensity = grid[day][h] / maxVal;
             const alpha = intensity > 0 ? 0.1 + intensity * 0.8 : 0.02;
-            html += `<div class="heatmap-cell" style="background:rgba(110,168,254,${alpha})" title="${day} ${h}:00 — ${grid[day][h]} visitors"></div>`;
+            html += `<div class="heatmap-cell" style="background:rgba(139,92,246,${alpha})" title="${day} ${h}:00 — ${grid[day][h]} visitors"></div>`;
         }
     });
     container.innerHTML = html;
