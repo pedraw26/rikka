@@ -589,7 +589,15 @@
         }
 
         .geo-flag {
-            font-size: 14px;
+            width: 18px;
+            height: 12px;
+            display: flex;
+            flex-shrink: 0;
+        }
+
+        .geo-flag span {
+            flex: 1;
+            height: 100%;
         }
 
         .geo-name {
@@ -1356,10 +1364,23 @@
         return `<div class="metric-delta ${pos ? 'positive' : 'negative'}">${arrow} ${pos ? '+' : ''}${pct.toFixed(1)}%</div>`;
     }
 
-    /* Country code to flag emoji */
+    /* Minimal 2-color flag */
+    const FLAG_COLORS = {
+        US: ['#3C3B6E','#B22234'], GB: ['#012169','#C8102E'], DE: ['#000000','#DD0000'],
+        FR: ['#002395','#ED2939'], JP: ['#FFFFFF','#BC002D'], BR: ['#009739','#FFDF00'],
+        CA: ['#FF0000','#FFFFFF'], AU: ['#002868','#FFFFFF'], IN: ['#FF9933','#138808'],
+        IT: ['#009246','#CE2B37'], ES: ['#AA151B','#F1BF00'], NL: ['#AE1C28','#21468B'],
+        SE: ['#004B87','#FFCD00'], PT: ['#006600','#FF0000'], MX: ['#006341','#CE1126'],
+        KR: ['#FFFFFF','#CD2E3A'], CN: ['#DE2910','#FFDE00'], RU: ['#FFFFFF','#0039A6'],
+        AR: ['#74ACDF','#FFFFFF'], PL: ['#FFFFFF','#DC143C'], NO: ['#BA0C2F','#00205B'],
+        CH: ['#FF0000','#FFFFFF'], BE: ['#000000','#FDDA24'], AT: ['#ED2939','#FFFFFF'],
+        DK: ['#C8102E','#FFFFFF'], FI: ['#FFFFFF','#003580'], IE: ['#169B62','#FF883E'],
+        NZ: ['#00247D','#CC142B'], CL: ['#FFFFFF','#D52B1E'], CO: ['#FCD116','#003893'],
+        ZA: ['#007749','#FFB81C'], SG: ['#EF3340','#FFFFFF'], TH: ['#A51931','#2D2A4A']
+    };
     function countryFlag(code) {
-        if (!code || code.length !== 2) return '🌍';
-        return String.fromCodePoint(...[...code.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+        const c = FLAG_COLORS[code] || ['#555','#333'];
+        return `<span style="background:${c[0]}"></span><span style="background:${c[1]}"></span>`;
     }
 
     /* Country code to name */
