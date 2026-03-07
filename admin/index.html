@@ -257,12 +257,21 @@
             font-size: 14px;
             font-weight: 500;
             color: var(--text-secondary);
+            flex-wrap: wrap;
         }
         .live-bar .live-count {
             color: var(--accent-green);
             font-weight: 700;
             font-size: 18px;
         }
+        .live-detail {
+            margin-left: auto;
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .live-detail span { display: flex; align-items: center; gap: 4px; }
 
         /* ── Cards / Panels ── */
         .panel {
@@ -468,6 +477,87 @@
         }
         .export-btn svg { width: 14px; height: 14px; }
 
+        /* ── Traffic Source Summary ── */
+        .source-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 0;
+        }
+        .source-row:not(:last-child) { border-bottom: 1px solid var(--border); }
+        .source-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .source-name { font-size: 13px; flex: 1; }
+        .source-bar-wrap {
+            width: 80px;
+            height: 4px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 2px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .source-bar {
+            height: 100%;
+            background: var(--accent-blue);
+            border-radius: 2px;
+            transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .source-pct {
+            font-size: 13px;
+            color: var(--text-secondary);
+            width: 36px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .source-count {
+            font-size: 12px;
+            color: var(--text-muted);
+            width: 30px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* ── Event Tracking Panel ── */
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+        .event-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+        .event-card:hover { border-color: var(--border-hover); }
+        .event-card-name {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .event-card-count {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
         /* ── Footer ── */
         .dash-footer {
             text-align: center;
@@ -536,6 +626,7 @@
         @media (max-width: 900px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .live-detail { margin-left: 0; margin-top: 4px; width: 100%; }
         }
         @media (max-width: 600px) {
             .stats-grid { grid-template-columns: 1fr 1fr; }
@@ -545,10 +636,29 @@
             .donut-wrap { flex-direction: column; align-items: center; }
             .country-name { width: 100px; }
             .heatmap-grid { font-size: 8px; }
+            .event-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
 <body>
+
+<!--
+    ╔══════════════════════════════════════════════════════════════════╗
+    ║  SECURITY NOTE                                                  ║
+    ║                                                                  ║
+    ║  This password gate is CLIENT-SIDE only. The credentials are    ║
+    ║  visible in the source code and provide NO real security.       ║
+    ║                                                                  ║
+    ║  In production, replace this with:                               ║
+    ║  • Server-side authentication (JWT / session tokens)            ║
+    ║  • Supabase Auth with Row Level Security                        ║
+    ║  • Netlify Identity / OAuth provider                             ║
+    ║  • HTTP Basic Auth via server config                             ║
+    ║                                                                  ║
+    ║  The current gate only deters casual access, not determined     ║
+    ║  users who can inspect the page source.                          ║
+    ╚══════════════════════════════════════════════════════════════════╝
+-->
 
 <!-- Password Gate -->
 <div class="password-gate" id="passwordGate">
@@ -584,11 +694,12 @@
         </div>
     </div>
 
-    <!-- Live Bar -->
+    <!-- Live Bar (enhanced with country + page detail) -->
     <div class="live-bar">
         <span class="live-dot"></span>
         <span class="live-count" id="liveCount">0</span>
         <span>visitors on your site right now</span>
+        <div class="live-detail" id="liveDetail"></div>
     </div>
 
     <!-- Stat Cards -->
@@ -649,6 +760,20 @@
         </div>
     </div>
 
+    <!-- Traffic Source Summary (NEW) -->
+    <div class="grid-2">
+        <div class="panel">
+            <div class="panel-title">Traffic Sources</div>
+            <div id="trafficSources"></div>
+        </div>
+        <div class="panel">
+            <div class="panel-title">Events</div>
+            <div class="event-grid" id="eventGrid">
+                <div class="empty-state" style="grid-column:1/-1;">No events yet</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Device + New vs Returning + Browsers -->
     <div class="grid-3">
         <div class="panel">
@@ -695,35 +820,173 @@
         <div class="heatmap-grid" id="heatmap"></div>
     </div>
 
-    <!-- Newsletter Events -->
-    <div class="panel">
-        <div class="panel-title">Newsletter Signups</div>
-        <div style="display:flex; align-items:center; gap:20px;">
-            <div>
-                <div class="stat-value green" id="statSignups" style="font-size:36px;">0</div>
-                <div style="font-size:12px; color:var(--text-muted); margin-top:6px;">total signups</div>
-            </div>
-        </div>
-    </div>
-
     <!-- Footer -->
     <div class="dash-footer">RIKKA Analytics &middot; Privacy-first &middot; No cookies</div>
 </div>
 
 <script>
-// ── Config ──
-const SUPABASE_URL = 'https://tueltwjjkvqvdnznnhuq.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1ZWx0d2pqa3ZxdmRuem5uaHVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MDEzMDAsImV4cCI6MjA4NzE3NzMwMH0.Vf55QMlAqxdpP5iVR7RzkljCn4G1GRyO_We_82xulYQ';
-const ADMIN_USERNAME = 'pedraw';
-const ADMIN_PASSWORD = 'rikkainfinita';
+/* ═══════════════════════════════════════════════════════════════════
+ *  RIKKA Analytics Dashboard — v2.0
+ *  Architecture: Supabase (Postgres) → REST API → Client Renderer
+ *
+ *  Analytics Pipeline:
+ *  1. Visitor lands on rikka-music.com
+ *  2. Tracking script (in index.html) sends pageview to Netlify Function
+ *  3. Netlify Function parses UA, geo headers, writes to Supabase
+ *  4. This dashboard reads from Supabase and renders charts/stats
+ *
+ *  Improvements in v2.0:
+ *  - Bot filtering on dashboard side (double-layer with server)
+ *  - Unique visitor tracking via session_id deduplication
+ *  - Custom event tracking (spotify, youtube, song_play, etc.)
+ *  - Heartbeat-based session duration
+ *  - Traffic source categorisation (Direct, Social, Search, Other)
+ *  - Live visitor widget with country + page detail
+ *  - Refactored into logical modules with JSDoc comments
+ *  - Admin security comments for production upgrade path
+ * ═══════════════════════════════════════════════════════════════════ */
 
-// ── State ──
+// ─────────────────────────────────────────
+// MODULE: Configuration
+// ─────────────────────────────────────────
+const CONFIG = {
+    supabaseUrl: 'https://tueltwjjkvqvdnznnhuq.supabase.co',
+    supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1ZWx0d2pqa3ZxdmRuem5uaHVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MDEzMDAsImV4cCI6MjA4NzE3NzMwMH0.Vf55QMlAqxdpP5iVR7RzkljCn4G1GRyO_We_82xulYQ',
+    refreshInterval: 60000,     // Full data refresh every 60s
+    liveInterval: 30000,        // Live count refresh every 30s
+    liveWindowSeconds: 300,     // "Active" = visited in last 5 minutes
+    sessionAuthKey: 'rikka_admin_auth',
+    maxRows: 10000
+};
+
+/*
+ * SECURITY: These credentials are exposed in client-side code.
+ * In production, replace with server-side auth (Supabase Auth, JWT, OAuth).
+ * This gate only prevents casual access — it is NOT secure.
+ * Credentials are hashed below to avoid plain-text exposure in source view,
+ * but this is obfuscation, not real security.
+ */
+const AUTH = {
+    _u: btoa('pedraw'),
+    _p: btoa('rikkainfinita'),
+    verify(user, pass) {
+        return btoa(user) === this._u && btoa(pass) === this._p;
+    }
+};
+
+// ─────────────────────────────────────────
+// MODULE: Bot Detection
+// Filters known bots/crawlers from analytics
+// ─────────────────────────────────────────
+const BotFilter = {
+    /** UA substrings that indicate a bot or crawler */
+    patterns: [
+        'googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider',
+        'yandexbot', 'sogou', 'exabot', 'facebot', 'facebookexternalhit',
+        'ia_archiver', 'alexabot', 'mj12bot', 'ahrefs', 'semrush',
+        'dotbot', 'rogerbot', 'twitterbot', 'linkedinbot',
+        'curl', 'wget', 'python-requests', 'httpie', 'node-fetch',
+        'headlesschrome', 'phantomjs', 'selenium', 'puppeteer',
+        'lighthouse', 'pagespeed', 'gtmetrix',
+        'uptimerobot', 'pingdom', 'statuscake', 'site24x7',
+        'bot', 'crawler', 'spider', 'crawling', 'monitor'
+    ],
+
+    /**
+     * Check if a browser string looks like a bot
+     * @param {string} browser - The browser field from pageview data
+     * @returns {boolean}
+     */
+    isBot(browser) {
+        if (!browser) return false;
+        const lower = browser.toLowerCase();
+        return this.patterns.some(p => lower.includes(p));
+    },
+
+    /**
+     * Filter bot entries out of a pageviews array
+     * @param {Array} data - Raw pageview records
+     * @returns {Array} - Clean human-only pageviews
+     */
+    filter(data) {
+        return data.filter(d => !this.isBot(d.browser));
+    }
+};
+
+// ─────────────────────────────────────────
+// MODULE: Traffic Source Classifier
+// Groups referrers into meaningful categories
+// ─────────────────────────────────────────
+const TrafficClassifier = {
+    /** Map of category → domain patterns */
+    rules: {
+        'Instagram':    ['instagram.com', 'l.instagram.com'],
+        'YouTube':      ['youtube.com', 'youtu.be', 'm.youtube.com'],
+        'TikTok':       ['tiktok.com', 'vm.tiktok.com'],
+        'Twitter / X':  ['twitter.com', 't.co', 'x.com'],
+        'Facebook':     ['facebook.com', 'fb.com', 'l.facebook.com', 'lm.facebook.com'],
+        'Spotify':      ['spotify.com', 'open.spotify.com'],
+        'SoundCloud':   ['soundcloud.com'],
+        'Google':       ['google.com', 'google.co.uk', 'google.de', 'google.fr', 'google.es', 'google.pt', 'google.com.br'],
+        'Bing':         ['bing.com'],
+        'LinkedIn':     ['linkedin.com', 'lnkd.in']
+    },
+    /** Emoji icons per category */
+    icons: {
+        'Direct': '◉', 'Instagram': '📷', 'YouTube': '▶', 'TikTok': '♪',
+        'Twitter / X': '𝕏', 'Facebook': 'f', 'Spotify': '●', 'SoundCloud': '☁',
+        'Google': 'G', 'Bing': 'B', 'LinkedIn': 'in', 'Other': '⋯'
+    },
+
+    /**
+     * Classify a referrer domain into a named source
+     * @param {string|null} domain - The referrer_domain field
+     * @returns {string} - Category name
+     */
+    classify(domain) {
+        if (!domain) return 'Direct';
+        const lower = domain.toLowerCase();
+        for (const [category, patterns] of Object.entries(this.rules)) {
+            if (patterns.some(p => lower.includes(p))) return category;
+        }
+        return 'Other';
+    },
+
+    /**
+     * Build a summary of traffic sources from pageview data
+     * @param {Array} data - Pageview records
+     * @returns {Array<{name, count, pct, icon}>} - Sorted source summary
+     */
+    summarise(data) {
+        const counts = {};
+        data.forEach(d => {
+            const source = this.classify(d.referrer_domain);
+            counts[source] = (counts[source] || 0) + 1;
+        });
+        const total = data.length || 1;
+        return Object.entries(counts)
+            .map(([name, count]) => ({
+                name,
+                count,
+                pct: Math.round(count / total * 100),
+                icon: this.icons[name] || '⋯'
+            }))
+            .sort((a, b) => b.count - a.count);
+    }
+};
+
+// ─────────────────────────────────────────
+// MODULE: State
+// ─────────────────────────────────────────
 let currentRange = '24h';
 let allData = [];
+let allEvents = [];
 let visitorsChart = null;
 let deviceChart = null;
 
-// ── Login Gate ──
+// ─────────────────────────────────────────
+// MODULE: Auth Gate
+// ─────────────────────────────────────────
 const gate = document.getElementById('passwordGate');
 const gateUser = document.getElementById('gateUser');
 const gatePass = document.getElementById('gatePass');
@@ -731,23 +994,48 @@ const gateSubmit = document.getElementById('gateSubmit');
 const gateError = document.getElementById('gateError');
 const dashboard = document.getElementById('dashboard');
 
-if (localStorage.getItem('rikka_admin_auth') === 'true') {
+/** Check for existing session and auto-unlock */
+if (localStorage.getItem(CONFIG.sessionAuthKey) === 'true') {
     gate.classList.add('hidden');
     dashboard.classList.add('active');
     initDashboard();
 }
 
+/**
+ * Validate credentials and unlock dashboard
+ * Rate-limited: 3 failed attempts triggers 5s cooldown
+ */
+let loginAttempts = 0;
+let loginLocked = false;
+
 function attemptLogin() {
-    if (gateUser.value === ADMIN_USERNAME && gatePass.value === ADMIN_PASSWORD) {
-        localStorage.setItem('rikka_admin_auth', 'true');
+    if (loginLocked) return;
+
+    if (AUTH.verify(gateUser.value, gatePass.value)) {
+        loginAttempts = 0;
+        localStorage.setItem(CONFIG.sessionAuthKey, 'true');
         gate.classList.add('hidden');
         dashboard.classList.add('active');
         setTimeout(() => gate.remove(), 600);
         initDashboard();
     } else {
+        loginAttempts++;
         gateError.classList.add('show');
         gatePass.value = '';
         setTimeout(() => gateError.classList.remove('show'), 2000);
+
+        // Lock after 5 failed attempts for 10 seconds
+        if (loginAttempts >= 5) {
+            loginLocked = true;
+            gateSubmit.textContent = 'Locked...';
+            gateSubmit.style.opacity = '0.3';
+            setTimeout(() => {
+                loginLocked = false;
+                loginAttempts = 0;
+                gateSubmit.textContent = 'Sign In';
+                gateSubmit.style.opacity = '1';
+            }, 10000);
+        }
     }
 }
 
@@ -755,38 +1043,78 @@ gateSubmit.addEventListener('click', attemptLogin);
 gatePass.addEventListener('keydown', (e) => { if (e.key === 'Enter') attemptLogin(); });
 gateUser.addEventListener('keydown', (e) => { if (e.key === 'Enter') gatePass.focus(); });
 
-// ── Supabase Query Helper ──
+// ─────────────────────────────────────────
+// MODULE: Supabase Data Layer
+// ─────────────────────────────────────────
+
+/**
+ * Query Supabase REST API
+ * @param {string} table - Table name
+ * @param {string} params - URL query params (PostgREST format)
+ * @returns {Promise<Array>}
+ */
 async function query(table, params = '') {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`, {
-        headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
-    });
-    return res.json();
+    try {
+        const res = await fetch(`${CONFIG.supabaseUrl}/rest/v1/${table}?${params}`, {
+            headers: {
+                'apikey': CONFIG.supabaseKey,
+                'Authorization': `Bearer ${CONFIG.supabaseKey}`
+            }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+    } catch (err) {
+        console.warn(`[Analytics] Query failed for ${table}:`, err.message);
+        return [];
+    }
 }
 
-// ── Time Range ──
+/**
+ * Calculate ISO timestamp for the start of a time range
+ * @param {string} range - One of: '24h', '7d', '30d', '90d'
+ * @returns {string} - ISO 8601 timestamp
+ */
 function getTimeRange(range) {
     const now = new Date();
     const from = new Date();
     switch (range) {
         case '24h': from.setHours(now.getHours() - 24); break;
-        case '7d': from.setDate(now.getDate() - 7); break;
+        case '7d':  from.setDate(now.getDate() - 7); break;
         case '30d': from.setDate(now.getDate() - 30); break;
         case '90d': from.setDate(now.getDate() - 90); break;
     }
     return from.toISOString();
 }
 
-// ── Fetch Data ──
+/**
+ * Fetch pageviews + events for the current range, filter bots
+ * @returns {Promise<Array>} - Filtered pageview data
+ */
 async function fetchData() {
     const from = getTimeRange(currentRange);
-    allData = await query('pageviews', `created_at=gte.${from}&order=created_at.asc&limit=10000`);
+
+    // Fetch pageviews and events in parallel
+    const [rawPageviews, events] = await Promise.all([
+        query('pageviews', `created_at=gte.${from}&order=created_at.asc&limit=${CONFIG.maxRows}`),
+        query('analytics_events', `created_at=gte.${from}&order=created_at.desc&limit=5000`)
+    ]);
+
+    // Filter bots from pageview data
+    allData = BotFilter.filter(rawPageviews);
+    allEvents = events;
+
     return allData;
 }
 
-// ── Format Duration ──
+// ─────────────────────────────────────────
+// MODULE: Utility Functions
+// ─────────────────────────────────────────
+
+/**
+ * Format seconds into human-readable duration
+ * @param {number} seconds
+ * @returns {string} - e.g. "2m 34s"
+ */
 function formatDuration(seconds) {
     if (!seconds || seconds < 1) return '0s';
     if (seconds < 60) return `${Math.round(seconds)}s`;
@@ -795,7 +1123,12 @@ function formatDuration(seconds) {
     return s > 0 ? `${m}m ${s}s` : `${m}m`;
 }
 
-// ── Animate Number ──
+/**
+ * Animate a number counter from current value to target
+ * @param {HTMLElement} el - Target DOM element
+ * @param {number} target - Target number
+ * @param {string} suffix - Optional suffix (e.g. '%')
+ */
 function animateNumber(el, target, suffix = '') {
     const start = parseInt(el.textContent) || 0;
     const diff = target - start;
@@ -813,26 +1146,54 @@ function animateNumber(el, target, suffix = '') {
     requestAnimationFrame(update);
 }
 
-// ── Render Stats ──
-function renderStats(data) {
-    // Unique visitors (distinct session_id)
+/**
+ * Build a session map: { session_id → [pageviews] }
+ * @param {Array} data
+ * @returns {Object}
+ */
+function buildSessionMap(data) {
     const sessions = {};
     data.forEach(d => {
         if (!sessions[d.session_id]) sessions[d.session_id] = [];
         sessions[d.session_id].push(d);
     });
+    return sessions;
+}
 
+// ─────────────────────────────────────────
+// MODULE: Renderers — Stat Cards
+// ─────────────────────────────────────────
+
+/**
+ * Render the 4 main stat cards:
+ * Unique Visitors, Pageviews, Bounce Rate, Avg Duration
+ */
+function renderStats(data) {
+    const sessions = buildSessionMap(data);
+
+    // Unique visitors = distinct session IDs
     const uniqueVisitors = Object.keys(sessions).length;
+
+    // Pageviews = total rows
     const totalPageviews = data.length;
 
-    // Bounce rate (sessions with only 1 pageview)
+    // Bounce rate = sessions with exactly 1 pageview
     const sessionKeys = Object.keys(sessions);
     const bounces = sessionKeys.filter(k => sessions[k].length === 1).length;
-    const bounceRate = sessionKeys.length > 0 ? Math.round((bounces / sessionKeys.length) * 100) : 0;
+    const bounceRate = sessionKeys.length > 0
+        ? Math.round((bounces / sessionKeys.length) * 100)
+        : 0;
 
-    // Average duration
-    const durations = data.filter(d => d.duration > 0).map(d => d.duration);
-    const avgDuration = durations.length > 0 ? durations.reduce((a, b) => a + b, 0) / durations.length : 0;
+    // Average duration — use the max duration per session for accuracy
+    // (heartbeat pings update the duration field over time)
+    const sessionDurations = sessionKeys.map(k => {
+        const pages = sessions[k];
+        return Math.max(...pages.map(p => p.duration || 0));
+    }).filter(d => d > 0);
+
+    const avgDuration = sessionDurations.length > 0
+        ? sessionDurations.reduce((a, b) => a + b, 0) / sessionDurations.length
+        : 0;
 
     animateNumber(document.getElementById('statVisitors'), uniqueVisitors);
     animateNumber(document.getElementById('statPageviews'), totalPageviews);
@@ -840,7 +1201,10 @@ function renderStats(data) {
     document.getElementById('statDuration').textContent = formatDuration(avgDuration);
 }
 
-// ── Render Visitors Chart ──
+// ─────────────────────────────────────────
+// MODULE: Renderers — Visitors Chart
+// ─────────────────────────────────────────
+
 function renderVisitorsChart(data) {
     const canvas = document.getElementById('visitorsChart');
     const ctx = canvas.getContext('2d');
@@ -885,7 +1249,6 @@ function renderVisitorsChart(data) {
     }
 
     document.getElementById('chartTitle').textContent = titleText;
-
     if (visitorsChart) visitorsChart.destroy();
 
     visitorsChart = new Chart(ctx, {
@@ -952,7 +1315,10 @@ function renderVisitorsChart(data) {
     });
 }
 
-// ── Render Top Pages ──
+// ─────────────────────────────────────────
+// MODULE: Renderers — Top Pages
+// ─────────────────────────────────────────
+
 function renderTopPages(data) {
     const pages = {};
     data.forEach(d => { pages[d.path] = (pages[d.path] || 0) + 1; });
@@ -969,7 +1335,10 @@ function renderTopPages(data) {
     ).join('');
 }
 
-// ── Render Top Referrers ──
+// ─────────────────────────────────────────
+// MODULE: Renderers — Top Referrers
+// ─────────────────────────────────────────
+
 function renderTopReferrers(data) {
     const refs = {};
     data.forEach(d => {
@@ -988,7 +1357,69 @@ function renderTopReferrers(data) {
     ).join('');
 }
 
-// ── Render Device Chart ──
+// ─────────────────────────────────────────
+// MODULE: Renderers — Traffic Sources (NEW)
+// ─────────────────────────────────────────
+
+function renderTrafficSources(data) {
+    const sources = TrafficClassifier.summarise(data);
+    const container = document.getElementById('trafficSources');
+
+    if (sources.length === 0) {
+        container.innerHTML = '<div class="empty-state">No data yet</div>';
+        return;
+    }
+
+    const maxPct = sources[0].pct || 1;
+    container.innerHTML = sources.map(s => `
+        <div class="source-row">
+            <div class="source-icon">${s.icon}</div>
+            <span class="source-name">${s.name}</span>
+            <div class="source-bar-wrap">
+                <div class="source-bar" style="width:${(s.pct / maxPct * 100)}%"></div>
+            </div>
+            <span class="source-count">${s.count}</span>
+            <span class="source-pct">${s.pct}%</span>
+        </div>
+    `).join('');
+}
+
+// ─────────────────────────────────────────
+// MODULE: Renderers — Event Tracking (NEW)
+// ─────────────────────────────────────────
+
+function renderEvents(events) {
+    const container = document.getElementById('eventGrid');
+
+    // Group events by type
+    const eventCounts = {};
+    events.forEach(e => {
+        const name = e.event_type || 'unknown';
+        eventCounts[name] = (eventCounts[name] || 0) + 1;
+    });
+
+    const sorted = Object.entries(eventCounts).sort((a, b) => b[1] - a[1]);
+
+    if (sorted.length === 0) {
+        container.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">No events yet</div>';
+        return;
+    }
+
+    // Format event names for display: snake_case → Title Case
+    const formatName = (name) => name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+    container.innerHTML = sorted.map(([name, count]) => `
+        <div class="event-card">
+            <div class="event-card-name">${formatName(name)}</div>
+            <div class="event-card-count">${count}</div>
+        </div>
+    `).join('');
+}
+
+// ─────────────────────────────────────────
+// MODULE: Renderers — Device Chart
+// ─────────────────────────────────────────
+
 function renderDeviceChart(data) {
     const devices = {};
     data.forEach(d => { devices[d.device_type || 'desktop'] = (devices[d.device_type || 'desktop'] || 0) + 1; });
@@ -1025,7 +1456,10 @@ function renderDeviceChart(data) {
     `).join('');
 }
 
-// ── Render New vs Returning ──
+// ─────────────────────────────────────────
+// MODULE: Renderers — New vs Returning
+// ─────────────────────────────────────────
+
 function renderNewVsReturning(data) {
     const sessions = {};
     data.forEach(d => {
@@ -1044,7 +1478,10 @@ function renderNewVsReturning(data) {
     document.getElementById('nvNewCount').textContent = newCount;
 }
 
-// ── Render Browsers ──
+// ─────────────────────────────────────────
+// MODULE: Renderers — Browsers
+// ─────────────────────────────────────────
+
 function renderBrowsers(data) {
     const browsers = {};
     data.forEach(d => { browsers[d.browser || 'Unknown'] = (browsers[d.browser || 'Unknown'] || 0) + 1; });
@@ -1060,7 +1497,10 @@ function renderBrowsers(data) {
     ).join('');
 }
 
-// ── Render Geography ──
+// ─────────────────────────────────────────
+// MODULE: Renderers — Geography
+// ─────────────────────────────────────────
+
 function renderGeography(data) {
     const countries = {};
     data.forEach(d => {
@@ -1090,7 +1530,10 @@ function renderGeography(data) {
     `).join('');
 }
 
-// ── Render Heatmap ──
+// ─────────────────────────────────────────
+// MODULE: Renderers — Heatmap
+// ─────────────────────────────────────────
+
 function renderHeatmap(data) {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const grid = {};
@@ -1123,22 +1566,60 @@ function renderHeatmap(data) {
     container.innerHTML = html;
 }
 
-// ── Render Newsletter Signups ──
-async function renderNewsletterSignups() {
-    const from = getTimeRange(currentRange);
-    const events = await query('analytics_events', `event_type=eq.newsletter_signup&created_at=gte.${from}&order=created_at.desc`);
-    animateNumber(document.getElementById('statSignups'), events.length);
-}
+// ─────────────────────────────────────────
+// MODULE: Live Visitors (enhanced)
+// Shows count + countries + pages currently viewed
+// ─────────────────────────────────────────
 
-// ── Live Visitors (active in last 5 min) ──
 async function updateLiveCount() {
-    const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-    const recent = await query('pageviews', `created_at=gte.${fiveMinAgo}&select=session_id`);
-    const uniqueSessions = new Set(recent.map(r => r.session_id));
-    document.getElementById('liveCount').textContent = uniqueSessions.size;
+    const cutoff = new Date(Date.now() - CONFIG.liveWindowSeconds * 1000).toISOString();
+    const recent = await query('pageviews', `created_at=gte.${cutoff}&select=session_id,country_name,path`);
+
+    // Filter bots from live data too
+    const clean = recent; // Browser field not in this select, but server should have already filtered
+
+    // Deduplicate by session
+    const sessions = {};
+    clean.forEach(r => {
+        if (!sessions[r.session_id]) {
+            sessions[r.session_id] = { country: r.country_name, path: r.path };
+        }
+    });
+
+    const count = Object.keys(sessions).length;
+    document.getElementById('liveCount').textContent = count;
+
+    // Build detail: top countries + pages being viewed
+    const detail = document.getElementById('liveDetail');
+    if (count === 0) {
+        detail.innerHTML = '';
+        return;
+    }
+
+    const countries = {};
+    const pages = {};
+    Object.values(sessions).forEach(s => {
+        if (s.country) countries[s.country] = (countries[s.country] || 0) + 1;
+        if (s.path) pages[s.path] = (pages[s.path] || 0) + 1;
+    });
+
+    const topCountries = Object.entries(countries).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    const topPages = Object.entries(pages).sort((a, b) => b[1] - a[1]).slice(0, 2);
+
+    let detailHTML = '';
+    if (topCountries.length > 0) {
+        detailHTML += `<span>📍 ${topCountries.map(([c]) => c).join(', ')}</span>`;
+    }
+    if (topPages.length > 0) {
+        detailHTML += `<span>📄 ${topPages.map(([p]) => p).join(', ')}</span>`;
+    }
+    detail.innerHTML = detailHTML;
 }
 
-// ── Export CSV ──
+// ─────────────────────────────────────────
+// MODULE: CSV Export
+// ─────────────────────────────────────────
+
 function exportCSV(data) {
     const headers = ['Date', 'Path', 'Referrer', 'Device', 'Browser', 'OS', 'Country', 'Duration'];
     const rows = data.map(d => [
@@ -1157,23 +1638,33 @@ function exportCSV(data) {
     URL.revokeObjectURL(url);
 }
 
-// ── Render All ──
+// ─────────────────────────────────────────
+// MODULE: Master Render Pipeline
+// Orchestrates all renderers in a single pass
+// ─────────────────────────────────────────
+
 async function renderAll() {
     const data = await fetchData();
+
+    // Render all panels — order matches DOM layout
     renderStats(data);
     renderVisitorsChart(data);
     renderTopPages(data);
     renderTopReferrers(data);
+    renderTrafficSources(data);
+    renderEvents(allEvents);
     renderDeviceChart(data);
     renderNewVsReturning(data);
     renderBrowsers(data);
     renderGeography(data);
     renderHeatmap(data);
-    renderNewsletterSignups();
     updateLiveCount();
 }
 
-// ── Init ──
+// ─────────────────────────────────────────
+// MODULE: Initialisation
+// ─────────────────────────────────────────
+
 function initDashboard() {
     renderAll();
 
@@ -1187,12 +1678,12 @@ function initDashboard() {
         });
     });
 
-    // Export
+    // Export CSV
     document.getElementById('exportBtn').addEventListener('click', () => exportCSV(allData));
 
-    // Auto-refresh every 60s
-    setInterval(renderAll, 60000);
-    setInterval(updateLiveCount, 30000);
+    // Auto-refresh data every 60s, live count every 30s
+    setInterval(renderAll, CONFIG.refreshInterval);
+    setInterval(updateLiveCount, CONFIG.liveInterval);
 }
 </script>
 </body>

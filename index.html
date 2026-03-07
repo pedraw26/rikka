@@ -2080,12 +2080,17 @@
         });
     </script>
 
-    <!-- Analytics Tracking (privacy-first, no cookies) -->
+    <!-- Analytics Tracking v2 (privacy-first, no cookies, bot-filtered) -->
     <script>
     (function() {
+        'use strict';
         var TRACK_URL = 'https://rikka-official.netlify.app/.netlify/functions/track';
 
-        // Generate session ID (fingerprint-based, no cookies)
+        /* ── Bot Detection ── */
+        var BOT_PATTERNS = /bot|crawler|spider|crawling|googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot|facebot|facebookexternalhit|curl|wget|python|headless|phantom|selenium|puppeteer|lighthouse|pagespeed|gtmetrix|uptimerobot|pingdom|statuscake|monitor/i;
+        if (BOT_PATTERNS.test(navigator.userAgent)) return; // Exit early — don't track bots
+
+        /* ── Session Management (localStorage for returning visitor detection) ── */
         function getSessionId() {
             var stored = sessionStorage.getItem('_rikka_sid');
             if (stored) return stored;
@@ -2094,10 +2099,20 @@
             return id;
         }
 
-        // Check if new visitor (first time this session)
         function isNewVisitor() {
-            var visited = sessionStorage.getItem('_rikka_visited');
-            if (visited) return false;
+            // Use localStorage (persists across sessions) to detect returning visitors
+            var hasVisited = localStorage.getItem('_rikka_visitor');
+            if (hasVisited) {
+                // Returning visitor — but check if this is a new session
+                var sessionVisited = sessionStorage.getItem('_rikka_visited');
+                if (!sessionVisited) {
+                    sessionStorage.setItem('_rikka_visited', '1');
+                    return false; // Returning visitor, new session
+                }
+                return false; // Returning visitor, same session
+            }
+            // First-time visitor ever
+            localStorage.setItem('_rikka_visitor', Date.now().toString());
             sessionStorage.setItem('_rikka_visited', '1');
             return true;
         }
@@ -2107,7 +2122,7 @@
         var pageviewId = null;
         var startTime = Date.now();
 
-        // Send pageview
+        /* ── Pageview Tracking ── */
         function trackPageview() {
             var data = {
                 type: 'pageview',
@@ -2129,7 +2144,7 @@
             .catch(function() {});
         }
 
-        // Send duration update
+        /* ── Duration Tracking (sendBeacon for reliability on page leave) ── */
         function trackDuration() {
             if (!pageviewId) return;
             var duration = Math.round((Date.now() - startTime) / 1000);
@@ -2140,7 +2155,10 @@
             }));
         }
 
-        // Track newsletter signup events
+        /* ── Custom Event Tracking ──
+         * Usage: window.trackEvent('spotify_click')
+         *        window.trackEvent('song_play', { track: 'Afro Futuristik' })
+         */
         window.trackEvent = function(name, data) {
             fetch(TRACK_URL, {
                 method: 'POST',
@@ -2155,7 +2173,7 @@
             }).catch(function() {});
         };
 
-        // Duration heartbeat every 30s
+        /* ── Heartbeat: ping duration every 15s for accurate session length ── */
         setInterval(function() {
             if (!pageviewId || document.hidden) return;
             var duration = Math.round((Date.now() - startTime) / 1000);
@@ -2164,18 +2182,29 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type: 'duration', pageview_id: pageviewId, duration: duration })
             }).catch(function() {});
-        }, 30000);
+        }, 15000);
 
-        // Send final duration on page leave
+        /* ── Final duration on page leave ── */
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) trackDuration();
         });
         window.addEventListener('beforeunload', trackDuration);
 
-        // Track on load (skip if bot)
-        if (!/bot|crawler|spider|crawling/i.test(navigator.userAgent)) {
-            trackPageview();
-        }
+        /* ── Auto-track outbound link clicks (Spotify, YouTube, SoundCloud, etc.) ── */
+        document.addEventListener('click', function(e) {
+            var link = e.target.closest('a[href]');
+            if (!link) return;
+            var href = link.href || '';
+            if (href.indexOf('spotify.com') !== -1) window.trackEvent('spotify_click', { url: href });
+            else if (href.indexOf('youtube.com') !== -1 || href.indexOf('youtu.be') !== -1) window.trackEvent('youtube_click', { url: href });
+            else if (href.indexOf('soundcloud.com') !== -1) window.trackEvent('soundcloud_click', { url: href });
+            else if (href.indexOf('instagram.com') !== -1) window.trackEvent('instagram_click', { url: href });
+            else if (href.indexOf('tiktok.com') !== -1) window.trackEvent('tiktok_click', { url: href });
+            else if (href.indexOf('mailto:') === 0) window.trackEvent('email_click', { email: href.replace('mailto:', '') });
+        });
+
+        /* ── Fire pageview ── */
+        trackPageview();
     })();
     </script>
 </body>
