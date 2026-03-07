@@ -3,1029 +3,788 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RIKKA Analytics</title>
+    <title>RIKKA Command Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <style>
-        /* ── Reset & Base ── */
+        :root {
+            --void: #050505;
+            --graphite: #0a0a0a;
+            --surface: #111111;
+            --surface-up: #1a1a1a;
+            --border: #2a2a2a;
+            --border-light: #3a3a3a;
+            --text: #f0f0f0;
+            --text-sec: #888888;
+            --text-muted: #555555;
+            --cyan: #00f0ff;
+            --violet: #7c3aed;
+            --gold: #c5a059;
+            --emerald: #10b981;
+            --rose: #f43f5e;
+            --mono: 'JetBrains Mono', 'SF Mono', 'Monaco', monospace;
+            --sans: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
+            --sidebar-w: 240px;
+            --sidebar-c: 64px;
+            --header-h: 56px;
+        }
+
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        :root {
-            --bg: #0a0a0a;
-            --bg-card: #111111;
-            --bg-card-hover: #161616;
-            --border: rgba(255,255,255,0.06);
-            --border-hover: rgba(255,255,255,0.12);
-            --text: #f0f0f0;
-            --text-secondary: #707070;
-            --text-muted: #4a4a4a;
-            --accent-blue: #4a9eff;
-            --accent-green: #34d399;
-            --accent-yellow: #fbbf24;
-            --accent-red: #f87171;
-            --accent-purple: #a78bfa;
-            --radius: 14px;
-            --radius-sm: 8px;
-        }
-
-        @font-face {
-            font-family: 'SF Pro Display';
-            src: local('SF Pro Display'), local('.SF-Pro-Display'), local('SFProDisplay-Regular');
-            font-weight: 400;
-        }
-        @font-face {
-            font-family: 'SF Pro Display';
-            src: local('SF Pro Display Medium'), local('.SF-Pro-Display-Medium'), local('SFProDisplay-Medium');
-            font-weight: 500;
-        }
-        @font-face {
-            font-family: 'SF Pro Display';
-            src: local('SF Pro Display Semibold'), local('.SF-Pro-Display-Semibold'), local('SFProDisplay-Semibold');
-            font-weight: 600;
-        }
-        @font-face {
-            font-family: 'SF Pro Display';
-            src: local('SF Pro Display Bold'), local('.SF-Pro-Display-Bold'), local('SFProDisplay-Bold');
-            font-weight: 700;
-        }
-
-        body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
+        html, body {
+            height: 100%;
+            background: var(--void);
             color: var(--text);
-            min-height: 100vh;
+            font-family: var(--sans);
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: var(--void); }
+        ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
 
         /* ── Password Gate ── */
-        .password-gate {
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .gate {
+            position: fixed; inset: 0;
+            background: var(--void);
+            display: flex; align-items: center; justify-content: center;
             z-index: 9999;
-            opacity: 1;
-            transition: opacity 0.5s ease;
+            opacity: 1; transition: opacity 0.5s ease;
         }
-        .password-gate.hidden { opacity: 0; pointer-events: none; }
-        .gate-box {
-            text-align: center;
-            max-width: 320px;
-            width: 100%;
-            padding: 0 20px;
-        }
+        .gate.hidden { opacity: 0; pointer-events: none; }
+        .gate-box { text-align: center; max-width: 300px; width: 100%; padding: 0 20px; }
         .gate-logo {
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 6px;
-            text-transform: uppercase;
+            font-family: var(--mono);
+            font-size: 14px; font-weight: 700;
+            letter-spacing: 8px; text-transform: uppercase;
             color: var(--text);
-            margin-bottom: 40px;
+            margin-bottom: 48px;
+            background: linear-gradient(135deg, var(--cyan), var(--violet));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
         .gate-input {
-            width: 100%;
-            padding: 14px 18px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            color: var(--text);
-            font-family: inherit;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.3s ease;
-            text-align: center;
-            letter-spacing: 2px;
+            width: 100%; padding: 12px 16px;
+            background: var(--surface); border: 1px solid var(--border);
+            color: var(--text); font-family: var(--mono); font-size: 12px;
+            outline: none; text-align: center; letter-spacing: 2px;
+            transition: border-color 0.3s;
         }
-        .gate-input + .gate-input { margin-top: 12px; }
-        .gate-input:focus { border-color: rgba(255,255,255,0.2); }
-        .gate-input::placeholder { letter-spacing: 2px; color: var(--text-muted); }
+        .gate-input + .gate-input { margin-top: 8px; }
+        .gate-input:focus { border-color: var(--border-light); }
+        .gate-input::placeholder { color: var(--text-muted); letter-spacing: 2px; }
         .gate-submit {
-            width: 100%;
-            margin-top: 16px;
-            padding: 14px 18px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            color: var(--text-secondary);
-            font-family: inherit;
-            font-size: 13px;
-            font-weight: 500;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            width: 100%; margin-top: 12px; padding: 12px;
+            background: rgba(0, 240, 255, 0.05); border: 1px solid var(--border);
+            color: var(--cyan); font-family: var(--mono);
+            font-size: 10px; font-weight: 600;
+            letter-spacing: 3px; text-transform: uppercase;
+            cursor: pointer; transition: all 0.2s;
         }
-        .gate-submit:hover { background: rgba(255,255,255,0.08); color: var(--text); border-color: var(--border-hover); }
+        .gate-submit:hover { background: rgba(0, 240, 255, 0.1); border-color: rgba(0, 240, 255, 0.3); }
         .gate-error {
-            font-size: 12px;
-            color: var(--accent-red);
-            margin-top: 12px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            font-family: var(--mono); font-size: 11px;
+            color: var(--rose); margin-top: 12px;
+            opacity: 0; transition: opacity 0.3s;
         }
         .gate-error.show { opacity: 1; }
 
-        /* ── Dashboard Layout ── */
-        .dashboard {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px 20px 60px;
-            display: none;
+        /* ── Layout ── */
+        .app { display: none; min-height: 100vh; }
+        .app.active { display: flex; }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            position: fixed; left: 0; top: 0; bottom: 0;
+            width: var(--sidebar-w);
+            background: var(--graphite);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
         }
-        .dashboard.active { display: block; }
+        .sidebar.collapsed { width: var(--sidebar-c); }
+        .sidebar-head {
+            height: var(--header-h);
+            display: flex; align-items: center;
+            padding: 0 16px; gap: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .s-logo {
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, var(--cyan), var(--violet));
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--mono); font-weight: 700; font-size: 11px;
+            color: var(--void); flex-shrink: 0;
+        }
+        .s-logo-text {
+            font-family: var(--mono); font-size: 11px; font-weight: 600;
+            letter-spacing: 0.05em; color: var(--text);
+            white-space: nowrap; opacity: 1; transition: opacity 0.2s;
+        }
+        .sidebar.collapsed .s-logo-text { opacity: 0; pointer-events: none; }
+
+        .sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+        .nav-group { margin-bottom: 20px; }
+        .nav-group-title {
+            padding: 0 16px; margin-bottom: 6px;
+            font-size: 9px; font-weight: 600;
+            letter-spacing: 0.12em; color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .sidebar.collapsed .nav-group-title { opacity: 0; height: 0; margin: 0; padding: 0; }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 16px; color: var(--text-sec);
+            text-decoration: none; font-size: 12px; font-weight: 500;
+            cursor: pointer; border-left: 2px solid transparent;
+            transition: all 0.15s;
+        }
+        .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+        .nav-item.active { color: var(--cyan); background: rgba(0,240,255,0.04); border-left-color: var(--cyan); }
+        .nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
+        .nav-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+        .nav-label { white-space: nowrap; opacity: 1; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-label { opacity: 0; pointer-events: none; }
+
+        .sidebar-foot {
+            padding: 12px; border-top: 1px solid var(--border);
+        }
+        .collapse-btn {
+            width: 100%; padding: 8px;
+            background: transparent; border: 1px solid var(--border);
+            color: var(--text-sec); font-size: 11px; font-family: var(--mono);
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+            transition: all 0.15s;
+        }
+        .collapse-btn:hover { background: var(--surface); color: var(--text); }
+        .collapse-btn svg { width: 14px; height: 14px; transition: transform 0.3s; }
+        .sidebar.collapsed .collapse-btn svg { transform: rotate(180deg); }
+        .sidebar.collapsed .collapse-btn span { display: none; }
+
+        /* ── Main ── */
+        .main {
+            flex: 1; margin-left: var(--sidebar-w);
+            transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            min-height: 100vh;
+        }
+        .sidebar.collapsed ~ .main { margin-left: var(--sidebar-c); }
 
         /* ── Header ── */
-        .dash-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 32px;
-            flex-wrap: wrap;
-            gap: 16px;
+        .header {
+            position: sticky; top: 0;
+            height: var(--header-h);
+            background: rgba(5,5,5,0.92); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 28px; z-index: 50;
         }
-        .dash-brand {
-            display: flex;
-            align-items: center;
-            gap: 14px;
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .header-title {
+            font-size: 13px; font-weight: 600;
+            letter-spacing: -0.01em; color: var(--text);
         }
-        .dash-brand h1 {
-            font-size: 18px;
-            font-weight: 600;
-            letter-spacing: 4px;
-            text-transform: uppercase;
+        .time-filter {
+            display: flex; gap: 2px;
+            background: var(--surface); padding: 3px; border: 1px solid var(--border);
         }
-        .dash-brand span {
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-muted);
-            letter-spacing: 2px;
+        .time-filter button {
+            padding: 5px 12px; background: transparent; border: none;
+            color: var(--text-sec); font-size: 10px; font-weight: 600;
+            font-family: var(--mono); cursor: pointer;
+            text-transform: uppercase; letter-spacing: 0.06em;
+            transition: all 0.15s;
+        }
+        .time-filter button:hover { color: var(--text); }
+        .time-filter button.active { background: var(--surface-up); color: var(--cyan); }
+
+        .header-right { display: flex; align-items: center; gap: 14px; }
+        .live-badge {
+            display: flex; align-items: center; gap: 6px;
+            padding: 5px 10px;
+            background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25);
         }
         .live-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--accent-green);
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 4px;
-            animation: pulse-dot 2s ease-in-out infinite;
+            width: 5px; height: 5px; background: var(--emerald);
+            border-radius: 50%; animation: pulse 2s infinite;
         }
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .live-text {
+            font-size: 9px; font-weight: 600; font-family: var(--mono);
+            color: var(--emerald); text-transform: uppercase; letter-spacing: 0.1em;
+        }
+        .live-count-head {
+            font-family: var(--mono); font-size: 11px; font-weight: 600;
+            color: var(--emerald); margin-left: 2px;
+        }
+        .export-btn {
+            padding: 5px 10px; background: transparent;
+            border: 1px solid var(--border); color: var(--text-muted);
+            font-size: 10px; font-family: var(--mono); cursor: pointer;
+            display: flex; align-items: center; gap: 5px; transition: all 0.15s;
+        }
+        .export-btn:hover { color: var(--text-sec); border-color: var(--border-light); }
+        .export-btn svg { width: 12px; height: 12px; }
+
+        /* ── Content ── */
+        .content { padding: 20px 28px; display: grid; gap: 16px; }
+
+        /* ── Metric Cards ── */
+        .metrics-row {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 1px; background: var(--border); border: 1px solid var(--border);
+        }
+        .metric {
+            background: var(--surface); padding: 18px 20px;
+            display: flex; flex-direction: column; gap: 10px;
+            position: relative; overflow: hidden;
+        }
+        .metric::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 2px; background: var(--cyan);
+            opacity: 0; transition: opacity 0.2s;
+        }
+        .metric:hover::before { opacity: 1; }
+        .metric.violet::before { background: var(--violet); }
+        .metric.gold::before { background: var(--gold); }
+        .metric.emerald::before { background: var(--emerald); }
+        .metric-label {
+            font-size: 10px; font-weight: 600; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.08em;
+        }
+        .metric-value {
+            font-family: var(--mono); font-size: 28px; font-weight: 600;
+            color: var(--text); letter-spacing: -0.02em; line-height: 1;
         }
 
-        /* ── Time Filters ── */
-        .time-filters {
-            display: flex;
-            gap: 4px;
-            background: var(--bg-card);
-            padding: 4px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-        }
-        .time-btn {
-            padding: 8px 16px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-family: inherit;
-            font-size: 13px;
-            font-weight: 500;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-        .time-btn:hover { color: var(--text); }
-        .time-btn.active {
-            background: rgba(255,255,255,0.08);
-            color: var(--text);
-        }
-
-        /* ── Stat Cards ── */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-            margin-bottom: 24px;
-        }
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 22px 24px;
-            transition: border-color 0.3s ease;
-        }
-        .stat-card:hover { border-color: var(--border-hover); }
-        .stat-label {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .stat-label svg { width: 14px; height: 14px; opacity: 0.5; }
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            letter-spacing: -1px;
-            line-height: 1;
-        }
-        .stat-value.blue { color: #ffffff; }
-        .stat-value.green { color: #e0e0e0; }
-        .stat-value.yellow { color: #d4d4d4; }
-        .stat-value.purple { color: #c8c8c8; }
-
-        /* ── Live Bar ── */
-        .live-bar {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px 24px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            flex-wrap: wrap;
-        }
-        .live-bar .live-count {
-            color: var(--accent-green);
-            font-weight: 700;
-            font-size: 18px;
-        }
-        .live-detail {
-            margin-left: auto;
-            display: flex;
-            gap: 16px;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-        .live-detail span { display: flex; align-items: center; gap: 4px; }
-
-        /* ── Cards / Panels ── */
+        /* ── Panel ── */
         .panel {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 24px;
-            transition: border-color 0.3s ease;
+            background: var(--surface); border: 1px solid var(--border);
+            padding: 20px; transition: border-color 0.3s;
         }
-        .panel:hover { border-color: var(--border-hover); }
+        .panel:hover { border-color: var(--border-light); }
         .panel-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: var(--text);
+            font-size: 10px; font-weight: 600; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;
         }
 
-        /* ── Grid Layouts ── */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 24px;
+        /* ── Traffic Panel (chart + breakdown) ── */
+        .traffic-split {
+            display: grid; grid-template-columns: 1fr 280px;
+            background: var(--surface); border: 1px solid var(--border);
         }
-        .grid-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 24px;
+        .traffic-chart { padding: 20px; border-right: 1px solid var(--border); }
+        .chart-wrap { height: 260px; position: relative; }
+        .traffic-breakdown { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+        .bd-section { display: flex; flex-direction: column; gap: 8px; }
+        .bd-title {
+            font-size: 9px; font-weight: 600; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.1em;
         }
+        .bd-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 6px 0; border-bottom: 1px solid var(--border);
+        }
+        .bd-item:last-child { border-bottom: none; }
+        .bd-label { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-sec); }
+        .bd-dot { width: 7px; height: 7px; }
+        .bd-val { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--text); }
+        .bd-bar { height: 3px; background: var(--border); margin-top: 4px; position: relative; }
+        .bd-bar-fill { height: 100%; position: absolute; left: 0; top: 0; transition: width 0.5s ease; }
 
-        /* ── Chart Container ── */
-        .chart-wrap {
-            position: relative;
-            height: 260px;
-        }
+        /* ── Grids ── */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
 
         /* ── Tables ── */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        .data-table { width: 100%; border-collapse: collapse; }
         .data-table thead th {
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 0 0 14px 0;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
+            font-size: 9px; font-weight: 600; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.08em;
+            padding: 0 0 10px; text-align: left; border-bottom: 1px solid var(--border);
         }
         .data-table thead th:last-child,
         .data-table thead th:nth-child(2) { text-align: right; }
         .data-table tbody td {
-            padding: 12px 0;
-            font-size: 13px;
-            font-weight: 400;
-            color: var(--text);
+            padding: 9px 0; font-size: 12px; color: var(--text-sec);
             border-bottom: 1px solid var(--border);
         }
+        .data-table tbody td:first-child { color: var(--text); }
         .data-table tbody td:last-child,
-        .data-table tbody td:nth-child(2) { text-align: right; color: var(--text-secondary); }
+        .data-table tbody td:nth-child(2) { text-align: right; }
         .data-table tbody tr:last-child td { border-bottom: none; }
-        .path-text {
-            font-family: 'SF Mono', SFMono-Regular, Menlo, monospace;
-            font-size: 12px;
-            color: var(--text);
-        }
+        .path-text { font-family: var(--mono); font-size: 11px; }
 
-        /* ── Country Bars ── */
-        .country-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 0;
-        }
-        .country-row:not(:last-child) { border-bottom: 1px solid var(--border); }
-        .country-flag {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            width: 24px;
-            flex-shrink: 0;
-        }
-        .country-name {
-            font-size: 13px;
-            width: 140px;
-            flex-shrink: 0;
-        }
-        .country-bar-wrap {
-            flex: 1;
-            height: 6px;
-            background: rgba(255,255,255,0.04);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-        .country-bar {
-            height: 100%;
-            background: var(--accent-blue);
-            border-radius: 3px;
-            transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .country-pct {
-            font-size: 13px;
-            color: var(--text-secondary);
-            width: 40px;
-            text-align: right;
-            flex-shrink: 0;
-        }
-
-        /* ── Donut Legend ── */
-        .donut-wrap {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-        .donut-chart-container {
-            width: 160px;
-            height: 160px;
-            flex-shrink: 0;
-        }
-        .donut-legend {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-        }
-        .legend-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        .legend-label { color: var(--text); flex: 1; }
-        .legend-value { color: var(--text-secondary); font-weight: 500; }
-
-        /* ── Heatmap ── */
-        .heatmap-grid {
-            display: grid;
-            grid-template-columns: 40px repeat(24, 1fr);
-            gap: 2px;
-            font-size: 10px;
-        }
-        .heatmap-label {
-            display: flex;
-            align-items: center;
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 10px;
-        }
-        .heatmap-cell {
-            aspect-ratio: 1;
-            border-radius: 3px;
-            background: rgba(74, 158, 255, 0.05);
-            min-height: 14px;
-            transition: background 0.3s ease;
-        }
-        .heatmap-hour {
-            text-align: center;
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 9px;
-            padding-bottom: 4px;
-        }
-
-        /* ── Browser List ── */
-        .browser-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 0;
-        }
-        .browser-row:not(:last-child) { border-bottom: 1px solid var(--border); }
-        .browser-name { font-size: 13px; }
-        .browser-count { font-size: 13px; color: var(--text-secondary); }
-
-        /* ── Export Button ── */
-        .export-btn {
-            padding: 10px 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            color: var(--text-secondary);
-            font-family: inherit;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .export-btn:hover {
-            border-color: var(--border-hover);
-            color: var(--text);
-        }
-        .export-btn svg { width: 14px; height: 14px; }
-
-        /* ── Traffic Source Summary ── */
-        .source-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 9px 0;
-        }
+        /* ── Traffic Sources ── */
+        .source-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; }
         .source-row:not(:last-child) { border-bottom: 1px solid var(--border); }
         .source-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            background: rgba(255,255,255,0.06);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+            width: 26px; height: 26px; border-radius: 5px;
+            background: rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
-        .source-icon svg {
-            width: 14px;
-            height: 14px;
-            fill: rgba(255,255,255,0.7);
-        }
-        .source-name { font-size: 13px; flex: 1; }
+        .source-icon svg { width: 13px; height: 13px; fill: rgba(255,255,255,0.65); }
+        .source-name { font-size: 12px; flex: 1; }
         .source-bar-wrap {
-            width: 80px;
-            height: 4px;
+            width: 70px; height: 3px;
             background: rgba(255,255,255,0.04);
-            border-radius: 2px;
-            overflow: hidden;
-            flex-shrink: 0;
+            border-radius: 2px; overflow: hidden; flex-shrink: 0;
         }
         .source-bar {
-            height: 100%;
-            background: var(--accent-blue);
-            border-radius: 2px;
+            height: 100%; background: var(--cyan); border-radius: 2px;
             transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
-        .source-pct {
-            font-size: 13px;
-            color: var(--text-secondary);
-            width: 36px;
-            text-align: right;
-            flex-shrink: 0;
-        }
-        .source-count {
-            font-size: 12px;
-            color: var(--text-muted);
-            width: 30px;
-            text-align: right;
-            flex-shrink: 0;
-        }
+        .source-pct { font-family: var(--mono); font-size: 11px; color: var(--text-sec); width: 34px; text-align: right; flex-shrink: 0; }
+        .source-count { font-family: var(--mono); font-size: 10px; color: var(--text-muted); width: 28px; text-align: right; flex-shrink: 0; }
 
-        /* ── Event Tracking Panel ── */
-        .event-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 12px;
-        }
+        /* ── Events ── */
+        .event-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
         .event-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 16px;
-            text-align: center;
-            transition: border-color 0.3s ease;
+            background: rgba(124,58,237,0.04); border: 1px solid var(--border);
+            padding: 14px; text-align: center; transition: border-color 0.2s;
         }
-        .event-card:hover { border-color: var(--border-hover); }
+        .event-card:hover { border-color: rgba(124,58,237,0.3); }
         .event-card-name {
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 9px; font-weight: 600; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.05em;
+            margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .event-card-count {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--accent-green);
+        .event-card-count { font-family: var(--mono); font-size: 20px; font-weight: 600; color: var(--violet); }
+
+        /* ── Donut ── */
+        .donut-wrap { display: flex; align-items: center; gap: 24px; }
+        .donut-canvas { width: 140px; height: 140px; flex-shrink: 0; }
+        .donut-legend { display: flex; flex-direction: column; gap: 10px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .legend-label { color: var(--text-sec); flex: 1; }
+        .legend-val { font-family: var(--mono); font-weight: 500; color: var(--text); }
+
+        /* ── New vs Returning ── */
+        .nv-bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; margin: 14px 0; background: rgba(255,255,255,0.04); }
+        .nv-new { background: var(--cyan); transition: width 0.8s ease; }
+        .nv-ret { background: var(--violet); transition: width 0.8s ease; }
+        .nv-labels { display: flex; justify-content: space-between; font-size: 12px; }
+        .nv-labels span { display: flex; align-items: center; gap: 5px; color: var(--text-sec); }
+        .nv-labels .dot { width: 7px; height: 7px; border-radius: 50%; }
+        .nv-labels strong { color: var(--text); font-family: var(--mono); font-size: 11px; }
+        .nv-big { text-align: center; margin-top: 18px; }
+        .nv-big-num { font-family: var(--mono); font-size: 32px; font-weight: 600; color: var(--cyan); }
+        .nv-big-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* ── Browser List ── */
+        .browser-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
+        .browser-row:not(:last-child) { border-bottom: 1px solid var(--border); }
+        .browser-name { font-size: 12px; color: var(--text-sec); }
+        .browser-count { font-family: var(--mono); font-size: 12px; color: var(--text); }
+
+        /* ── Geography ── */
+        .geo-item { display: flex; align-items: center; gap: 10px; }
+        .geo-item:not(:last-child) { padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); }
+        .geo-rank { font-family: var(--mono); font-size: 10px; color: var(--text-muted); width: 18px; }
+        .geo-code { font-size: 10px; font-weight: 600; color: var(--text-muted); width: 22px; }
+        .geo-name { flex: 1; font-size: 12px; color: var(--text-sec); }
+        .geo-bar-wrap { flex: 2; height: 3px; background: var(--border); position: relative; }
+        .geo-bar { position: absolute; left: 0; top: 0; height: 100%; background: var(--gold); opacity: 0.8; }
+        .geo-val { font-family: var(--mono); font-size: 11px; color: var(--text); width: 42px; text-align: right; }
+
+        /* ── Heatmap ── */
+        .heatmap-grid { display: grid; grid-template-columns: 36px repeat(24, 1fr); gap: 2px; }
+        .heatmap-label { display: flex; align-items: center; color: var(--text-muted); font-size: 9px; font-weight: 500; }
+        .heatmap-cell { aspect-ratio: 1; border-radius: 2px; background: rgba(0,240,255,0.03); min-height: 12px; transition: background 0.3s; }
+        .heatmap-hour { text-align: center; color: var(--text-muted); font-size: 8px; font-weight: 500; font-family: var(--mono); padding-bottom: 3px; }
+
+        /* ── Live Activity ── */
+        .activity-feed { max-height: 220px; overflow-y: auto; }
+        .activity-item {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 8px 0; border-bottom: 1px solid var(--border);
+            font-family: var(--mono); font-size: 10px;
+            animation: fadeIn 0.3s ease;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-time { color: var(--text-muted); min-width: 60px; }
+        .act-tag {
+            padding: 1px 5px; font-size: 8px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.04em;
+        }
+        .act-tag.visit { background: rgba(0,240,255,0.08); color: var(--cyan); }
+        .act-tag.event { background: rgba(124,58,237,0.08); color: var(--violet); }
+        .act-tag.page { background: rgba(197,160,89,0.08); color: var(--gold); }
+        .activity-msg { color: var(--text-sec); flex: 1; }
+        .activity-loc { color: var(--text-muted); }
 
         /* ── Footer ── */
         .dash-footer {
-            text-align: center;
-            padding: 40px 0 20px;
-            font-size: 12px;
-            color: var(--text-muted);
+            text-align: center; padding: 32px 0 16px;
+            font-size: 10px; color: var(--text-muted);
+            font-family: var(--mono); letter-spacing: 0.05em;
         }
 
-        /* ── Loading State ── */
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 60px 0;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-        .spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--border);
-            border-top-color: var(--text-secondary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-right: 10px;
-        }
+        /* ── Empty / Loading ── */
+        .empty-state { text-align: center; padding: 30px 0; color: var(--text-muted); font-size: 12px; }
+        .loading { display: flex; align-items: center; justify-content: center; padding: 40px; color: var(--text-muted); font-size: 12px; }
+        .spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--text-sec); border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 8px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ── Empty State ── */
-        .empty-state {
-            text-align: center;
-            padding: 40px 0;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-
-        /* ── Animated Number ── */
-        .counter { transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
-
-        /* ── New vs Returning ── */
-        .nv-bar {
-            display: flex;
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 16px 0;
-            background: rgba(255,255,255,0.04);
-        }
-        .nv-new {
-            background: var(--accent-blue);
-            transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .nv-returning {
-            background: var(--accent-purple);
-            transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .nv-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-        }
-        .nv-labels span { display: flex; align-items: center; gap: 6px; }
-        .nv-labels .dot { width: 8px; height: 8px; border-radius: 50%; }
+        /* ── Full-width panel ── */
+        .full-span { grid-column: 1 / -1; }
 
         /* ── Responsive ── */
+        @media (max-width: 1400px) {
+            .metrics-row { grid-template-columns: repeat(2, 1fr); }
+            .traffic-split { grid-template-columns: 1fr; }
+            .traffic-chart { border-right: none; border-bottom: 1px solid var(--border); }
+            .grid-3 { grid-template-columns: 1fr; }
+        }
         @media (max-width: 900px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .grid-2, .grid-3 { grid-template-columns: 1fr; }
-            .live-detail { margin-left: 0; margin-top: 4px; width: 100%; }
+            .grid-2 { grid-template-columns: 1fr; }
+            .sidebar { width: var(--sidebar-c); }
+            .sidebar .s-logo-text, .sidebar .nav-label, .sidebar .nav-group-title { display: none; }
+            .main { margin-left: var(--sidebar-c); }
+            .header { padding: 0 16px; }
+            .content { padding: 14px 16px; }
         }
         @media (max-width: 600px) {
-            .stats-grid { grid-template-columns: 1fr 1fr; }
-            .stat-value { font-size: 26px; }
-            .stat-card { padding: 16px 18px; }
-            .dash-header { flex-direction: column; align-items: flex-start; }
-            .donut-wrap { flex-direction: column; align-items: center; }
-            .country-name { width: 100px; }
-            .heatmap-grid { font-size: 8px; }
+            .metrics-row { grid-template-columns: 1fr 1fr; }
+            .metric-value { font-size: 22px; }
+            .donut-wrap { flex-direction: column; }
             .event-grid { grid-template-columns: repeat(2, 1fr); }
+            .header-title { display: none; }
         }
     </style>
 </head>
 <body>
 
-<!--
-    ╔══════════════════════════════════════════════════════════════════╗
-    ║  SECURITY NOTE                                                  ║
-    ║                                                                  ║
-    ║  This password gate is CLIENT-SIDE only. The credentials are    ║
-    ║  visible in the source code and provide NO real security.       ║
-    ║                                                                  ║
-    ║  In production, replace this with:                               ║
-    ║  • Server-side authentication (JWT / session tokens)            ║
-    ║  • Supabase Auth with Row Level Security                        ║
-    ║  • Netlify Identity / OAuth provider                             ║
-    ║  • HTTP Basic Auth via server config                             ║
-    ║                                                                  ║
-    ║  The current gate only deters casual access, not determined     ║
-    ║  users who can inspect the page source.                          ║
-    ╚══════════════════════════════════════════════════════════════════╝
--->
-
 <!-- Password Gate -->
-<div class="password-gate" id="passwordGate">
+<div class="gate" id="gate">
     <div class="gate-box">
         <div class="gate-logo">RIKKA</div>
         <input type="text" class="gate-input" id="gateUser" placeholder="Username" autocomplete="off" spellcheck="false">
         <input type="password" class="gate-input" id="gatePass" placeholder="Password" autocomplete="off">
-        <button class="gate-submit" id="gateSubmit">Sign In</button>
+        <button class="gate-submit" id="gateSubmit">Authenticate</button>
         <div class="gate-error" id="gateError">Invalid credentials</div>
     </div>
 </div>
 
-<!-- Dashboard -->
-<div class="dashboard" id="dashboard">
-
-    <!-- Header -->
-    <div class="dash-header">
-        <div class="dash-brand">
-            <h1>RIKKA</h1>
-            <span>Analytics</span>
+<!-- App Shell -->
+<div class="app" id="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-head">
+            <div class="s-logo">R</div>
+            <span class="s-logo-text">RIKKA</span>
         </div>
-        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-            <div class="time-filters">
-                <button class="time-btn active" data-range="24h">24h</button>
-                <button class="time-btn" data-range="7d">7d</button>
-                <button class="time-btn" data-range="30d">30d</button>
-                <button class="time-btn" data-range="90d">90d</button>
+        <nav class="sidebar-nav">
+            <div class="nav-group">
+                <div class="nav-group-title">Intelligence</div>
+                <a class="nav-item active" data-section="top">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
+                    <span class="nav-label">Overview</span>
+                </a>
+                <a class="nav-item" data-section="trafficPanel">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-3 3"/></svg></span>
+                    <span class="nav-label">Traffic</span>
+                </a>
+                <a class="nav-item" data-section="geoSection">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+                    <span class="nav-label">Audience</span>
+                </a>
+                <a class="nav-item" data-section="eventsSection">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="nav-label">Events</span>
+                </a>
             </div>
-            <button class="export-btn" id="exportBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Export CSV
+            <div class="nav-group">
+                <div class="nav-group-title">Analysis</div>
+                <a class="nav-item" data-section="pagesSection">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>
+                    <span class="nav-label">Pages</span>
+                </a>
+                <a class="nav-item" data-section="liveSection">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg></span>
+                    <span class="nav-label">Live</span>
+                </a>
+                <a class="nav-item" data-section="heatmapSection">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></span>
+                    <span class="nav-label">Heatmap</span>
+                </a>
+            </div>
+        </nav>
+        <div class="sidebar-foot">
+            <button class="collapse-btn" onclick="document.getElementById('sidebar').classList.toggle('collapsed')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                <span>Collapse</span>
             </button>
         </div>
-    </div>
+    </aside>
 
-    <!-- Live Bar (enhanced with country + page detail) -->
-    <div class="live-bar">
-        <span class="live-dot"></span>
-        <span class="live-count" id="liveCount">0</span>
-        <span>visitors on your site right now</span>
-        <div class="live-detail" id="liveDetail"></div>
-    </div>
-
-    <!-- Stat Cards -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-label">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-                Unique Visitors
-            </div>
-            <div class="stat-value blue" id="statVisitors">—</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                Pageviews
-            </div>
-            <div class="stat-value green" id="statPageviews">—</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                Bounce Rate
-            </div>
-            <div class="stat-value yellow" id="statBounce">—</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                Avg Duration
-            </div>
-            <div class="stat-value purple" id="statDuration">—</div>
-        </div>
-    </div>
-
-    <!-- Visitors Chart -->
-    <div class="panel">
-        <div class="panel-title" id="chartTitle">Hourly Visitors</div>
-        <div class="chart-wrap">
-            <canvas id="visitorsChart"></canvas>
-        </div>
-    </div>
-
-    <!-- Top Pages + Top Referrers -->
-    <div class="grid-2">
-        <div class="panel">
-            <div class="panel-title">Top Pages</div>
-            <table class="data-table">
-                <thead><tr><th>Path</th><th>Views</th><th>%</th></tr></thead>
-                <tbody id="topPages"><tr><td colspan="3" class="empty-state">No data yet</td></tr></tbody>
-            </table>
-        </div>
-        <div class="panel">
-            <div class="panel-title">Top Referrers</div>
-            <table class="data-table">
-                <thead><tr><th>Source</th><th>Visitors</th><th>%</th></tr></thead>
-                <tbody id="topReferrers"><tr><td colspan="3" class="empty-state">No data yet</td></tr></tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Traffic Source Summary (NEW) -->
-    <div class="grid-2">
-        <div class="panel">
-            <div class="panel-title">Traffic Sources</div>
-            <div id="trafficSources"></div>
-        </div>
-        <div class="panel">
-            <div class="panel-title">Events</div>
-            <div class="event-grid" id="eventGrid">
-                <div class="empty-state" style="grid-column:1/-1;">No events yet</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Device + New vs Returning + Browsers -->
-    <div class="grid-3">
-        <div class="panel">
-            <div class="panel-title">Device Breakdown</div>
-            <div class="donut-wrap">
-                <div class="donut-chart-container">
-                    <canvas id="deviceChart"></canvas>
-                </div>
-                <div class="donut-legend" id="deviceLegend"></div>
-            </div>
-        </div>
-        <div class="panel">
-            <div class="panel-title">New vs Returning</div>
-            <div id="newVsReturning">
-                <div class="nv-bar">
-                    <div class="nv-new" id="nvNew" style="width:0%"></div>
-                    <div class="nv-returning" id="nvReturning" style="width:0%"></div>
-                </div>
-                <div class="nv-labels">
-                    <span><span class="dot" style="background:var(--accent-blue)"></span> New <strong id="nvNewPct">0%</strong></span>
-                    <span><span class="dot" style="background:var(--accent-purple)"></span> Returning <strong id="nvRetPct">0%</strong></span>
-                </div>
-                <div style="text-align:center; margin-top:20px;">
-                    <div style="font-size:36px; font-weight:700; color:var(--accent-blue);" id="nvNewCount">0</div>
-                    <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">new visitors</div>
+    <!-- Main Content -->
+    <main class="main">
+        <header class="header">
+            <div class="header-left">
+                <h1 class="header-title">Analytics Overview</h1>
+                <div class="time-filter">
+                    <button class="active" data-range="24h">24H</button>
+                    <button data-range="7d">7D</button>
+                    <button data-range="30d">30D</button>
+                    <button data-range="90d">90D</button>
                 </div>
             </div>
+            <div class="header-right">
+                <div class="live-badge">
+                    <span class="live-dot"></span>
+                    <span class="live-text">Live</span>
+                    <span class="live-count-head" id="liveCountHead">0</span>
+                </div>
+                <button class="export-btn" id="exportBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span>CSV</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="content">
+            <!-- Metrics Row -->
+            <section class="metrics-row" id="top">
+                <div class="metric">
+                    <span class="metric-label">Unique Visitors</span>
+                    <span class="metric-value" id="mVisitors">—</span>
+                </div>
+                <div class="metric violet">
+                    <span class="metric-label">Pageviews</span>
+                    <span class="metric-value" id="mPageviews">—</span>
+                </div>
+                <div class="metric emerald">
+                    <span class="metric-label">Avg. Duration</span>
+                    <span class="metric-value" id="mDuration">—</span>
+                </div>
+                <div class="metric gold">
+                    <span class="metric-label">Bounce Rate</span>
+                    <span class="metric-value" id="mBounce">—</span>
+                </div>
+            </section>
+
+            <!-- Traffic Panel -->
+            <section class="traffic-split" id="trafficPanel">
+                <div class="traffic-chart">
+                    <div class="panel-title" id="chartTitle">Hourly Visitors</div>
+                    <div class="chart-wrap"><canvas id="visitorsChart"></canvas></div>
+                </div>
+                <div class="traffic-breakdown">
+                    <div class="bd-section">
+                        <h3 class="bd-title">Traffic Sources</h3>
+                        <div id="bdSources"></div>
+                    </div>
+                    <div class="bd-section">
+                        <h3 class="bd-title">Devices</h3>
+                        <div id="bdDevices"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Top Pages + Top Referrers -->
+            <div class="grid-2" id="pagesSection">
+                <div class="panel">
+                    <div class="panel-title">Top Pages</div>
+                    <table class="data-table">
+                        <thead><tr><th>Path</th><th>Views</th><th>%</th></tr></thead>
+                        <tbody id="topPages"><tr><td colspan="3" class="empty-state">No data yet</td></tr></tbody>
+                    </table>
+                </div>
+                <div class="panel">
+                    <div class="panel-title">Top Referrers</div>
+                    <table class="data-table">
+                        <thead><tr><th>Source</th><th>Visitors</th><th>%</th></tr></thead>
+                        <tbody id="topReferrers"><tr><td colspan="3" class="empty-state">No data yet</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Traffic Sources + Events -->
+            <div class="grid-2" id="eventsSection">
+                <div class="panel">
+                    <div class="panel-title">Traffic Sources</div>
+                    <div id="trafficSources"></div>
+                </div>
+                <div class="panel">
+                    <div class="panel-title">Conversion Events</div>
+                    <div class="event-grid" id="eventGrid">
+                        <div class="empty-state" style="grid-column:1/-1;">No events yet</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Device + New/Returning + Browsers -->
+            <div class="grid-3">
+                <div class="panel">
+                    <div class="panel-title">Device Breakdown</div>
+                    <div class="donut-wrap">
+                        <div class="donut-canvas"><canvas id="deviceChart"></canvas></div>
+                        <div class="donut-legend" id="deviceLegend"></div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-title">New vs Returning</div>
+                    <div>
+                        <div class="nv-bar">
+                            <div class="nv-new" id="nvNew" style="width:0%"></div>
+                            <div class="nv-ret" id="nvRet" style="width:0%"></div>
+                        </div>
+                        <div class="nv-labels">
+                            <span><span class="dot" style="background:var(--cyan)"></span> New <strong id="nvNewPct">0%</strong></span>
+                            <span><span class="dot" style="background:var(--violet)"></span> Returning <strong id="nvRetPct">0%</strong></span>
+                        </div>
+                        <div class="nv-big">
+                            <div class="nv-big-num" id="nvNewCount">0</div>
+                            <div class="nv-big-label">new visitors</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-title">Top Browsers</div>
+                    <div id="browserList"></div>
+                </div>
+            </div>
+
+            <!-- Geography -->
+            <div class="panel" id="geoSection">
+                <div class="panel-title">Audience Geography</div>
+                <div id="geoList"></div>
+            </div>
+
+            <!-- Heatmap -->
+            <div class="panel" id="heatmapSection">
+                <div class="panel-title">Peak Hours</div>
+                <div class="heatmap-grid" id="heatmap"></div>
+            </div>
+
+            <!-- Live Activity -->
+            <div class="panel" id="liveSection">
+                <div class="panel-title">Live Activity Monitor</div>
+                <div class="activity-feed" id="activityFeed">
+                    <div class="empty-state">Waiting for activity…</div>
+                </div>
+            </div>
+
+            <div class="dash-footer">RIKKA Analytics · Privacy-first · No cookies</div>
         </div>
-        <div class="panel">
-            <div class="panel-title">Top Browsers</div>
-            <div id="browserList"></div>
-        </div>
-    </div>
-
-    <!-- Geography -->
-    <div class="panel">
-        <div class="panel-title">Visitor Geography (Top 10)</div>
-        <div id="geoList"></div>
-    </div>
-
-    <!-- Peak Hours Heatmap -->
-    <div class="panel">
-        <div class="panel-title">Peak Hours</div>
-        <div class="heatmap-grid" id="heatmap"></div>
-    </div>
-
-    <!-- Footer -->
-    <div class="dash-footer">RIKKA Analytics &middot; Privacy-first &middot; No cookies</div>
+    </main>
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════════════
- *  RIKKA Analytics Dashboard — v2.0
- *  Architecture: Supabase (Postgres) → REST API → Client Renderer
- *
- *  Analytics Pipeline:
- *  1. Visitor lands on rikka-music.com
- *  2. Tracking script (in index.html) sends pageview to Netlify Function
- *  3. Netlify Function parses UA, geo headers, writes to Supabase
- *  4. This dashboard reads from Supabase and renders charts/stats
- *
- *  Improvements in v2.0:
- *  - Bot filtering on dashboard side (double-layer with server)
- *  - Unique visitor tracking via session_id deduplication
- *  - Custom event tracking (spotify, youtube, song_play, etc.)
- *  - Heartbeat-based session duration
- *  - Traffic source categorisation (Direct, Social, Search, Other)
- *  - Live visitor widget with country + page detail
- *  - Refactored into logical modules with JSDoc comments
- *  - Admin security comments for production upgrade path
- * ═══════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+ *  RIKKA Command Center — v2.0
+ *  Supabase → REST API → Client Renderer
+ * ═══════════════════════════════════════════════════════════ */
 
-// ─────────────────────────────────────────
-// MODULE: Configuration
-// ─────────────────────────────────────────
 const CONFIG = {
     supabaseUrl: 'https://tueltwjjkvqvdnznnhuq.supabase.co',
     supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1ZWx0d2pqa3ZxdmRuem5uaHVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MDEzMDAsImV4cCI6MjA4NzE3NzMwMH0.Vf55QMlAqxdpP5iVR7RzkljCn4G1GRyO_We_82xulYQ',
-    refreshInterval: 60000,     // Full data refresh every 60s
-    liveInterval: 30000,        // Live count refresh every 30s
-    liveWindowSeconds: 300,     // "Active" = visited in last 5 minutes
+    refreshInterval: 60000,
+    liveInterval: 30000,
+    liveWindowSeconds: 300,
     sessionAuthKey: 'rikka_admin_auth',
     maxRows: 10000
 };
 
-/*
- * SECURITY: These credentials are exposed in client-side code.
- * In production, replace with server-side auth (Supabase Auth, JWT, OAuth).
- * This gate only prevents casual access — it is NOT secure.
- * Credentials are hashed below to avoid plain-text exposure in source view,
- * but this is obfuscation, not real security.
- */
 const AUTH = {
     _u: btoa('pedraw'),
     _p: btoa('rikkainfinita'),
-    verify(user, pass) {
-        return btoa(user) === this._u && btoa(pass) === this._p;
-    }
+    verify(u, p) { return btoa(u) === this._u && btoa(p) === this._p; }
 };
 
-// ─────────────────────────────────────────
-// MODULE: Bot Detection
-// Filters known bots/crawlers from analytics
-// ─────────────────────────────────────────
+// ── Bot Filter ──
 const BotFilter = {
-    /** UA substrings that indicate a bot or crawler */
     patterns: [
-        'googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider',
-        'yandexbot', 'sogou', 'exabot', 'facebot', 'facebookexternalhit',
-        'ia_archiver', 'alexabot', 'mj12bot', 'ahrefs', 'semrush',
-        'dotbot', 'rogerbot', 'twitterbot', 'linkedinbot',
-        'curl', 'wget', 'python-requests', 'httpie', 'node-fetch',
-        'headlesschrome', 'phantomjs', 'selenium', 'puppeteer',
-        'lighthouse', 'pagespeed', 'gtmetrix',
-        'uptimerobot', 'pingdom', 'statuscake', 'site24x7',
-        'bot', 'crawler', 'spider', 'crawling', 'monitor'
+        'googlebot','bingbot','slurp','duckduckbot','baiduspider','yandexbot','sogou',
+        'exabot','facebot','facebookexternalhit','ia_archiver','alexabot','mj12bot',
+        'ahrefs','semrush','dotbot','rogerbot','twitterbot','linkedinbot',
+        'curl','wget','python-requests','httpie','node-fetch',
+        'headlesschrome','phantomjs','selenium','puppeteer',
+        'lighthouse','pagespeed','gtmetrix',
+        'uptimerobot','pingdom','statuscake','site24x7',
+        'bot','crawler','spider','crawling','monitor'
     ],
-
-    /**
-     * Check if a browser string looks like a bot
-     * @param {string} browser - The browser field from pageview data
-     * @returns {boolean}
-     */
-    isBot(browser) {
-        if (!browser) return false;
-        const lower = browser.toLowerCase();
-        return this.patterns.some(p => lower.includes(p));
-    },
-
-    /**
-     * Filter bot entries out of a pageviews array
-     * @param {Array} data - Raw pageview records
-     * @returns {Array} - Clean human-only pageviews
-     */
-    filter(data) {
-        return data.filter(d => !this.isBot(d.browser));
-    }
+    isBot(b) { if (!b) return false; const l = b.toLowerCase(); return this.patterns.some(p => l.includes(p)); },
+    filter(data) { return data.filter(d => !this.isBot(d.browser)); }
 };
 
-// ─────────────────────────────────────────
-// MODULE: Traffic Source Classifier
-// Groups referrers into meaningful categories
-// ─────────────────────────────────────────
+// ── Traffic Source Classifier ──
 const TrafficClassifier = {
-    /** Map of category → domain patterns */
     rules: {
-        'Instagram':    ['instagram.com', 'l.instagram.com'],
-        'YouTube':      ['youtube.com', 'youtu.be', 'm.youtube.com'],
-        'TikTok':       ['tiktok.com', 'vm.tiktok.com'],
-        'Twitter / X':  ['twitter.com', 't.co', 'x.com'],
-        'Facebook':     ['facebook.com', 'fb.com', 'l.facebook.com', 'lm.facebook.com'],
-        'Spotify':      ['spotify.com', 'open.spotify.com'],
-        'SoundCloud':   ['soundcloud.com'],
-        'Google':       ['google.com', 'google.co.uk', 'google.de', 'google.fr', 'google.es', 'google.pt', 'google.com.br'],
-        'Bing':         ['bing.com'],
-        'LinkedIn':     ['linkedin.com', 'lnkd.in']
+        'Instagram':   ['instagram.com','l.instagram.com'],
+        'YouTube':     ['youtube.com','youtu.be','m.youtube.com'],
+        'TikTok':      ['tiktok.com','vm.tiktok.com'],
+        'Twitter / X': ['twitter.com','t.co','x.com'],
+        'Facebook':    ['facebook.com','fb.com','l.facebook.com','lm.facebook.com'],
+        'Spotify':     ['spotify.com','open.spotify.com'],
+        'SoundCloud':  ['soundcloud.com'],
+        'Google':      ['google.com','google.co.uk','google.de','google.fr','google.es','google.pt','google.com.br'],
+        'Bing':        ['bing.com'],
+        'LinkedIn':    ['linkedin.com','lnkd.in']
     },
-    /** SVG icons per category (white/grey) */
     icons: {
-        'Direct':       '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"/><path d="M12 2v4m0 12v4m10-10h-4M6 12H2m15.07-7.07l-2.83 2.83M9.76 14.24l-2.83 2.83m11.14 0l-2.83-2.83M9.76 9.76L6.93 6.93" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round"/></svg>',
-        'Instagram':    '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>',
-        'YouTube':      '<svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 2C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58zM9.75 15.02V8.98L15.5 12l-5.75 3.02z" fill="rgba(255,255,255,0.7)"/></svg>',
-        'TikTok':       '<svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.51a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.71a8.35 8.35 0 0 0 4.76 1.49V6.75a4.79 4.79 0 0 1-1-.06z" fill="rgba(255,255,255,0.7)"/></svg>',
-        'Twitter / X':  '<svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="rgba(255,255,255,0.7)"/></svg>',
-        'Facebook':     '<svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="rgba(255,255,255,0.7)"/></svg>',
-        'Spotify':      '<svg viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" fill="rgba(255,255,255,0.7)"/></svg>',
-        'SoundCloud':   '<svg viewBox="0 0 24 24"><path d="M1.175 12.225c-.051 0-.094.046-.101.1l-.233 2.154.233 2.105c.007.058.05.098.101.098.05 0 .09-.04.099-.098l.255-2.105-.27-2.154c-.009-.06-.05-.1-.1-.1m-.899.828c-.06 0-.091.037-.104.094L0 14.479l.172 1.282c.013.06.044.094.104.094.058 0 .09-.037.104-.094l.2-1.282-.2-1.332c-.014-.057-.046-.094-.104-.094m1.81-1.133c-.065 0-.111.05-.118.117l-.197 2.442.197 2.399c.007.065.053.116.118.116.063 0 .11-.051.117-.116l.228-2.399-.228-2.442c-.008-.066-.054-.117-.117-.117m.925-.216c-.073 0-.126.058-.132.13l-.182 2.658.182 2.584c.006.072.059.131.132.131s.126-.06.132-.131l.208-2.584-.208-2.658c-.006-.072-.059-.13-.132-.13m.92-.155c-.08 0-.14.065-.147.146l-.167 2.813.167 2.754c.007.08.067.146.147.146.079 0 .139-.065.147-.146l.192-2.754-.192-2.813c-.008-.08-.068-.146-.147-.146m.93-.12c-.088 0-.155.073-.16.162l-.153 2.933.153 2.882c.005.087.072.161.16.161.087 0 .154-.074.16-.161l.175-2.882-.175-2.933c-.006-.09-.073-.163-.16-.163m.937-.06c-.097 0-.168.08-.174.178L5.45 14.48l.138 2.985c.006.096.077.176.174.176s.168-.08.174-.176l.158-2.985-.158-3.006c-.006-.098-.077-.178-.174-.178m.948-.024c-.104 0-.183.087-.188.192l-.123 3.03.123 3.056c.005.104.084.192.188.192.104 0 .183-.088.189-.192l.14-3.056-.14-3.03c-.006-.105-.085-.192-.19-.192m.953.008c-.112 0-.197.094-.202.207l-.108 3.022.108 3.092c.005.113.09.208.202.208.11 0 .196-.095.202-.208l.124-3.092-.124-3.022c-.006-.113-.091-.207-.202-.207m.967.06c-.119 0-.21.1-.214.221l-.094 2.962.094 3.07c.004.12.095.22.214.22s.21-.1.214-.22l.108-3.07-.108-2.962c-.004-.12-.095-.222-.214-.222m7.105-.238c-.236 0-.464.029-.684.086a5.42 5.42 0 0 0-5.418-5.093c-.688 0-1.362.134-1.98.388-.232.096-.294.194-.294.384v10.078c0 .2.155.368.35.388h8.026a2.973 2.973 0 0 0 2.975-2.975 2.973 2.973 0 0 0-2.975-2.976" fill="rgba(255,255,255,0.7)"/></svg>',
-        'Google':       '<svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="rgba(255,255,255,0.5)"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="rgba(255,255,255,0.6)"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="rgba(255,255,255,0.45)"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="rgba(255,255,255,0.7)"/></svg>',
-        'Bing':         '<svg viewBox="0 0 24 24"><path d="M5 3v16.5l4.67 2.5 7.83-4.5v-3.5L11.33 11l-2.33 1v3.5l-1.5-.85V4.5L5 3zm4.67 11.65l4.33 2.5v-3L11.33 12l-1.66.95v1.7z" fill="rgba(255,255,255,0.7)"/></svg>',
-        'LinkedIn':     '<svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" fill="rgba(255,255,255,0.7)"/></svg>',
+        'Direct':       '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="2"/><path d="M12 2v4m0 12v4m10-10h-4M6 12H2m15.07-7.07l-2.83 2.83M9.76 14.24l-2.83 2.83m11.14 0l-2.83-2.83M9.76 9.76L6.93 6.93" stroke="rgba(255,255,255,0.65)" stroke-width="2" stroke-linecap="round"/></svg>',
+        'Instagram':    '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>',
+        'YouTube':      '<svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 2C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58zM9.75 15.02V8.98L15.5 12l-5.75 3.02z" fill="rgba(255,255,255,0.65)"/></svg>',
+        'TikTok':       '<svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.51a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.71a8.35 8.35 0 0 0 4.76 1.49V6.75a4.79 4.79 0 0 1-1-.06z" fill="rgba(255,255,255,0.65)"/></svg>',
+        'Twitter / X':  '<svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="rgba(255,255,255,0.65)"/></svg>',
+        'Facebook':     '<svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="rgba(255,255,255,0.65)"/></svg>',
+        'Spotify':      '<svg viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" fill="rgba(255,255,255,0.65)"/></svg>',
+        'SoundCloud':   '<svg viewBox="0 0 24 24"><path d="M1.175 12.225c-.051 0-.094.046-.101.1l-.233 2.154.233 2.105c.007.058.05.098.101.098.05 0 .09-.04.099-.098l.255-2.105-.27-2.154c-.009-.06-.05-.1-.1-.1m-.899.828c-.06 0-.091.037-.104.094L0 14.479l.172 1.282c.013.06.044.094.104.094.058 0 .09-.037.104-.094l.2-1.282-.2-1.332c-.014-.057-.046-.094-.104-.094m1.81-1.133c-.065 0-.111.05-.118.117l-.197 2.442.197 2.399c.007.065.053.116.118.116.063 0 .11-.051.117-.116l.228-2.399-.228-2.442c-.008-.066-.054-.117-.117-.117m.925-.216c-.073 0-.126.058-.132.13l-.182 2.658.182 2.584c.006.072.059.131.132.131s.126-.06.132-.131l.208-2.584-.208-2.658c-.006-.072-.059-.13-.132-.13m.92-.155c-.08 0-.14.065-.147.146l-.167 2.813.167 2.754c.007.08.067.146.147.146.079 0 .139-.065.147-.146l.192-2.754-.192-2.813c-.008-.08-.068-.146-.147-.146m.93-.12c-.088 0-.155.073-.16.162l-.153 2.933.153 2.882c.005.087.072.161.16.161.087 0 .154-.074.16-.161l.175-2.882-.175-2.933c-.006-.09-.073-.163-.16-.163m.937-.06c-.097 0-.168.08-.174.178L5.45 14.48l.138 2.985c.006.096.077.176.174.176s.168-.08.174-.176l.158-2.985-.158-3.006c-.006-.098-.077-.178-.174-.178m.948-.024c-.104 0-.183.087-.188.192l-.123 3.03.123 3.056c.005.104.084.192.188.192.104 0 .183-.088.189-.192l.14-3.056-.14-3.03c-.006-.105-.085-.192-.19-.192m.953.008c-.112 0-.197.094-.202.207l-.108 3.022.108 3.092c.005.113.09.208.202.208.11 0 .196-.095.202-.208l.124-3.092-.124-3.022c-.006-.113-.091-.207-.202-.207m.967.06c-.119 0-.21.1-.214.221l-.094 2.962.094 3.07c.004.12.095.22.214.22s.21-.1.214-.22l.108-3.07-.108-2.962c-.004-.12-.095-.222-.214-.222m7.105-.238c-.236 0-.464.029-.684.086a5.42 5.42 0 0 0-5.418-5.093c-.688 0-1.362.134-1.98.388-.232.096-.294.194-.294.384v10.078c0 .2.155.368.35.388h8.026a2.973 2.973 0 0 0 2.975-2.975 2.973 2.973 0 0 0-2.975-2.976" fill="rgba(255,255,255,0.65)"/></svg>',
+        'Google':       '<svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="rgba(255,255,255,0.45)"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="rgba(255,255,255,0.55)"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="rgba(255,255,255,0.4)"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="rgba(255,255,255,0.65)"/></svg>',
+        'Bing':         '<svg viewBox="0 0 24 24"><path d="M5 3v16.5l4.67 2.5 7.83-4.5v-3.5L11.33 11l-2.33 1v3.5l-1.5-.85V4.5L5 3zm4.67 11.65l4.33 2.5v-3L11.33 12l-1.66.95v1.7z" fill="rgba(255,255,255,0.65)"/></svg>',
+        'LinkedIn':     '<svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" fill="rgba(255,255,255,0.65)"/></svg>',
         'Other':        '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.5"/><circle cx="6" cy="12" r="1.5"/><circle cx="18" cy="12" r="1.5"/></svg>'
     },
-
-    /**
-     * Classify a referrer domain into a named source
-     * @param {string|null} domain - The referrer_domain field
-     * @returns {string} - Category name
-     */
     classify(domain) {
         if (!domain) return 'Direct';
-        const lower = domain.toLowerCase();
-        for (const [category, patterns] of Object.entries(this.rules)) {
-            if (patterns.some(p => lower.includes(p))) return category;
+        const l = domain.toLowerCase();
+        for (const [cat, patterns] of Object.entries(this.rules)) {
+            if (patterns.some(p => l.includes(p))) return cat;
         }
         return 'Other';
     },
-
-    /**
-     * Build a summary of traffic sources from pageview data
-     * @param {Array} data - Pageview records
-     * @returns {Array<{name, count, pct, icon}>} - Sorted source summary
-     */
     summarise(data) {
         const counts = {};
-        data.forEach(d => {
-            const source = this.classify(d.referrer_domain);
-            counts[source] = (counts[source] || 0) + 1;
-        });
+        data.forEach(d => { const s = this.classify(d.referrer_domain); counts[s] = (counts[s] || 0) + 1; });
         const total = data.length || 1;
         return Object.entries(counts)
-            .map(([name, count]) => ({
-                name,
-                count,
-                pct: Math.round(count / total * 100),
-                icon: this.icons[name] || '⋯'
-            }))
+            .map(([name, count]) => ({ name, count, pct: Math.round(count / total * 100), icon: this.icons[name] || '⋯' }))
             .sort((a, b) => b.count - a.count);
     }
 };
 
-// ─────────────────────────────────────────
-// MODULE: State
-// ─────────────────────────────────────────
+// ── State ──
 let currentRange = '24h';
 let allData = [];
 let allEvents = [];
 let visitorsChart = null;
 let deviceChart = null;
 
-// ─────────────────────────────────────────
-// MODULE: Auth Gate
-// ─────────────────────────────────────────
-const gate = document.getElementById('passwordGate');
+// ── Auth Gate ──
+const gate = document.getElementById('gate');
 const gateUser = document.getElementById('gateUser');
 const gatePass = document.getElementById('gatePass');
 const gateSubmit = document.getElementById('gateSubmit');
 const gateError = document.getElementById('gateError');
-const dashboard = document.getElementById('dashboard');
+const app = document.getElementById('app');
 
-/** Check for existing session and auto-unlock */
 if (localStorage.getItem(CONFIG.sessionAuthKey) === 'true') {
-    gate.classList.add('hidden');
-    dashboard.classList.add('active');
-    initDashboard();
+    gate.classList.add('hidden'); app.classList.add('active'); initDashboard();
 }
 
-/**
- * Validate credentials and unlock dashboard
- * Rate-limited: 3 failed attempts triggers 5s cooldown
- */
-let loginAttempts = 0;
-let loginLocked = false;
-
+let loginAttempts = 0, loginLocked = false;
 function attemptLogin() {
     if (loginLocked) return;
-
     if (AUTH.verify(gateUser.value, gatePass.value)) {
         loginAttempts = 0;
         localStorage.setItem(CONFIG.sessionAuthKey, 'true');
-        gate.classList.add('hidden');
-        dashboard.classList.add('active');
+        gate.classList.add('hidden'); app.classList.add('active');
         setTimeout(() => gate.remove(), 600);
         initDashboard();
     } else {
@@ -1033,60 +792,31 @@ function attemptLogin() {
         gateError.classList.add('show');
         gatePass.value = '';
         setTimeout(() => gateError.classList.remove('show'), 2000);
-
-        // Lock after 5 failed attempts for 10 seconds
         if (loginAttempts >= 5) {
             loginLocked = true;
-            gateSubmit.textContent = 'Locked...';
+            gateSubmit.textContent = 'LOCKED';
             gateSubmit.style.opacity = '0.3';
-            setTimeout(() => {
-                loginLocked = false;
-                loginAttempts = 0;
-                gateSubmit.textContent = 'Sign In';
-                gateSubmit.style.opacity = '1';
-            }, 10000);
+            setTimeout(() => { loginLocked = false; loginAttempts = 0; gateSubmit.textContent = 'Authenticate'; gateSubmit.style.opacity = '1'; }, 10000);
         }
     }
 }
-
 gateSubmit.addEventListener('click', attemptLogin);
-gatePass.addEventListener('keydown', (e) => { if (e.key === 'Enter') attemptLogin(); });
-gateUser.addEventListener('keydown', (e) => { if (e.key === 'Enter') gatePass.focus(); });
+gatePass.addEventListener('keydown', e => { if (e.key === 'Enter') attemptLogin(); });
+gateUser.addEventListener('keydown', e => { if (e.key === 'Enter') gatePass.focus(); });
 
-// ─────────────────────────────────────────
-// MODULE: Supabase Data Layer
-// ─────────────────────────────────────────
-
-/**
- * Query Supabase REST API
- * @param {string} table - Table name
- * @param {string} params - URL query params (PostgREST format)
- * @returns {Promise<Array>}
- */
+// ── Supabase Query ──
 async function query(table, params = '') {
     try {
         const res = await fetch(`${CONFIG.supabaseUrl}/rest/v1/${table}?${params}`, {
-            headers: {
-                'apikey': CONFIG.supabaseKey,
-                'Authorization': `Bearer ${CONFIG.supabaseKey}`
-            }
+            headers: { 'apikey': CONFIG.supabaseKey, 'Authorization': `Bearer ${CONFIG.supabaseKey}` }
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return await res.json();
-    } catch (err) {
-        console.warn(`[Analytics] Query failed for ${table}:`, err.message);
-        return [];
-    }
+    } catch (err) { console.warn(`[Query] ${table}:`, err.message); return []; }
 }
 
-/**
- * Calculate ISO timestamp for the start of a time range
- * @param {string} range - One of: '24h', '7d', '30d', '90d'
- * @returns {string} - ISO 8601 timestamp
- */
 function getTimeRange(range) {
-    const now = new Date();
-    const from = new Date();
+    const now = new Date(), from = new Date();
     switch (range) {
         case '24h': from.setHours(now.getHours() - 24); break;
         case '7d':  from.setDate(now.getDate() - 7); break;
@@ -1096,569 +826,343 @@ function getTimeRange(range) {
     return from.toISOString();
 }
 
-/**
- * Fetch pageviews + events for the current range, filter bots
- * @returns {Promise<Array>} - Filtered pageview data
- */
 async function fetchData() {
     const from = getTimeRange(currentRange);
-
-    // Fetch pageviews and events in parallel
-    const [rawPageviews, events] = await Promise.all([
+    const [raw, events] = await Promise.all([
         query('pageviews', `created_at=gte.${from}&order=created_at.asc&limit=${CONFIG.maxRows}`),
         query('analytics_events', `created_at=gte.${from}&order=created_at.desc&limit=5000`)
     ]);
-
-    // Filter bots from pageview data
-    allData = BotFilter.filter(rawPageviews);
+    allData = BotFilter.filter(raw);
     allEvents = events;
-
     return allData;
 }
 
-// ─────────────────────────────────────────
-// MODULE: Utility Functions
-// ─────────────────────────────────────────
-
-/**
- * Format seconds into human-readable duration
- * @param {number} seconds
- * @returns {string} - e.g. "2m 34s"
- */
-function formatDuration(seconds) {
-    if (!seconds || seconds < 1) return '0s';
-    if (seconds < 60) return `${Math.round(seconds)}s`;
-    const m = Math.floor(seconds / 60);
-    const s = Math.round(seconds % 60);
-    return s > 0 ? `${m}m ${s}s` : `${m}m`;
+// ── Utilities ──
+function formatDuration(s) {
+    if (!s || s < 1) return '0s';
+    if (s < 60) return `${Math.round(s)}s`;
+    const m = Math.floor(s / 60), sec = Math.round(s % 60);
+    return sec > 0 ? `${m}m ${sec}s` : `${m}m`;
 }
 
-/**
- * Animate a number counter from current value to target
- * @param {HTMLElement} el - Target DOM element
- * @param {number} target - Target number
- * @param {string} suffix - Optional suffix (e.g. '%')
- */
-function animateNumber(el, target, suffix = '') {
+function animateNum(el, target, suffix = '') {
     const start = parseInt(el.textContent) || 0;
     const diff = target - start;
-    const duration = 600;
-    const startTime = performance.now();
-
-    function update(now) {
-        const elapsed = now - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const current = Math.round(start + diff * eased);
-        el.textContent = current.toLocaleString() + suffix;
-        if (progress < 1) requestAnimationFrame(update);
+    const dur = 600, t0 = performance.now();
+    function tick(now) {
+        const p = Math.min((now - t0) / dur, 1);
+        const e = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(start + diff * e).toLocaleString() + suffix;
+        if (p < 1) requestAnimationFrame(tick);
     }
-    requestAnimationFrame(update);
+    requestAnimationFrame(tick);
 }
 
-/**
- * Build a session map: { session_id → [pageviews] }
- * @param {Array} data
- * @returns {Object}
- */
-function buildSessionMap(data) {
-    const sessions = {};
-    data.forEach(d => {
-        if (!sessions[d.session_id]) sessions[d.session_id] = [];
-        sessions[d.session_id].push(d);
-    });
-    return sessions;
+function buildSessions(data) {
+    const s = {};
+    data.forEach(d => { if (!s[d.session_id]) s[d.session_id] = []; s[d.session_id].push(d); });
+    return s;
 }
 
-// ─────────────────────────────────────────
-// MODULE: Renderers — Stat Cards
-// ─────────────────────────────────────────
-
-/**
- * Render the 4 main stat cards:
- * Unique Visitors, Pageviews, Bounce Rate, Avg Duration
- */
+// ── Renderers ──
 function renderStats(data) {
-    const sessions = buildSessionMap(data);
+    const sessions = buildSessions(data);
+    const keys = Object.keys(sessions);
+    const uniqueVisitors = keys.length;
+    const totalPV = data.length;
+    const bounces = keys.filter(k => sessions[k].length === 1).length;
+    const bounceRate = keys.length > 0 ? Math.round((bounces / keys.length) * 100) : 0;
+    const durations = keys.map(k => Math.max(...sessions[k].map(p => p.duration || 0))).filter(d => d > 0);
+    const avgDur = durations.length > 0 ? durations.reduce((a, b) => a + b, 0) / durations.length : 0;
 
-    // Unique visitors = distinct session IDs
-    const uniqueVisitors = Object.keys(sessions).length;
-
-    // Pageviews = total rows
-    const totalPageviews = data.length;
-
-    // Bounce rate = sessions with exactly 1 pageview
-    const sessionKeys = Object.keys(sessions);
-    const bounces = sessionKeys.filter(k => sessions[k].length === 1).length;
-    const bounceRate = sessionKeys.length > 0
-        ? Math.round((bounces / sessionKeys.length) * 100)
-        : 0;
-
-    // Average duration — use the max duration per session for accuracy
-    // (heartbeat pings update the duration field over time)
-    const sessionDurations = sessionKeys.map(k => {
-        const pages = sessions[k];
-        return Math.max(...pages.map(p => p.duration || 0));
-    }).filter(d => d > 0);
-
-    const avgDuration = sessionDurations.length > 0
-        ? sessionDurations.reduce((a, b) => a + b, 0) / sessionDurations.length
-        : 0;
-
-    animateNumber(document.getElementById('statVisitors'), uniqueVisitors);
-    animateNumber(document.getElementById('statPageviews'), totalPageviews);
-    animateNumber(document.getElementById('statBounce'), bounceRate, '%');
-    document.getElementById('statDuration').textContent = formatDuration(avgDuration);
+    animateNum(document.getElementById('mVisitors'), uniqueVisitors);
+    animateNum(document.getElementById('mPageviews'), totalPV);
+    animateNum(document.getElementById('mBounce'), bounceRate, '%');
+    document.getElementById('mDuration').textContent = formatDuration(avgDur);
 }
 
-// ─────────────────────────────────────────
-// MODULE: Renderers — Visitors Chart
-// ─────────────────────────────────────────
-
-function renderVisitorsChart(data) {
+function renderChart(data) {
     const canvas = document.getElementById('visitorsChart');
     const ctx = canvas.getContext('2d');
-
-    let labels = [];
-    let counts = [];
-    let titleText = '';
+    let labels = [], counts = [], title = '';
 
     if (currentRange === '24h') {
-        titleText = 'Hourly Visitors';
+        title = 'Hourly Visitors';
         const hours = {};
         for (let i = 23; i >= 0; i--) {
-            const d = new Date();
-            d.setHours(d.getHours() - i, 0, 0, 0);
+            const d = new Date(); d.setHours(d.getHours() - i, 0, 0, 0);
             const key = d.toISOString().slice(0, 13);
-            const label = d.toLocaleTimeString('en', { hour: 'numeric', hour12: true });
-            hours[key] = { label, count: 0 };
+            hours[key] = { label: d.toLocaleTimeString('en', { hour: 'numeric', hour12: true }), count: 0 };
         }
-        data.forEach(d => {
-            const key = d.created_at.slice(0, 13);
-            if (hours[key]) hours[key].count++;
-        });
+        data.forEach(d => { const k = d.created_at.slice(0, 13); if (hours[k]) hours[k].count++; });
         labels = Object.values(hours).map(h => h.label);
         counts = Object.values(hours).map(h => h.count);
     } else {
-        titleText = 'Daily Visitors';
+        title = 'Daily Visitors';
         const days = {};
-        const numDays = currentRange === '7d' ? 7 : currentRange === '30d' ? 30 : 90;
-        for (let i = numDays - 1; i >= 0; i--) {
-            const d = new Date();
-            d.setDate(d.getDate() - i);
+        const n = currentRange === '7d' ? 7 : currentRange === '30d' ? 30 : 90;
+        for (let i = n - 1; i >= 0; i--) {
+            const d = new Date(); d.setDate(d.getDate() - i);
             const key = d.toISOString().slice(0, 10);
-            const label = d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
-            days[key] = { label, sessions: new Set() };
+            days[key] = { label: d.toLocaleDateString('en', { month: 'short', day: 'numeric' }), sessions: new Set() };
         }
-        data.forEach(d => {
-            const key = d.created_at.slice(0, 10);
-            if (days[key]) days[key].sessions.add(d.session_id);
-        });
+        data.forEach(d => { const k = d.created_at.slice(0, 10); if (days[k]) days[k].sessions.add(d.session_id); });
         labels = Object.values(days).map(d => d.label);
         counts = Object.values(days).map(d => d.sessions.size);
     }
 
-    document.getElementById('chartTitle').textContent = titleText;
+    document.getElementById('chartTitle').textContent = title;
     if (visitorsChart) visitorsChart.destroy();
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+    gradient.addColorStop(0, 'rgba(0, 240, 255, 0.12)');
+    gradient.addColorStop(1, 'rgba(0, 240, 255, 0)');
 
     visitorsChart = new Chart(ctx, {
         type: 'line',
-        data: {
-            labels,
-            datasets: [{
-                data: counts,
-                borderColor: '#4a9eff',
-                backgroundColor: 'rgba(74, 158, 255, 0.05)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4,
-                pointRadius: 0,
-                pointHoverRadius: 5,
-                pointHoverBackgroundColor: '#4a9eff',
-                pointHoverBorderColor: '#fff',
-                pointHoverBorderWidth: 2
-            }]
-        },
+        data: { labels, datasets: [{
+            data: counts, borderColor: '#00f0ff', backgroundColor: gradient,
+            borderWidth: 2, fill: true, tension: 0.3,
+            pointRadius: 0, pointHoverRadius: 5,
+            pointHoverBackgroundColor: '#00f0ff',
+            pointHoverBorderColor: '#050505', pointHoverBorderWidth: 2
+        }]},
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false,
             interaction: { intersect: false, mode: 'index' },
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: '#1a1a1a',
-                    titleColor: '#888',
-                    bodyColor: '#fff',
-                    titleFont: { family: 'SF Pro Display, -apple-system, sans-serif', size: 11 },
-                    bodyFont: { family: 'SF Pro Display, -apple-system, sans-serif', size: 13, weight: '600' },
-                    padding: 12,
-                    cornerRadius: 8,
-                    borderColor: 'rgba(255,255,255,0.1)',
-                    borderWidth: 1,
-                    displayColors: false,
-                    callbacks: {
-                        label: (ctx) => `${ctx.parsed.y} visitors`
-                    }
+                    backgroundColor: '#111111', borderColor: '#2a2a2a', borderWidth: 1,
+                    titleColor: '#888', bodyColor: '#f0f0f0',
+                    titleFont: { family: "'JetBrains Mono', monospace", size: 10 },
+                    bodyFont: { family: "'JetBrains Mono', monospace", size: 11, weight: 600 },
+                    padding: 10, displayColors: false,
+                    callbacks: { label: c => c.parsed.y + ' visitors' }
                 }
             },
             scales: {
-                x: {
-                    grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false },
-                    ticks: {
-                        color: '#4a4a4a',
-                        font: { family: 'SF Pro Display, -apple-system, sans-serif', size: 11 },
-                        maxTicksLimit: 8,
-                        maxRotation: 0
-                    }
-                },
-                y: {
-                    grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false },
-                    ticks: {
-                        color: '#4a4a4a',
-                        font: { family: 'SF Pro Display, -apple-system, sans-serif', size: 11 },
-                        precision: 0
-                    },
-                    beginAtZero: true
-                }
+                x: { grid: { color: 'rgba(42,42,42,0.4)', drawBorder: false },
+                    ticks: { color: '#555', font: { family: "'JetBrains Mono', monospace", size: 9 }, maxTicksLimit: 8, maxRotation: 0 } },
+                y: { grid: { color: 'rgba(42,42,42,0.4)', drawBorder: false },
+                    ticks: { color: '#555', font: { family: "'JetBrains Mono', monospace", size: 9 }, precision: 0 }, beginAtZero: true }
             }
         }
     });
 }
 
-// ─────────────────────────────────────────
-// MODULE: Renderers — Top Pages
-// ─────────────────────────────────────────
+function renderBreakdown(data) {
+    // Sources breakdown (top 4 grouped)
+    const sources = TrafficClassifier.summarise(data).slice(0, 5);
+    const colors = { 'Direct': 'var(--cyan)', 'Instagram': '#E1306C', 'YouTube': '#FF0000', 'Google': 'var(--gold)', 'TikTok': '#69C9D0', 'Spotify': '#1DB954', 'Facebook': '#1877F2' };
+    const bdSrc = document.getElementById('bdSources');
+    if (sources.length === 0) { bdSrc.innerHTML = '<div style="font-size:11px;color:var(--text-muted)">No data</div>'; }
+    else {
+        bdSrc.innerHTML = sources.map(s => `
+            <div class="bd-item">
+                <span class="bd-label"><span class="bd-dot" style="background:${colors[s.name] || 'var(--text-muted)'}"></span>${s.name}</span>
+                <span class="bd-val">${s.pct}%</span>
+            </div>
+            <div class="bd-bar"><div class="bd-bar-fill" style="width:${s.pct}%;background:${colors[s.name] || 'var(--text-muted)'}"></div></div>
+        `).join('');
+    }
+
+    // Devices breakdown
+    const devices = {};
+    data.forEach(d => { devices[d.device_type || 'desktop'] = (devices[d.device_type || 'desktop'] || 0) + 1; });
+    const total = data.length || 1;
+    const sorted = Object.entries(devices).sort((a, b) => b[1] - a[1]);
+    const bdDev = document.getElementById('bdDevices');
+    bdDev.innerHTML = sorted.map(([name, count]) => `
+        <div class="bd-item">
+            <span class="bd-label">${name.charAt(0).toUpperCase() + name.slice(1)}</span>
+            <span class="bd-val">${Math.round(count / total * 100)}%</span>
+        </div>
+    `).join('');
+}
 
 function renderTopPages(data) {
     const pages = {};
     data.forEach(d => { pages[d.path] = (pages[d.path] || 0) + 1; });
     const sorted = Object.entries(pages).sort((a, b) => b[1] - a[1]).slice(0, 10);
     const total = data.length;
-
     const tbody = document.getElementById('topPages');
-    if (sorted.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No data yet</td></tr>';
-        return;
-    }
+    if (sorted.length === 0) { tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No data yet</td></tr>'; return; }
     tbody.innerHTML = sorted.map(([path, count]) =>
         `<tr><td><span class="path-text">${path}</span></td><td>${count}</td><td>${Math.round(count / total * 100)}%</td></tr>`
     ).join('');
 }
 
-// ─────────────────────────────────────────
-// MODULE: Renderers — Top Referrers
-// ─────────────────────────────────────────
-
 function renderTopReferrers(data) {
     const refs = {};
-    data.forEach(d => {
-        if (d.referrer_domain) refs[d.referrer_domain] = (refs[d.referrer_domain] || 0) + 1;
-    });
+    data.forEach(d => { if (d.referrer_domain) refs[d.referrer_domain] = (refs[d.referrer_domain] || 0) + 1; });
     const sorted = Object.entries(refs).sort((a, b) => b[1] - a[1]).slice(0, 10);
-    const total = Object.values(refs).reduce((a, b) => a + b, 0);
-
+    const total = Object.values(refs).reduce((a, b) => a + b, 0) || 1;
     const tbody = document.getElementById('topReferrers');
-    if (sorted.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No referrer data</td></tr>';
-        return;
-    }
-    tbody.innerHTML = sorted.map(([domain, count]) =>
-        `<tr><td>${domain}</td><td>${count}</td><td>${Math.round(count / total * 100)}%</td></tr>`
-    ).join('');
+    if (sorted.length === 0) { tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No referrers</td></tr>'; return; }
+    tbody.innerHTML = sorted.map(([d, c]) => `<tr><td>${d}</td><td>${c}</td><td>${Math.round(c / total * 100)}%</td></tr>`).join('');
 }
-
-// ─────────────────────────────────────────
-// MODULE: Renderers — Traffic Sources (NEW)
-// ─────────────────────────────────────────
 
 function renderTrafficSources(data) {
     const sources = TrafficClassifier.summarise(data);
-    const container = document.getElementById('trafficSources');
-
-    if (sources.length === 0) {
-        container.innerHTML = '<div class="empty-state">No data yet</div>';
-        return;
-    }
-
+    const el = document.getElementById('trafficSources');
+    if (sources.length === 0) { el.innerHTML = '<div class="empty-state">No data yet</div>'; return; }
     const maxPct = sources[0].pct || 1;
-    container.innerHTML = sources.map(s => `
+    el.innerHTML = sources.map(s => `
         <div class="source-row">
             <div class="source-icon">${s.icon}</div>
             <span class="source-name">${s.name}</span>
-            <div class="source-bar-wrap">
-                <div class="source-bar" style="width:${(s.pct / maxPct * 100)}%"></div>
-            </div>
+            <div class="source-bar-wrap"><div class="source-bar" style="width:${(s.pct / maxPct * 100)}%"></div></div>
             <span class="source-count">${s.count}</span>
             <span class="source-pct">${s.pct}%</span>
         </div>
     `).join('');
 }
 
-// ─────────────────────────────────────────
-// MODULE: Renderers — Event Tracking (NEW)
-// ─────────────────────────────────────────
-
 function renderEvents(events) {
-    const container = document.getElementById('eventGrid');
-
-    // Group events by type
-    const eventCounts = {};
-    events.forEach(e => {
-        const name = e.event_type || 'unknown';
-        eventCounts[name] = (eventCounts[name] || 0) + 1;
-    });
-
-    const sorted = Object.entries(eventCounts).sort((a, b) => b[1] - a[1]);
-
-    if (sorted.length === 0) {
-        container.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">No events yet</div>';
-        return;
-    }
-
-    // Format event names for display: snake_case → Title Case
-    const formatName = (name) => name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-
-    container.innerHTML = sorted.map(([name, count]) => `
-        <div class="event-card">
-            <div class="event-card-name">${formatName(name)}</div>
-            <div class="event-card-count">${count}</div>
-        </div>
-    `).join('');
+    const el = document.getElementById('eventGrid');
+    const counts = {};
+    events.forEach(e => { const n = e.event_type || 'unknown'; counts[n] = (counts[n] || 0) + 1; });
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    if (sorted.length === 0) { el.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">No events yet</div>'; return; }
+    const fmt = n => n.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    el.innerHTML = sorted.map(([n, c]) => `<div class="event-card"><div class="event-card-name">${fmt(n)}</div><div class="event-card-count">${c}</div></div>`).join('');
 }
-
-// ─────────────────────────────────────────
-// MODULE: Renderers — Device Chart
-// ─────────────────────────────────────────
 
 function renderDeviceChart(data) {
     const devices = {};
     data.forEach(d => { devices[d.device_type || 'desktop'] = (devices[d.device_type || 'desktop'] || 0) + 1; });
     const total = data.length || 1;
-
-    const colors = { mobile: '#34d399', desktop: '#4a9eff', tablet: '#fbbf24' };
+    const colors = { mobile: '#10b981', desktop: '#00f0ff', tablet: '#c5a059' };
     const labels = Object.keys(devices);
     const values = Object.values(devices);
-    const bgColors = labels.map(l => colors[l] || '#666');
-
+    const bg = labels.map(l => colors[l] || '#666');
     if (deviceChart) deviceChart.destroy();
-
-    const canvas = document.getElementById('deviceChart');
-    deviceChart = new Chart(canvas.getContext('2d'), {
+    deviceChart = new Chart(document.getElementById('deviceChart').getContext('2d'), {
         type: 'doughnut',
-        data: {
-            labels: labels.map(l => l.charAt(0).toUpperCase() + l.slice(1)),
-            datasets: [{ data: values, backgroundColor: bgColors, borderWidth: 0, cutout: '70%' }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: { legend: { display: false }, tooltip: { enabled: false } }
-        }
+        data: { labels: labels.map(l => l.charAt(0).toUpperCase() + l.slice(1)), datasets: [{ data: values, backgroundColor: bg, borderWidth: 0, cutout: '72%' }] },
+        options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false }, tooltip: { enabled: false } } }
     });
-
-    const legend = document.getElementById('deviceLegend');
-    legend.innerHTML = labels.map((l, i) => `
+    document.getElementById('deviceLegend').innerHTML = labels.map((l, i) => `
         <div class="legend-item">
-            <span class="legend-dot" style="background:${bgColors[i]}"></span>
+            <span class="legend-dot" style="background:${bg[i]}"></span>
             <span class="legend-label">${l.charAt(0).toUpperCase() + l.slice(1)}</span>
-            <span class="legend-value">${Math.round(values[i] / total * 100)}%</span>
+            <span class="legend-val">${Math.round(values[i] / total * 100)}%</span>
         </div>
     `).join('');
 }
-
-// ─────────────────────────────────────────
-// MODULE: Renderers — New vs Returning
-// ─────────────────────────────────────────
 
 function renderNewVsReturning(data) {
     const sessions = {};
-    data.forEach(d => {
-        if (!sessions[d.session_id]) sessions[d.session_id] = { is_unique: d.is_unique };
-    });
+    data.forEach(d => { if (!sessions[d.session_id]) sessions[d.session_id] = { is_unique: d.is_unique }; });
     const total = Object.keys(sessions).length || 1;
-    const newCount = Object.values(sessions).filter(s => s.is_unique).length;
-    const retCount = total - newCount;
-    const newPct = Math.round(newCount / total * 100);
-    const retPct = 100 - newPct;
-
-    document.getElementById('nvNew').style.width = newPct + '%';
-    document.getElementById('nvReturning').style.width = retPct + '%';
-    document.getElementById('nvNewPct').textContent = newPct + '%';
-    document.getElementById('nvRetPct').textContent = retPct + '%';
-    document.getElementById('nvNewCount').textContent = newCount;
+    const newC = Object.values(sessions).filter(s => s.is_unique).length;
+    const retC = total - newC;
+    const newP = Math.round(newC / total * 100);
+    document.getElementById('nvNew').style.width = newP + '%';
+    document.getElementById('nvRet').style.width = (100 - newP) + '%';
+    document.getElementById('nvNewPct').textContent = newP + '%';
+    document.getElementById('nvRetPct').textContent = (100 - newP) + '%';
+    document.getElementById('nvNewCount').textContent = newC;
 }
-
-// ─────────────────────────────────────────
-// MODULE: Renderers — Browsers
-// ─────────────────────────────────────────
 
 function renderBrowsers(data) {
-    const browsers = {};
-    data.forEach(d => { browsers[d.browser || 'Unknown'] = (browsers[d.browser || 'Unknown'] || 0) + 1; });
-    const sorted = Object.entries(browsers).sort((a, b) => b[1] - a[1]).slice(0, 6);
-
-    const container = document.getElementById('browserList');
-    if (sorted.length === 0) {
-        container.innerHTML = '<div class="empty-state">No data yet</div>';
-        return;
-    }
-    container.innerHTML = sorted.map(([name, count]) =>
-        `<div class="browser-row"><span class="browser-name">${name}</span><span class="browser-count">${count}</span></div>`
-    ).join('');
+    const b = {};
+    data.forEach(d => { b[d.browser || 'Unknown'] = (b[d.browser || 'Unknown'] || 0) + 1; });
+    const sorted = Object.entries(b).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    const el = document.getElementById('browserList');
+    if (sorted.length === 0) { el.innerHTML = '<div class="empty-state">No data</div>'; return; }
+    el.innerHTML = sorted.map(([n, c]) => `<div class="browser-row"><span class="browser-name">${n}</span><span class="browser-count">${c}</span></div>`).join('');
 }
-
-// ─────────────────────────────────────────
-// MODULE: Renderers — Geography
-// ─────────────────────────────────────────
 
 function renderGeography(data) {
     const countries = {};
-    data.forEach(d => {
-        const key = d.country || 'XX';
-        if (!countries[key]) countries[key] = { name: d.country_name || key, count: 0 };
-        countries[key].count++;
-    });
-
+    data.forEach(d => { const k = d.country || 'XX'; if (!countries[k]) countries[k] = { name: d.country_name || k, count: 0 }; countries[k].count++; });
     const sorted = Object.entries(countries).sort((a, b) => b[1].count - a[1].count).slice(0, 10);
-    const maxCount = sorted.length > 0 ? sorted[0][1].count : 1;
+    const max = sorted.length > 0 ? sorted[0][1].count : 1;
     const total = data.length || 1;
-
-    const container = document.getElementById('geoList');
-    if (sorted.length === 0) {
-        container.innerHTML = '<div class="empty-state">No data yet</div>';
-        return;
-    }
-    container.innerHTML = sorted.map(([code, { name, count }]) => `
-        <div class="country-row">
-            <span class="country-flag">${code}</span>
-            <span class="country-name">${name}</span>
-            <div class="country-bar-wrap">
-                <div class="country-bar" style="width:${(count / maxCount * 100)}%"></div>
-            </div>
-            <span class="country-pct">${Math.round(count / total * 100)}%</span>
+    const el = document.getElementById('geoList');
+    if (sorted.length === 0) { el.innerHTML = '<div class="empty-state">No data</div>'; return; }
+    el.innerHTML = sorted.map(([code, { name, count }], i) => `
+        <div class="geo-item">
+            <span class="geo-rank">${String(i + 1).padStart(2, '0')}</span>
+            <span class="geo-code">${code}</span>
+            <span class="geo-name">${name}</span>
+            <div class="geo-bar-wrap"><div class="geo-bar" style="width:${(count / max * 100)}%"></div></div>
+            <span class="geo-val">${count} · ${Math.round(count / total * 100)}%</span>
         </div>
     `).join('');
 }
 
-// ─────────────────────────────────────────
-// MODULE: Renderers — Heatmap
-// ─────────────────────────────────────────
-
 function renderHeatmap(data) {
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
     const grid = {};
     days.forEach(d => { grid[d] = new Array(24).fill(0); });
-
     data.forEach(d => {
         const date = new Date(d.created_at);
         const day = days[date.getDay() === 0 ? 6 : date.getDay() - 1];
-        const hour = date.getHours();
-        grid[day][hour]++;
+        grid[day][date.getHours()]++;
     });
-
     let maxVal = 0;
     days.forEach(d => grid[d].forEach(v => { if (v > maxVal) maxVal = v; }));
     maxVal = maxVal || 1;
-
-    const container = document.getElementById('heatmap');
+    const el = document.getElementById('heatmap');
     let html = '<div></div>';
-    for (let h = 0; h < 24; h++) {
-        html += `<div class="heatmap-hour">${h}</div>`;
-    }
+    for (let h = 0; h < 24; h++) html += `<div class="heatmap-hour">${h}</div>`;
     days.forEach(day => {
         html += `<div class="heatmap-label">${day}</div>`;
         for (let h = 0; h < 24; h++) {
-            const intensity = grid[day][h] / maxVal;
-            const alpha = intensity > 0 ? 0.1 + intensity * 0.8 : 0.02;
-            html += `<div class="heatmap-cell" style="background:rgba(74,158,255,${alpha})" title="${day} ${h}:00 — ${grid[day][h]} visitors"></div>`;
+            const int = grid[day][h] / maxVal;
+            const a = int > 0 ? 0.1 + int * 0.8 : 0.02;
+            html += `<div class="heatmap-cell" style="background:rgba(0,240,255,${a})" title="${day} ${h}:00 — ${grid[day][h]} visitors"></div>`;
         }
     });
-    container.innerHTML = html;
+    el.innerHTML = html;
 }
 
-// ─────────────────────────────────────────
-// MODULE: Live Visitors (enhanced)
-// Shows count + countries + pages currently viewed
-// ─────────────────────────────────────────
-
-async function updateLiveCount() {
+// ── Live Visitors ──
+async function updateLive() {
     const cutoff = new Date(Date.now() - CONFIG.liveWindowSeconds * 1000).toISOString();
-    const recent = await query('pageviews', `created_at=gte.${cutoff}&select=session_id,country_name,path`);
-
-    // Filter bots from live data too
-    const clean = recent; // Browser field not in this select, but server should have already filtered
-
-    // Deduplicate by session
+    const recent = await query('pageviews', `created_at=gte.${cutoff}&select=session_id,country_name,path,created_at`);
     const sessions = {};
-    clean.forEach(r => {
-        if (!sessions[r.session_id]) {
-            sessions[r.session_id] = { country: r.country_name, path: r.path };
-        }
-    });
-
+    recent.forEach(r => { if (!sessions[r.session_id]) sessions[r.session_id] = r; });
     const count = Object.keys(sessions).length;
-    document.getElementById('liveCount').textContent = count;
+    document.getElementById('liveCountHead').textContent = count;
 
-    // Build detail: top countries + pages being viewed
-    const detail = document.getElementById('liveDetail');
-    if (count === 0) {
-        detail.innerHTML = '';
-        return;
-    }
-
-    const countries = {};
-    const pages = {};
-    Object.values(sessions).forEach(s => {
-        if (s.country) countries[s.country] = (countries[s.country] || 0) + 1;
-        if (s.path) pages[s.path] = (pages[s.path] || 0) + 1;
-    });
-
-    const topCountries = Object.entries(countries).sort((a, b) => b[1] - a[1]).slice(0, 3);
-    const topPages = Object.entries(pages).sort((a, b) => b[1] - a[1]).slice(0, 2);
-
-    let detailHTML = '';
-    if (topCountries.length > 0) {
-        detailHTML += `<span>📍 ${topCountries.map(([c]) => c).join(', ')}</span>`;
-    }
-    if (topPages.length > 0) {
-        detailHTML += `<span>📄 ${topPages.map(([p]) => p).join(', ')}</span>`;
-    }
-    detail.innerHTML = detailHTML;
+    // Build activity feed
+    const feed = document.getElementById('activityFeed');
+    const entries = recent.slice(0, 15).reverse();
+    if (entries.length === 0) { feed.innerHTML = '<div class="empty-state">Waiting for activity…</div>'; return; }
+    feed.innerHTML = entries.map(e => {
+        const time = new Date(e.created_at).toLocaleTimeString('en', { hour12: false });
+        const country = e.country_name || '';
+        return `<div class="activity-item">
+            <span class="activity-time">${time}</span>
+            <span class="act-tag visit">Visit</span>
+            <span class="activity-msg">${country ? 'Visitor from ' + country : 'New visitor'}</span>
+            <span class="activity-loc">${e.path || '/'}</span>
+        </div>`;
+    }).join('');
 }
 
-// ─────────────────────────────────────────
-// MODULE: CSV Export
-// ─────────────────────────────────────────
-
+// ── CSV Export ──
 function exportCSV(data) {
-    const headers = ['Date', 'Path', 'Referrer', 'Device', 'Browser', 'OS', 'Country', 'Duration'];
-    const rows = data.map(d => [
-        new Date(d.created_at).toLocaleString(),
-        d.path, d.referrer_domain || 'Direct', d.device_type,
-        d.browser, d.os, d.country_name, d.duration
-    ]);
-
+    const headers = ['Date','Path','Referrer','Device','Browser','OS','Country','Duration'];
+    const rows = data.map(d => [new Date(d.created_at).toLocaleString(), d.path, d.referrer_domain || 'Direct', d.device_type, d.browser, d.os, d.country_name, d.duration]);
     const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
+    const a = document.createElement('a'); a.href = url;
     a.download = `rikka-analytics-${currentRange}-${new Date().toISOString().slice(0,10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    a.click(); URL.revokeObjectURL(url);
 }
 
-// ─────────────────────────────────────────
-// MODULE: Master Render Pipeline
-// Orchestrates all renderers in a single pass
-// ─────────────────────────────────────────
-
+// ── Master Render ──
 async function renderAll() {
     const data = await fetchData();
-
-    // Render all panels — order matches DOM layout
     renderStats(data);
-    renderVisitorsChart(data);
+    renderChart(data);
+    renderBreakdown(data);
     renderTopPages(data);
     renderTopReferrers(data);
     renderTrafficSources(data);
@@ -1668,32 +1172,33 @@ async function renderAll() {
     renderBrowsers(data);
     renderGeography(data);
     renderHeatmap(data);
-    updateLiveCount();
+    updateLive();
 }
 
-// ─────────────────────────────────────────
-// MODULE: Initialisation
-// ─────────────────────────────────────────
+// ── Sidebar Nav ──
+document.querySelectorAll('.nav-item[data-section]').forEach(item => {
+    item.addEventListener('click', () => {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        const target = document.getElementById(item.dataset.section);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
 
+// ── Init ──
 function initDashboard() {
     renderAll();
-
-    // Time filter buttons
-    document.querySelectorAll('.time-btn').forEach(btn => {
+    document.querySelectorAll('.time-filter button').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.time-filter button').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentRange = btn.dataset.range;
             renderAll();
         });
     });
-
-    // Export CSV
     document.getElementById('exportBtn').addEventListener('click', () => exportCSV(allData));
-
-    // Auto-refresh data every 60s, live count every 30s
     setInterval(renderAll, CONFIG.refreshInterval);
-    setInterval(updateLiveCount, CONFIG.liveInterval);
+    setInterval(updateLive, CONFIG.liveInterval);
 }
 </script>
 </body>
