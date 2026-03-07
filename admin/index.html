@@ -215,6 +215,37 @@
             border-top: 1px solid var(--border);
         }
 
+        .signout-btn {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: transparent;
+            border: 1px solid rgba(244, 63, 94, 0.25);
+            color: var(--accent-rose);
+            font-size: 12px;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.15s;
+        }
+
+        .signout-btn:hover {
+            background: rgba(244, 63, 94, 0.08);
+            border-color: rgba(244, 63, 94, 0.4);
+        }
+
+        .signout-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .sidebar.collapsed .signout-btn span {
+            display: none;
+        }
+
         .collapse-btn {
             width: 100%;
             padding: 10px;
@@ -1046,6 +1077,10 @@
                 </div>
             </nav>
             <div class="sidebar-footer">
+                <button class="signout-btn" onclick="_AUTH.revoke()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    <span>Sign Out</span>
+                </button>
                 <button class="collapse-btn" onclick="toggleSidebar()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
                     <span>Collapse</span>
@@ -1279,36 +1314,71 @@
         liveInterval: 15000,
         maxRows: 10000
     };
-    const AUTH = {
-        _u: btoa('pedraw'),
-        _p: btoa('rikkainfinita'),
-        verify(u, p) { return btoa(u) === this._u && btoa(p) === this._p; }
-    };
-    const SESSION_KEY = 'rikka_admin_auth';
+    /* ============================================================
+       AUTH MODULE — SHA-256 hash-based, no plaintext credentials
+       Credential verification uses Web Crypto API.
+       The original credentials are NOT stored in this file.
+       ============================================================ */
+    const _AUTH = (() => {
+        const _k = [
+            '700c162e','af80719d','15570cf4','d6779e20',
+            '2bd877fb','6e6e091b','eb664ad5','97a831a9'
+        ];
+        const _a = () => _k.reduce((s, c) => s + c, '');
+        const _TK = 'rkst_tk';
+        const _VF = 'rkst_vf';
+
+        async function _h(str) {
+            const b = new TextEncoder().encode(str);
+            const d = await crypto.subtle.digest('SHA-256', b);
+            return Array.from(new Uint8Array(d)).map(x => x.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function check() {
+            try {
+                const tk = localStorage.getItem(_TK);
+                const vf = localStorage.getItem(_VF);
+                if (!tk || !vf) return false;
+                return (await _h(tk + ':valid')) === vf;
+            } catch { return false; }
+        }
+
+        async function verify(u, p) {
+            const input = await _h(u + ':' + p);
+            if (input !== _a()) return false;
+            const token = await _h(_a() + ':s:' + Date.now() + ':' + Math.random());
+            try {
+                localStorage.setItem(_TK, token);
+                localStorage.setItem(_VF, await _h(token + ':valid'));
+            } catch {}
+            return true;
+        }
+
+        function revoke() {
+            try { localStorage.removeItem(_TK); localStorage.removeItem(_VF); } catch {}
+            location.reload();
+        }
+
+        return Object.freeze({ check, verify, revoke });
+    })();
 
     /* ============================================================
        AUTH GATE
+       Dashboard does NOT render until authentication passes.
        ============================================================ */
-    function checkAuth() {
-        try { return sessionStorage.getItem(SESSION_KEY) === 'true'; } catch { return false; }
-    }
-    function initAuth() {
-        if (checkAuth()) {
-            document.getElementById('authGate').classList.add('hidden');
-            document.getElementById('loadingOverlay').classList.remove('hidden');
-            bootDashboard();
+    async function initAuth() {
+        if (await _AUTH.check()) {
+            unlockDashboard();
             return;
         }
-        const submit = () => {
+        const submit = async () => {
             const u = document.getElementById('authUser').value.trim();
             const p = document.getElementById('authPass').value;
-            if (AUTH.verify(u, p)) {
-                try { sessionStorage.setItem(SESSION_KEY, 'true'); } catch {}
-                document.getElementById('authGate').classList.add('hidden');
-                document.getElementById('loadingOverlay').classList.remove('hidden');
-                bootDashboard();
+            if (await _AUTH.verify(u, p)) {
+                unlockDashboard();
             } else {
                 document.getElementById('authError').style.display = 'block';
+                document.getElementById('authPass').value = '';
             }
         };
         document.getElementById('authSubmit').addEventListener('click', submit);
@@ -1316,11 +1386,24 @@
         document.getElementById('authUser').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('authPass').focus(); });
     }
 
+    function unlockDashboard() {
+        document.getElementById('authGate').classList.add('hidden');
+        document.getElementById('loadingOverlay').classList.remove('hidden');
+        bootDashboard();
+    }
+
     /* ============================================================
        SUPABASE HELPER
        ============================================================ */
+    /*  ── Supabase Read-Only Fetch ──────────────────────────────
+     *  sbFetch() performs GET-only requests via PostgREST.
+     *  The anon key is public by design — RLS policies on
+     *  pageviews / analytics_events are the real security
+     *  boundary.  NEVER add POST / PATCH / DELETE here.
+     *  ─────────────────────────────────────────────────────── */
     async function sbFetch(table, query = '') {
         const r = await fetch(`${CONFIG.supabaseUrl}/rest/v1/${table}?${query}`, {
+            method: 'GET',               // read-only — do not change
             headers: {
                 'apikey': CONFIG.supabaseKey,
                 'Authorization': `Bearer ${CONFIG.supabaseKey}`
