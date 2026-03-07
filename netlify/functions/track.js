@@ -108,6 +108,8 @@ exports.handler = async (event) => {
         path: data.path || '/',
         referrer: data.referrer || null,
         referrer_domain: referrer_domain,
+        utm_source: data.utm_source || null,
+        utm_medium: data.utm_medium || null,
         device_type: device_type,
         browser: browser,
         os: os,

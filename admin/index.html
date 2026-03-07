@@ -1447,14 +1447,23 @@
         return COUNTRY_NAMES[code] || code || 'Unknown';
     }
 
-    /* Source classification */
-    function classifySource(domain) {
+    /* Source classification (uses UTM params first, then referrer domain) */
+    function classifySource(row) {
+        const utm = (row.utm_source || '').toLowerCase();
+        const med = (row.utm_medium || '').toLowerCase();
+        if (utm || med) {
+            const socialUtm = ['instagram','facebook','twitter','x','tiktok','reddit','linkedin','pinterest','threads','youtube','fb','ig','tw'];
+            const searchUtm = ['google','bing','yahoo','duckduckgo','baidu','yandex','ecosia'];
+            if (socialUtm.some(s => utm.includes(s)) || med === 'social') return 'Social';
+            if (searchUtm.some(s => utm.includes(s)) || med === 'cpc' || med === 'ppc' || med === 'search') return 'Search';
+            return 'Referral';
+        }
+        const domain = (row.referrer_domain || '').toLowerCase();
         if (!domain) return 'Direct';
-        const d = domain.toLowerCase();
         const social = ['instagram.com','facebook.com','twitter.com','x.com','tiktok.com','reddit.com','linkedin.com','pinterest.com','threads.net','t.co','youtube.com'];
         const search = ['google.com','bing.com','yahoo.com','duckduckgo.com','baidu.com','yandex.com','ecosia.org'];
-        if (social.some(s => d.includes(s))) return 'Social';
-        if (search.some(s => d.includes(s))) return 'Search';
+        if (social.some(s => domain.includes(s))) return 'Social';
+        if (search.some(s => domain.includes(s))) return 'Search';
         return 'Referral';
     }
 
@@ -1633,7 +1642,7 @@
     function updateSources(pv) {
         const counts = { Direct: 0, Social: 0, Referral: 0, Search: 0 };
         pv.forEach(r => {
-            const cat = r.referrer_domain ? classifySource(r.referrer_domain) : 'Direct';
+            const cat = classifySource(r);
             counts[cat] = (counts[cat] || 0) + 1;
         });
         const total = pv.length || 1;
