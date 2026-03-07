@@ -2117,5 +2117,104 @@
             audioPlayer.currentTime = pct * audioPlayer.duration;
         });
     </script>
+
+    <!-- Analytics Tracking (privacy-first, no cookies) -->
+    <script>
+    (function() {
+        var TRACK_URL = 'https://rikka-official.netlify.app/.netlify/functions/track';
+
+        // Generate session ID (fingerprint-based, no cookies)
+        function getSessionId() {
+            var stored = sessionStorage.getItem('_rikka_sid');
+            if (stored) return stored;
+            var id = 'S' + Date.now().toString(36) + Math.random().toString(36).substr(2, 8);
+            sessionStorage.setItem('_rikka_sid', id);
+            return id;
+        }
+
+        // Check if new visitor (first time this session)
+        function isNewVisitor() {
+            var visited = sessionStorage.getItem('_rikka_visited');
+            if (visited) return false;
+            sessionStorage.setItem('_rikka_visited', '1');
+            return true;
+        }
+
+        var sessionId = getSessionId();
+        var isUnique = isNewVisitor();
+        var pageviewId = null;
+        var startTime = Date.now();
+
+        // Send pageview
+        function trackPageview() {
+            var data = {
+                type: 'pageview',
+                session_id: sessionId,
+                path: window.location.pathname + window.location.hash,
+                referrer: document.referrer || null,
+                screen_width: window.screen.width,
+                screen_height: window.screen.height,
+                is_unique: isUnique
+            };
+
+            fetch(TRACK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(res) { pageviewId = res.id; })
+            .catch(function() {});
+        }
+
+        // Send duration update
+        function trackDuration() {
+            if (!pageviewId) return;
+            var duration = Math.round((Date.now() - startTime) / 1000);
+            navigator.sendBeacon(TRACK_URL, JSON.stringify({
+                type: 'duration',
+                pageview_id: pageviewId,
+                duration: duration
+            }));
+        }
+
+        // Track newsletter signup events
+        window.trackEvent = function(name, data) {
+            fetch(TRACK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'event',
+                    event_name: name,
+                    event_data: data || {},
+                    session_id: sessionId,
+                    path: window.location.pathname + window.location.hash
+                })
+            }).catch(function() {});
+        };
+
+        // Duration heartbeat every 30s
+        setInterval(function() {
+            if (!pageviewId || document.hidden) return;
+            var duration = Math.round((Date.now() - startTime) / 1000);
+            fetch(TRACK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'duration', pageview_id: pageviewId, duration: duration })
+            }).catch(function() {});
+        }, 30000);
+
+        // Send final duration on page leave
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) trackDuration();
+        });
+        window.addEventListener('beforeunload', trackDuration);
+
+        // Track on load (skip if bot)
+        if (!/bot|crawler|spider|crawling/i.test(navigator.userAgent)) {
+            trackPageview();
+        }
+    })();
+    </script>
 </body>
 </html>
