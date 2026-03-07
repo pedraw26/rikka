@@ -1643,7 +1643,7 @@
 
     <!-- Music Widget Section -->
     <section class="video-section divider-player-section" id="video">
-        <audio id="audio-player" preload="metadata" src="https://res.cloudinary.com/dzgqzeebg/video/upload/v1772626227/afro_fut_nqiv3o.wav"></audio>
+        <audio id="audio-player" preload="none"></audio>
         <div class="rk-widget">
             <div class="rk-now-playing">
 
@@ -1665,7 +1665,7 @@
             <div class="rk-track-list">
                 <div class="rk-track-item" id="rk-track1">
                     <span class="rk-track-num">1</span>
-                    <div class="rk-track-details"><div class="rk-track-item-title">Afro Futuristik</div></div>
+                    <div class="rk-track-details"><div class="rk-track-item-title">Afro Futuristik <span class="rk-pill">COMING SOON</span></div></div>
                     <span class="rk-track-dur">03:05</span>
                 </div>
                 <div class="rk-track-item">
@@ -2037,51 +2037,13 @@
             return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
         }
 
-        function tryAutoplay() {
-            if (PASSWORD_GATE_ENABLED) return;
-            audioPlayer.muted = true;
-            audioPlayer.play().catch(function() {});
-        }
+        // Music disabled - Coming Soon
+        function tryAutoplay() { return; }
 
-        if (!PASSWORD_GATE_ENABLED) tryAutoplay();
-        audioPlayer.addEventListener('canplay', function() {
-            if (!PASSWORD_GATE_ENABLED && audioPlayer.paused) tryAutoplay();
-        }, { once: true });
-        document.addEventListener('visibilitychange', function() {
-            if (!PASSWORD_GATE_ENABLED && !document.hidden && audioPlayer.paused && !hasInteracted) tryAutoplay();
-        });
 
-        const enableAudioOnFirstInteraction = function() {
-            if (hasInteracted || body.classList.contains('site-locked')) return;
-            hasInteracted = true;
-            document.removeEventListener('click', enableAudioOnFirstInteraction);
-            document.removeEventListener('touchstart', enableAudioOnFirstInteraction);
-            audioPlayer.muted = false;
-            audioPlayer.play().catch(function(error) { console.log('Autoplay prevented:', error); });
-        };
-        document.addEventListener('click', enableAudioOnFirstInteraction);
-        document.addEventListener('touchstart', enableAudioOnFirstInteraction, { passive: true });
-
-        rkPlayBtn.addEventListener('click', function() {
-            if (audioPlayer.paused) {
-                hasInteracted = true;
-                if (audioPlayer.muted) audioPlayer.muted = false;
-                audioPlayer.volume = 1;
-                audioPlayer.play().catch(function(error) { console.log('Playback blocked:', error); });
-                rkPlayBtn.innerHTML = rkPauseSVG;
-            } else {
-                audioPlayer.pause();
-                rkPlayBtn.innerHTML = rkPlaySVG;
-            }
-        });
-
-        rkTrack1.addEventListener('click', function() {
-            audioPlayer.currentTime = 0;
-            audioPlayer.muted = false;
-            audioPlayer.volume = 1;
-            audioPlayer.play();
-            rkPlayBtn.innerHTML = rkPauseSVG;
-        });
+        // Play button and track click disabled - Coming Soon
+        rkPlayBtn.style.opacity = '0.3';
+        rkPlayBtn.style.pointerEvents = 'none';
 
         audioPlayer.addEventListener('timeupdate', function() {
             if (audioPlayer.duration) {
