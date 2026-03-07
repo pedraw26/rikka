@@ -10,19 +10,19 @@
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #0a0a0a;
-            --bg-card: #111111;
-            --bg-card-hover: #161616;
-            --border: rgba(255,255,255,0.06);
-            --border-hover: rgba(255,255,255,0.12);
-            --text: #f0f0f0;
-            --text-secondary: #707070;
-            --text-muted: #4a4a4a;
-            --accent-blue: #4a9eff;
-            --accent-green: #34d399;
-            --accent-yellow: #fbbf24;
-            --accent-red: #f87171;
-            --accent-purple: #a78bfa;
+            --bg: #060608;
+            --bg-card: #0e0e12;
+            --bg-card-hover: #141418;
+            --border: rgba(255,255,255,0.05);
+            --border-hover: rgba(255,255,255,0.10);
+            --text: #e8e8ed;
+            --text-secondary: #6e6e7a;
+            --text-muted: #3e3e4a;
+            --accent-blue: #6ea8fe;
+            --accent-green: #5ec9a2;
+            --accent-yellow: #e2b45a;
+            --accent-red: #d47b7b;
+            --accent-purple: #9b8ec4;
             --radius: 14px;
             --radius-sm: 8px;
         }
@@ -423,7 +423,7 @@
         .heatmap-cell {
             aspect-ratio: 1;
             border-radius: 3px;
-            background: rgba(74, 158, 255, 0.05);
+            background: rgba(110, 168, 254, 0.06);
             min-height: 14px;
             transition: background 0.3s ease;
         }
@@ -894,14 +894,14 @@ function renderVisitorsChart(data) {
             labels,
             datasets: [{
                 data: counts,
-                borderColor: '#4a9eff',
-                backgroundColor: 'rgba(74, 158, 255, 0.05)',
+                borderColor: '#6ea8fe',
+                backgroundColor: 'rgba(110, 168, 254, 0.06)',
                 borderWidth: 2,
                 fill: true,
                 tension: 0.4,
                 pointRadius: 0,
                 pointHoverRadius: 5,
-                pointHoverBackgroundColor: '#4a9eff',
+                pointHoverBackgroundColor: '#6ea8fe',
                 pointHoverBorderColor: '#fff',
                 pointHoverBorderWidth: 2
             }]
@@ -994,7 +994,7 @@ function renderDeviceChart(data) {
     data.forEach(d => { devices[d.device_type || 'desktop'] = (devices[d.device_type || 'desktop'] || 0) + 1; });
     const total = data.length || 1;
 
-    const colors = { mobile: '#34d399', desktop: '#4a9eff', tablet: '#fbbf24' };
+    const colors = { mobile: '#5ec9a2', desktop: '#6ea8fe', tablet: '#e2b45a' };
     const labels = Object.keys(devices);
     const values = Object.values(devices);
     const bgColors = labels.map(l => colors[l] || '#666');
@@ -1117,7 +1117,7 @@ function renderHeatmap(data) {
         for (let h = 0; h < 24; h++) {
             const intensity = grid[day][h] / maxVal;
             const alpha = intensity > 0 ? 0.1 + intensity * 0.8 : 0.02;
-            html += `<div class="heatmap-cell" style="background:rgba(74,158,255,${alpha})" title="${day} ${h}:00 — ${grid[day][h]} visitors"></div>`;
+            html += `<div class="heatmap-cell" style="background:rgba(110,168,254,${alpha})" title="${day} ${h}:00 — ${grid[day][h]} visitors"></div>`;
         }
     });
     container.innerHTML = html;
