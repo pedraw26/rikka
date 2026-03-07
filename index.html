@@ -2122,20 +2122,46 @@
         var pageviewId = null;
         var startTime = Date.now();
 
-        /* ── UTM helpers ── */
-        function getUTM(key) {
+        /* ── UTM + click-ID helpers ── */
+        function getParam(key) {
             try { return new URLSearchParams(window.location.search).get(key) || null; } catch(e) { return null; }
+        }
+        function detectSource() {
+            var src = getParam('utm_source');
+            var med = getParam('utm_medium');
+            if (src) return { utm_source: src, utm_medium: med };
+            /* Auto-detect platform click IDs added by social/search platforms */
+            if (getParam('fbclid'))    return { utm_source: 'facebook',  utm_medium: 'social' };
+            if (getParam('ttclid'))    return { utm_source: 'tiktok',    utm_medium: 'social' };
+            if (getParam('twclickid') || getParam('tw_source')) return { utm_source: 'twitter', utm_medium: 'social' };
+            if (getParam('igshid'))    return { utm_source: 'instagram', utm_medium: 'social' };
+            if (getParam('li_fat_id')) return { utm_source: 'linkedin',  utm_medium: 'social' };
+            if (getParam('gclid'))     return { utm_source: 'google',    utm_medium: 'cpc' };
+            if (getParam('msclkid'))   return { utm_source: 'bing',      utm_medium: 'cpc' };
+            /* Fallback: check document.referrer */
+            var ref = document.referrer || '';
+            if (ref) {
+                try {
+                    var host = new URL(ref).hostname.replace('www.','').toLowerCase();
+                    var socialHosts = ['instagram.com','facebook.com','twitter.com','x.com','tiktok.com','reddit.com','linkedin.com','pinterest.com','threads.net','t.co','youtube.com','l.instagram.com','lm.facebook.com'];
+                    var searchHosts = ['google.com','bing.com','yahoo.com','duckduckgo.com','baidu.com','yandex.com','ecosia.org'];
+                    for (var i = 0; i < socialHosts.length; i++) { if (host.indexOf(socialHosts[i]) !== -1) return { utm_source: socialHosts[i].split('.')[0], utm_medium: 'social' }; }
+                    for (var i = 0; i < searchHosts.length; i++) { if (host.indexOf(searchHosts[i]) !== -1) return { utm_source: searchHosts[i].split('.')[0], utm_medium: 'search' }; }
+                } catch(e) {}
+            }
+            return { utm_source: null, utm_medium: null };
         }
 
         /* ── Pageview Tracking ── */
         function trackPageview() {
+            var source = detectSource();
             var data = {
                 type: 'pageview',
                 session_id: sessionId,
                 path: window.location.pathname + window.location.hash,
                 referrer: document.referrer || null,
-                utm_source: getUTM('utm_source'),
-                utm_medium: getUTM('utm_medium'),
+                utm_source: source.utm_source,
+                utm_medium: source.utm_medium,
                 screen_width: window.screen.width,
                 screen_height: window.screen.height,
                 is_unique: isUnique
