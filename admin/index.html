@@ -800,21 +800,12 @@
             max-height: 200px;
             overflow-y: auto;
             margin-top: 16px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border-light) transparent;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
 
         .activity-feed::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .activity-feed::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .activity-feed::-webkit-scrollbar-thumb {
-            background: var(--border-light);
-            border-radius: 2px;
+            display: none;
         }
 
         .activity-item {
