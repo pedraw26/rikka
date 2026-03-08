@@ -1559,7 +1559,7 @@
 
     <div class="password-gate" id="password-gate" aria-hidden="true">
         <div class="password-gate-card">
-            <h2 class="password-gate-title">ACCE$$  DENIED BITX</h2>
+            <h2 class="password-gate-title">RIKKA</h2>
             <p class="password-gate-subtitle">Enter Password</p>
             <input class="password-gate-input" id="password-input" type="password" autocomplete="current-password" placeholder="" />
             <button class="password-gate-button" id="password-submit" type="button">Unlock</button>
@@ -1805,14 +1805,37 @@
         const passwordSubmit = document.getElementById('password-submit');
         const passwordError = document.getElementById('password-error');
         const audioPlayer = document.getElementById('audio-player');
-        const SITE_PASSWORD = 'rikka';
-        const PASSWORD_GATE_ENABLED = false;
+
+        /* ── Site lock — fetched from Supabase site_config ── */
+        const _SB = 'https://tueltwjjkvqvdnznnhuq.supabase.co';
+        const _SK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1ZWx0d2pqa3ZxdmRuem5uaHVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MDEzMDAsImV4cCI6MjA4NzE3NzMwMH0.Vf55QMlAqxdpP5iVR7RzkljCn4G1GRyO_We_82xulYQ';
+        let _sitePassword = '';
+        let _siteLocked = false;
         let hasInteracted = false;
         let count = 0;
 
-        const showPasswordGate = () => {
+        async function fetchSiteConfig() {
+            try {
+                var r = await fetch(_SB + '/rest/v1/site_config?select=site_locked,lock_password&id=eq.1', {
+                    method: 'GET',
+                    headers: { 'apikey': _SK, 'Authorization': 'Bearer ' + _SK }
+                });
+                if (r.ok) {
+                    var rows = await r.json();
+                    if (rows.length) {
+                        _siteLocked = rows[0].site_locked === true;
+                        _sitePassword = (rows[0].lock_password || '').toLowerCase();
+                    }
+                }
+            } catch (e) {
+                console.error('site_config fetch error', e);
+            }
+        }
+
+        const showPasswordGate = async () => {
             preloader.classList.add('hidden');
-            if (!PASSWORD_GATE_ENABLED) {
+            await fetchSiteConfig();
+            if (!_siteLocked) {
                 body.classList.remove('site-locked');
                 tryAutoplay();
                 return;
@@ -1820,6 +1843,7 @@
             body.classList.add('site-locked');
             passwordGate.classList.add('is-visible');
             passwordGate.setAttribute('aria-hidden', 'false');
+            passwordInput.focus();
         };
 
         const unlockSite = () => {
@@ -1831,7 +1855,7 @@
         };
 
         const submitPassword = () => {
-            if (passwordInput.value.trim().toLowerCase() === SITE_PASSWORD) {
+            if (passwordInput.value.trim().toLowerCase() === _sitePassword) {
                 hasInteracted = true;
                 passwordInput.blur();
                 audioPlayer.currentTime = 0;
