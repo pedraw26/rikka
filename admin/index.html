@@ -465,7 +465,7 @@
         /* Intelligence Header */
         .intelligence-header {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 1px;
             background: var(--border);
             border: 1px solid var(--border);
@@ -505,9 +505,6 @@
             background: var(--accent-gold);
         }
 
-        .metric-card.emerald::before {
-            background: var(--accent-emerald);
-        }
 
         .metric-label {
             font-size: 11px;
@@ -1658,15 +1655,6 @@
                         </div>
                         <span class="metric-comparison">vs previous period</span>
                     </div>
-                    <div class="metric-card emerald" id="metricSubscribers">
-                        <span class="metric-label">Subscribers</span>
-                        <span class="metric-value">—</span>
-                        <div class="metric-delta positive">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
-                            —
-                        </div>
-                        <span class="metric-comparison">vs previous period</span>
-                    </div>
                 </section>
 
                 <!-- Traffic Panel -->
@@ -1784,7 +1772,7 @@
                                 <div class="conversion-icon">
                                     <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                                 </div>
-                                <span class="conversion-label">Email Signups</span>
+                                <span class="conversion-label">Email Subscribers</span>
                                 <span class="conversion-value">—</span>
                                 <span class="conversion-change">—</span>
                             </div>
@@ -2320,12 +2308,12 @@
             prevPageviews = prevPageviews.filter(r => !_excludedIPs.has(r.ip));
         }
 
-        updateMetrics(pageviews, prevPageviews, events, prevEvents, subs, prevSubs);
+        updateMetrics(pageviews, prevPageviews, events, prevEvents);
         updateChart(pageviews);
         updateSources(pageviews);
         updateDevices(pageviews);
         updateGeo(pageviews);
-        updateConversions(events, prevEvents);
+        updateConversions(events, prevEvents, subs, prevSubs);
         updateLiveFeed(pageviews, events);
         fetchSubscribers();
     }
@@ -2333,7 +2321,7 @@
     /* ============================================================
        UPDATE METRICS
        ============================================================ */
-    function updateMetrics(pv, prevPv, ev, prevEv, subs, prevSubs) {
+    function updateMetrics(pv, prevPv, ev, prevEv) {
         const total = pv.length;
         const prevTotal = prevPv.length;
         const unique = pv.filter(r => r.is_unique).length;
@@ -2347,14 +2335,10 @@
         const conv = ev.length;
         const prevConv = prevEv.length;
 
-        const subCount = (subs || []).length;
-        const prevSubCount = (prevSubs || []).length;
-
         setMetric('metricVisitors', fmtNum(total), calcDelta(total, prevTotal));
         setMetric('metricUnique', fmtNum(unique), calcDelta(unique, prevUnique));
         setMetric('metricSession', fmtDuration(avgDur), calcDelta(avgDur, prevAvgDur));
         setMetric('metricConversions', fmtNum(conv), calcDelta(conv, prevConv));
-        setMetric('metricSubscribers', fmtNum(subCount), calcDelta(subCount, prevSubCount));
     }
 
     function setMetric(id, value, delta) {
@@ -2473,7 +2457,7 @@
     /* ============================================================
        UPDATE CONVERSIONS
        ============================================================ */
-    function updateConversions(ev, prevEv) {
+    function updateConversions(ev, prevEv, subs, prevSubs) {
         const curr = { spotify: 0, youtube: 0, soundcloud: 0, email: 0, plays: 0, merch: 0 };
         const prev = { spotify: 0, youtube: 0, soundcloud: 0, email: 0, plays: 0, merch: 0 };
 
@@ -2485,6 +2469,10 @@
             const cat = eventCategory(e.event_type);
             if (cat && prev[cat] !== undefined) prev[cat]++;
         });
+
+        // Email Subscribers uses real subscriber data instead of analytics events
+        curr.email = (subs || []).length;
+        prev.email = (prevSubs || []).length;
 
         const items = [
             { id: 'convSpotify', key: 'spotify' },
