@@ -778,6 +778,11 @@
             color: var(--accent-gold);
         }
 
+        .activity-type.admin {
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--accent-rose);
+        }
+
         .activity-message {
             color: var(--text-secondary);
             flex: 1;
@@ -1740,6 +1745,8 @@
     /* ============================================================
        LIVE ACTIVITY FEED
        ============================================================ */
+    const ADMIN_IP = '92.40.187.59';
+
     function updateLiveFeed(pv, ev) {
         const feed = document.getElementById('activityFeed');
         const items = [];
@@ -1748,12 +1755,15 @@
             const d = new Date(r.created_at);
             const time = d.toTimeString().split(' ')[0];
             const loc = r.country_name || countryName(r.country);
+            const isAdmin = r.ip === ADMIN_IP;
             items.push({
                 time: d.getTime(),
                 timeStr: time,
-                type: 'visit',
-                typeBadge: 'Visit',
-                message: `${r.is_unique ? 'New' : 'Returning'} visitor from ${loc}`,
+                type: isAdmin ? 'admin' : 'visit',
+                typeBadge: isAdmin ? 'Admin' : 'Visit',
+                message: isAdmin
+                    ? `You — ${r.is_unique ? 'new session' : 'returning'} from ${loc}`
+                    : `${r.is_unique ? 'New' : 'Returning'} visitor from ${loc}`,
                 location: r.path || '/'
             });
         });

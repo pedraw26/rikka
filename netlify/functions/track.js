@@ -101,6 +101,12 @@ exports.handler = async (event) => {
     // Extract referrer domain
     const referrer_domain = extractDomain(data.referrer);
 
+    // Client IP from Netlify headers
+    const clientIp = event.headers['x-forwarded-for']?.split(',')[0]?.trim()
+      || event.headers['x-nf-client-connection-ip']
+      || event.headers['client-ip']
+      || null;
+
     // Handle different event types
     if (data.type === 'pageview') {
       const payload = {
@@ -110,6 +116,7 @@ exports.handler = async (event) => {
         referrer_domain: referrer_domain,
         utm_source: data.utm_source || null,
         utm_medium: data.utm_medium || null,
+        ip: clientIp,
         device_type: device_type,
         browser: browser,
         os: os,
