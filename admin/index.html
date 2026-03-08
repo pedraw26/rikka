@@ -1921,7 +1921,7 @@
                 message: isAdmin
                     ? `You — ${r.is_unique ? 'new session' : 'returning'} from ${loc}`
                     : `${r.is_unique ? 'New' : 'Returning'} visitor from ${loc}`,
-                location: r.path || '/'
+                location: (r.path || '/').replace(/^\/index\.html?\/?$/i, '/')
             });
         });
 
@@ -1946,7 +1946,6 @@
                 <span class="activity-time">${item.timeStr}</span>
                 <span class="activity-type ${item.type}">${item.typeBadge}</span>
                 <span class="activity-message">${item.message}</span>
-                <span class="activity-location">${item.location}</span>
             </div>
         `).join('');
     }
