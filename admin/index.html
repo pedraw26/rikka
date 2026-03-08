@@ -1790,6 +1790,7 @@
     const CONFIG = {
         supabaseUrl: 'https://tueltwjjkvqvdnznnhuq.supabase.co',
         supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1ZWx0d2pqa3ZxdmRuem5uaHVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MDEzMDAsImV4cCI6MjA4NzE3NzMwMH0.Vf55QMlAqxdpP5iVR7RzkljCn4G1GRyO_We_82xulYQ',
+        functionsUrl: 'https://rikka-official.netlify.app/.netlify/functions',
         refreshInterval: 60000,
         liveInterval: 15000,
         maxRows: 10000
@@ -1892,44 +1893,53 @@
         return r.ok ? r.json() : [];
     }
 
-    /* ── Supabase write helpers ── */
-    async function sbPatch(table, query, body) {
-        const r = await fetch(`${CONFIG.supabaseUrl}/rest/v1/${table}?${query}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'apikey': CONFIG.supabaseKey,
-                'Authorization': `Bearer ${CONFIG.supabaseKey}`,
-                'Prefer': 'return=minimal'
-            },
-            body: JSON.stringify(body)
-        });
-        return r.ok;
+    /* ── Server-side write helpers (via Netlify Functions) ──
+     *  All writes go through serverless functions.
+     *  The browser NEVER writes to Supabase directly.
+     *  ─────────────────────────────────────────────────────── */
+    async function fnAdminWrite(data) {
+        try {
+            const r = await fetch(`${CONFIG.functionsUrl}/admin-write`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'update', data })
+            });
+            const j = await r.json();
+            return j.ok === true;
+        } catch (e) {
+            console.error('fnAdminWrite error:', e);
+            return false;
+        }
     }
 
-    async function sbPost(table, body) {
-        const r = await fetch(`${CONFIG.supabaseUrl}/rest/v1/${table}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'apikey': CONFIG.supabaseKey,
-                'Authorization': `Bearer ${CONFIG.supabaseKey}`,
-                'Prefer': 'return=representation'
-            },
-            body: JSON.stringify(body)
-        });
-        return r.ok ? r.json() : null;
+    async function fnAddIP(ip, label) {
+        try {
+            const r = await fetch(`${CONFIG.functionsUrl}/admin-ips`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'add', ip, label })
+            });
+            const j = await r.json();
+            return j.ok === true ? j.data : null;
+        } catch (e) {
+            console.error('fnAddIP error:', e);
+            return null;
+        }
     }
 
-    async function sbDelete(table, query) {
-        const r = await fetch(`${CONFIG.supabaseUrl}/rest/v1/${table}?${query}`, {
-            method: 'DELETE',
-            headers: {
-                'apikey': CONFIG.supabaseKey,
-                'Authorization': `Bearer ${CONFIG.supabaseKey}`
-            }
-        });
-        return r.ok;
+    async function fnRemoveIP(id) {
+        try {
+            const r = await fetch(`${CONFIG.functionsUrl}/admin-ips`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'remove', id })
+            });
+            const j = await r.json();
+            return j.ok === true;
+        } catch (e) {
+            console.error('fnRemoveIP error:', e);
+            return false;
+        }
     }
 
     /* ============================================================
@@ -1966,19 +1976,10 @@
         updateLockUI(newVal);
 
         try {
-            const r = await fetch(`${CONFIG.supabaseUrl}/rest/v1/site_config?id=eq.1`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': CONFIG.supabaseKey,
-                    'Authorization': `Bearer ${CONFIG.supabaseKey}`,
-                    'Prefer': 'return=representation'
-                },
-                body: JSON.stringify({ site_locked: newVal, updated_at: new Date().toISOString() })
-            });
-            if (!r.ok) {
+            const ok = await fnAdminWrite({ site_locked: newVal });
+            if (!ok) {
                 updateLockUI(current); // revert on failure
-                console.error('Lock toggle failed:', await r.text());
+                console.error('Lock toggle failed');
             }
         } catch (e) {
             updateLockUI(current);
@@ -2456,11 +2457,12 @@
 
     async function loadSettings() {
         try {
-            const rows = await sbFetch('site_config', 'select=lock_password,admin_ip,refresh_interval,live_interval&id=eq.1');
+            // Only fetch non-sensitive fields — lock_password stays server-side
+            const rows = await sbFetch('site_config', 'select=admin_ip,refresh_interval,live_interval&id=eq.1');
             if (rows.length) {
                 const cfg = rows[0];
                 document.getElementById('settingsLockPassword').value = '';
-                document.getElementById('settingsLockPassword').placeholder = '••••••••';
+                document.getElementById('settingsLockPassword').placeholder = 'Enter new password';
                 document.getElementById('settingsAdminIP').value = cfg.admin_ip || '';
                 document.getElementById('settingsRefreshInterval').value = cfg.refresh_interval || 60;
                 document.getElementById('settingsLiveInterval').value = cfg.live_interval || 15;
@@ -2503,7 +2505,7 @@
     async function saveLockPassword() {
         const pw = document.getElementById('settingsLockPassword').value.trim();
         if (!pw) { showFeedback('feedbackPassword', 'Enter a password', true); return; }
-        const ok = await sbPatch('site_config', 'id=eq.1', { lock_password: pw });
+        const ok = await fnAdminWrite({ lock_password: pw });
         if (ok) {
             showFeedback('feedbackPassword', 'Password updated');
             document.getElementById('settingsLockPassword').value = '';
@@ -2515,7 +2517,7 @@
     async function saveAdminIP() {
         const ip = document.getElementById('settingsAdminIP').value.trim();
         if (!ip) { showFeedback('feedbackAdminIP', 'Enter an IP', true); return; }
-        const ok = await sbPatch('site_config', 'id=eq.1', { admin_ip: ip });
+        const ok = await fnAdminWrite({ admin_ip: ip });
         if (ok) {
             ADMIN_IP = ip;
             showFeedback('feedbackAdminIP', 'Admin IP updated');
@@ -2529,7 +2531,7 @@
         const li = parseInt(document.getElementById('settingsLiveInterval').value) || 15;
         const clampRI = Math.max(10, Math.min(600, ri));
         const clampLI = Math.max(5, Math.min(120, li));
-        const ok = await sbPatch('site_config', 'id=eq.1', { refresh_interval: clampRI, live_interval: clampLI });
+        const ok = await fnAdminWrite({ refresh_interval: clampRI, live_interval: clampLI });
         if (ok) {
             CONFIG.refreshInterval = clampRI * 1000;
             CONFIG.liveInterval = clampLI * 1000;
@@ -2544,7 +2546,7 @@
         const ip = document.getElementById('ipExclusionInput').value.trim();
         const label = document.getElementById('ipExclusionLabel').value.trim();
         if (!ip) { showFeedback('feedbackExcludeIP', 'Enter an IP', true); return; }
-        const result = await sbPost('excluded_ips', { ip, label });
+        const result = await fnAddIP(ip, label);
         if (result) {
             document.getElementById('ipExclusionInput').value = '';
             document.getElementById('ipExclusionLabel').value = '';
@@ -2557,7 +2559,7 @@
     }
 
     async function removeExcludedIP(id) {
-        const ok = await sbDelete('excluded_ips', `id=eq.${id}`);
+        const ok = await fnRemoveIP(id);
         if (ok) {
             await loadExcludedIPs();
             fetchAllData(); // re-filter data
