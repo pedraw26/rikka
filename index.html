@@ -1986,6 +1986,12 @@
                     footerNlForm.style.display = 'none';
                     footerNlSuccess.textContent = "You're in.";
                     footerNlSuccess.style.display = 'block';
+                    // Also store in Supabase for dashboard analytics
+                    fetch(_FN + '/track', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type: 'subscriber', email: emailInput.value.trim(), source: 'footer' })
+                    }).catch(() => {});
                 } catch (err) {
                     footerNlSuccess.textContent = 'Could not submit. Try again.';
                     if (submitBtn) submitBtn.disabled = false;

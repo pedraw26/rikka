@@ -465,7 +465,7 @@
         /* Intelligence Header */
         .intelligence-header {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 1px;
             background: var(--border);
             border: 1px solid var(--border);
@@ -503,6 +503,10 @@
 
         .metric-card.gold::before {
             background: var(--accent-gold);
+        }
+
+        .metric-card.emerald::before {
+            background: var(--accent-emerald);
         }
 
         .metric-label {
@@ -1351,6 +1355,97 @@
             stroke-width: 2;
         }
 
+        /* Subscribers Panel */
+        .subscribers-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 24px;
+        }
+
+        .subscribers-panel .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .subscriber-total {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--accent-emerald);
+            font-weight: 500;
+        }
+
+        .subscriber-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 16px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .subscriber-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .subscriber-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 12px;
+        }
+
+        .subscriber-email {
+            color: var(--text-primary);
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .subscriber-source {
+            font-size: 10px;
+            padding: 2px 8px;
+            background: rgba(0, 240, 255, 0.08);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        .subscriber-date {
+            color: var(--text-muted);
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .subscriber-delete {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            transition: color 0.15s;
+            display: flex;
+            align-items: center;
+        }
+
+        .subscriber-delete:hover {
+            color: var(--accent-rose);
+        }
+
+        .subscriber-empty {
+            color: var(--text-muted);
+            font-size: 12px;
+            padding: 24px 0;
+            text-align: center;
+            font-family: var(--font-mono);
+        }
+
         @media (max-width: 1024px) {
             .settings-view.active {
                 grid-template-columns: 1fr;
@@ -1539,6 +1634,15 @@
                         </div>
                         <span class="metric-comparison">vs previous period</span>
                     </div>
+                    <div class="metric-card emerald" id="metricSubscribers">
+                        <span class="metric-label">Subscribers</span>
+                        <span class="metric-value">—</span>
+                        <div class="metric-delta positive">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+                            —
+                        </div>
+                        <span class="metric-comparison">vs previous period</span>
+                    </div>
                 </section>
 
                 <!-- Traffic Panel -->
@@ -1679,6 +1783,17 @@
                         </div>
                     </section>
 
+                    <!-- Subscribers Panel -->
+                    <section class="subscribers-panel">
+                        <div class="panel-header">
+                            <h2 class="panel-title">Email Subscribers</h2>
+                            <span class="subscriber-total" id="subscriberTotal">0 total</span>
+                        </div>
+                        <div class="subscriber-list" id="subscriberList">
+                            <div class="subscriber-empty">No subscribers yet</div>
+                        </div>
+                    </section>
+
                     <!-- Live Activity Panel -->
                     <section class="live-panel">
                         <div class="panel-header">
@@ -1776,6 +1891,10 @@
                             <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                             Export Events
                         </button>
+                        <button class="export-btn" onclick="downloadCSV('subscribers')">
+                            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Export Subscribers
+                        </button>
                     </div>
                 </div>
 
@@ -1793,7 +1912,7 @@
         functionsUrl: 'https://rikka-official.netlify.app/.netlify/functions',
         refreshInterval: 60000,
         liveInterval: 15000,
-        maxRows: 10000
+        maxRows: 500
     };
     /* ============================================================
        AUTH MODULE — SHA-256 hash-based, no plaintext credentials
@@ -1938,6 +2057,25 @@
             return j.ok === true;
         } catch (e) {
             console.error('fnRemoveIP error:', e);
+            return false;
+        }
+    }
+
+    async function fnRemoveSubscriber(id) {
+        try {
+            const r = await fetch(`${CONFIG.supabaseUrl}/rest/v1/rpc/admin_remove_subscriber`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': CONFIG.supabaseKey,
+                    'Authorization': `Bearer ${CONFIG.supabaseKey}`
+                },
+                body: JSON.stringify({ fn_secret: 'rkst_fn_8eac49f3cbc73c8b833d13db580d4ce14f21ad31071ce02a', sub_id: id })
+            });
+            const j = await r.json();
+            return j.ok === true;
+        } catch (e) {
+            console.error('fnRemoveSubscriber error:', e);
             return false;
         }
     }
@@ -2137,11 +2275,13 @@
         const from = getRangeISO(currentRange);
         const prevFrom = getPrevRangeISO(currentRange);
 
-        let [pageviews, prevPageviews, events, prevEvents] = await Promise.all([
+        let [pageviews, prevPageviews, events, prevEvents, subs, prevSubs] = await Promise.all([
             sbFetch('pageviews', `select=*&created_at=gte.${from}&order=created_at.desc&limit=${CONFIG.maxRows}`),
             sbFetch('pageviews', `select=*&created_at=gte.${prevFrom}&created_at=lt.${from}&order=created_at.desc&limit=${CONFIG.maxRows}`),
             sbFetch('analytics_events', `select=*&created_at=gte.${from}&order=created_at.desc&limit=${CONFIG.maxRows}`),
-            sbFetch('analytics_events', `select=*&created_at=gte.${prevFrom}&created_at=lt.${from}&order=created_at.desc&limit=${CONFIG.maxRows}`)
+            sbFetch('analytics_events', `select=*&created_at=gte.${prevFrom}&created_at=lt.${from}&order=created_at.desc&limit=${CONFIG.maxRows}`),
+            sbFetch('subscribers', `select=*&created_at=gte.${from}&order=created_at.desc`),
+            sbFetch('subscribers', `select=*&created_at=gte.${prevFrom}&created_at=lt.${from}&order=created_at.desc`)
         ]);
 
         // Filter out excluded IPs
@@ -2150,19 +2290,20 @@
             prevPageviews = prevPageviews.filter(r => !_excludedIPs.has(r.ip));
         }
 
-        updateMetrics(pageviews, prevPageviews, events, prevEvents);
+        updateMetrics(pageviews, prevPageviews, events, prevEvents, subs, prevSubs);
         updateChart(pageviews);
         updateSources(pageviews);
         updateDevices(pageviews);
         updateGeo(pageviews);
         updateConversions(events, prevEvents);
         updateLiveFeed(pageviews, events);
+        fetchSubscribers();
     }
 
     /* ============================================================
        UPDATE METRICS
        ============================================================ */
-    function updateMetrics(pv, prevPv, ev, prevEv) {
+    function updateMetrics(pv, prevPv, ev, prevEv, subs, prevSubs) {
         const total = pv.length;
         const prevTotal = prevPv.length;
         const unique = pv.filter(r => r.is_unique).length;
@@ -2176,10 +2317,14 @@
         const conv = ev.length;
         const prevConv = prevEv.length;
 
+        const subCount = (subs || []).length;
+        const prevSubCount = (prevSubs || []).length;
+
         setMetric('metricVisitors', fmtNum(total), calcDelta(total, prevTotal));
         setMetric('metricUnique', fmtNum(unique), calcDelta(unique, prevUnique));
         setMetric('metricSession', fmtDuration(avgDur), calcDelta(avgDur, prevAvgDur));
         setMetric('metricConversions', fmtNum(conv), calcDelta(conv, prevConv));
+        setMetric('metricSubscribers', fmtNum(subCount), calcDelta(subCount, prevSubCount));
     }
 
     function setMetric(id, value, delta) {
@@ -2444,6 +2589,48 @@
     });
 
     /* ============================================================
+       SUBSCRIBERS — fetch, render, delete
+       ============================================================ */
+    async function fetchSubscribers() {
+        try {
+            const rows = await sbFetch('subscribers', 'select=*&order=created_at.desc&limit=100');
+            const totalEl = document.getElementById('subscriberTotal');
+            if (totalEl) totalEl.textContent = `${rows.length} total`;
+            renderSubscribers(rows);
+        } catch (e) {
+            console.error('fetchSubscribers error:', e);
+        }
+    }
+
+    function renderSubscribers(rows) {
+        const list = document.getElementById('subscriberList');
+        if (!list) return;
+        if (!rows.length) {
+            list.innerHTML = '<div class="subscriber-empty">No subscribers yet</div>';
+            return;
+        }
+        list.innerHTML = rows.map(r => {
+            const d = new Date(r.created_at);
+            const dateStr = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+            return `<div class="subscriber-item">
+                <span class="subscriber-email">${r.email}</span>
+                <span class="subscriber-source">${r.source || 'website'}</span>
+                <span class="subscriber-date">${dateStr}</span>
+                <button class="subscriber-delete" onclick="deleteSubscriber(${r.id})" title="Remove">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>`;
+        }).join('');
+    }
+
+    async function deleteSubscriber(id) {
+        const ok = await fnRemoveSubscriber(id);
+        if (ok) {
+            fetchSubscribers();
+        }
+    }
+
+    /* ============================================================
        SETTINGS — load, save, export
        ============================================================ */
     function showFeedback(id, msg, isError) {
@@ -2568,8 +2755,11 @@
 
     async function downloadCSV(type) {
         const from = getRangeISO(currentRange);
-        const table = type === 'pageviews' ? 'pageviews' : 'analytics_events';
-        const rows = await sbFetch(table, `select=*&created_at=gte.${from}&order=created_at.desc&limit=${CONFIG.maxRows}`);
+        const table = type === 'subscribers' ? 'subscribers' : type === 'pageviews' ? 'pageviews' : 'analytics_events';
+        const query = type === 'subscribers'
+            ? `select=*&order=created_at.desc`
+            : `select=*&created_at=gte.${from}&order=created_at.desc&limit=${CONFIG.maxRows}`;
+        const rows = await sbFetch(table, query);
         if (!rows.length) { alert('No data to export'); return; }
 
         const headers = Object.keys(rows[0]);

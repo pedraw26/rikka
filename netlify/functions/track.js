@@ -189,6 +189,30 @@ exports.handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     }
 
+    // Handle newsletter subscriber signup
+    if (data.type === 'subscriber') {
+      if (!data.email || typeof data.email !== 'string' || !data.email.includes('@')) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Valid email required' }) };
+      }
+
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/subscribers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          email: data.email.trim().toLowerCase(),
+          source: data.source || 'website'
+        })
+      });
+
+      // 201 = new subscriber, 409 = already exists (both are fine)
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    }
+
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Unknown event type' }) };
   } catch (err) {
     console.error('Track error:', err);
