@@ -1806,17 +1806,17 @@
         const passwordError = document.getElementById('password-error');
         const audioPlayer = document.getElementById('audio-player');
 
-        /* ── Site lock — fetched from Supabase site_config ── */
+        /* ── Site lock — password verified server-side ── */
         const _SB = 'https://tueltwjjkvqvdnznnhuq.supabase.co';
         const _SK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1ZWx0d2pqa3ZxdmRuem5uaHVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MDEzMDAsImV4cCI6MjA4NzE3NzMwMH0.Vf55QMlAqxdpP5iVR7RzkljCn4G1GRyO_We_82xulYQ';
-        let _sitePassword = '';
+        const _FN = 'https://rikka-official.netlify.app/.netlify/functions';
         let _siteLocked = false;
         let hasInteracted = false;
         let count = 0;
 
         async function fetchSiteConfig() {
             try {
-                var r = await fetch(_SB + '/rest/v1/site_config?select=site_locked,lock_password&id=eq.1', {
+                var r = await fetch(_SB + '/rest/v1/site_lock_status?id=eq.1', {
                     method: 'GET',
                     headers: { 'apikey': _SK, 'Authorization': 'Bearer ' + _SK }
                 });
@@ -1824,7 +1824,6 @@
                     var rows = await r.json();
                     if (rows.length) {
                         _siteLocked = rows[0].site_locked === true;
-                        _sitePassword = (rows[0].lock_password || '').toLowerCase();
                     }
                 }
             } catch (e) {
@@ -1854,20 +1853,39 @@
             passwordInput.value = '';
         };
 
-        const submitPassword = () => {
-            if (passwordInput.value.trim().toLowerCase() === _sitePassword) {
-                hasInteracted = true;
-                passwordInput.blur();
-                audioPlayer.currentTime = 0;
-                audioPlayer.muted = false;
-                audioPlayer.play().catch(function(error) {
-                    console.log('Playback blocked:', error);
+        const submitPassword = async () => {
+            const pw = passwordInput.value.trim();
+            if (!pw) return;
+
+            passwordSubmit.disabled = true;
+            passwordError.textContent = '';
+
+            try {
+                var r = await fetch(_FN + '/verify-lock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pw })
                 });
-                unlockSite();
-                return;
+                var data = await r.json();
+
+                if (data.valid) {
+                    hasInteracted = true;
+                    passwordInput.blur();
+                    audioPlayer.currentTime = 0;
+                    audioPlayer.muted = false;
+                    audioPlayer.play().catch(function(error) {
+                        console.log('Playback blocked:', error);
+                    });
+                    unlockSite();
+                    return;
+                }
+            } catch (e) {
+                console.error('verify-lock error', e);
             }
+
             passwordError.textContent = 'Wrong password. Try again.';
             passwordInput.select();
+            passwordSubmit.disabled = false;
         };
 
         passwordSubmit.addEventListener('click', submitPassword);
