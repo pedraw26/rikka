@@ -1069,6 +1069,289 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ============================================================
+           SETTINGS VIEW
+           ============================================================ */
+        .settings-view {
+            padding: 32px;
+            display: none;
+            flex-direction: column;
+            gap: 24px;
+            max-width: 720px;
+        }
+
+        .settings-view.active {
+            display: flex;
+        }
+
+        .settings-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .settings-section-title {
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .settings-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .settings-field:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-field label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .settings-field input {
+            background: var(--graphite);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+
+        .settings-field input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .settings-field input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .settings-row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .settings-row .settings-field {
+            flex: 1;
+        }
+
+        .settings-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .settings-save {
+            background: var(--accent-emerald);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: opacity 0.2s;
+        }
+
+        .settings-save:hover {
+            opacity: 0.85;
+        }
+
+        .settings-save:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .settings-feedback {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--accent-emerald);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .settings-feedback.show {
+            opacity: 1;
+        }
+
+        .settings-feedback.error {
+            color: var(--accent-rose);
+        }
+
+        /* IP Exclusions */
+        .ip-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 14px;
+            max-height: 180px;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .ip-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .ip-list-empty {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-muted);
+            padding: 8px 0;
+        }
+
+        .ip-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--graphite);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+        }
+
+        .ip-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .ip-item-addr {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .ip-item-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .ip-item-delete {
+            background: none;
+            border: none;
+            color: var(--accent-rose);
+            cursor: pointer;
+            padding: 4px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .ip-item-delete:hover {
+            opacity: 1;
+        }
+
+        .ip-add-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .ip-add-row input {
+            flex: 1;
+            background: var(--graphite);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .ip-add-row input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .ip-add-row input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .ip-add-btn {
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            white-space: nowrap;
+        }
+
+        .ip-add-btn:hover {
+            border-color: var(--accent-cyan);
+        }
+
+        /* Export */
+        .export-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 20px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .export-btn:hover {
+            border-color: var(--accent-cyan);
+            background: var(--surface);
+        }
+
+        .export-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        @media (max-width: 600px) {
+            .settings-view {
+                padding: 16px;
+            }
+            .settings-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .export-row {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1155,7 +1438,7 @@
                 </div>
                 <div class="nav-section">
                     <div class="nav-section-title">System</div>
-                    <a class="nav-item">
+                    <a class="nav-item" data-view="settings">
                         <span class="nav-icon">
                             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                         </span>
@@ -1386,6 +1669,87 @@
                     </section>
                 </div>
             </div>
+
+            <!-- Settings View -->
+            <div class="settings-view" id="settingsView">
+
+                <!-- Lock Password -->
+                <div class="settings-section">
+                    <div class="settings-section-title">Lock Password</div>
+                    <div class="settings-field">
+                        <label>Site Lock Password</label>
+                        <input type="password" id="settingsLockPassword" placeholder="Enter new password">
+                    </div>
+                    <div class="settings-actions">
+                        <button class="settings-save" onclick="saveLockPassword()">Save</button>
+                        <span class="settings-feedback" id="feedbackPassword"></span>
+                    </div>
+                </div>
+
+                <!-- Admin IP -->
+                <div class="settings-section">
+                    <div class="settings-section-title">Admin IP</div>
+                    <div class="settings-field">
+                        <label>Your IP Address</label>
+                        <input type="text" id="settingsAdminIP" placeholder="e.g. 92.40.187.59">
+                    </div>
+                    <div class="settings-actions">
+                        <button class="settings-save" onclick="saveAdminIP()">Save</button>
+                        <span class="settings-feedback" id="feedbackAdminIP"></span>
+                    </div>
+                </div>
+
+                <!-- Refresh Rate -->
+                <div class="settings-section">
+                    <div class="settings-section-title">Refresh Rate</div>
+                    <div class="settings-row">
+                        <div class="settings-field">
+                            <label>Dashboard (seconds)</label>
+                            <input type="number" id="settingsRefreshInterval" min="10" max="600" placeholder="60">
+                        </div>
+                        <div class="settings-field">
+                            <label>Live Feed (seconds)</label>
+                            <input type="number" id="settingsLiveInterval" min="5" max="120" placeholder="15">
+                        </div>
+                    </div>
+                    <div class="settings-actions">
+                        <button class="settings-save" onclick="saveRefreshRate()">Save</button>
+                        <span class="settings-feedback" id="feedbackRefresh"></span>
+                    </div>
+                </div>
+
+                <!-- IP Exclusions -->
+                <div class="settings-section">
+                    <div class="settings-section-title">IP Exclusions</div>
+                    <div class="ip-list" id="ipExclusionList">
+                        <div class="ip-list-empty">No excluded IPs</div>
+                    </div>
+                    <div class="ip-add-row">
+                        <input type="text" id="ipExclusionInput" placeholder="IP address">
+                        <input type="text" id="ipExclusionLabel" placeholder="Label (optional)" style="max-width:160px">
+                        <button class="ip-add-btn" onclick="addExcludedIP()">Add</button>
+                    </div>
+                    <div class="settings-actions" style="margin-top:12px">
+                        <span class="settings-feedback" id="feedbackExcludeIP"></span>
+                    </div>
+                </div>
+
+                <!-- Data Export -->
+                <div class="settings-section">
+                    <div class="settings-section-title">Data Export</div>
+                    <div class="export-row">
+                        <button class="export-btn" onclick="downloadCSV('pageviews')">
+                            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Export Pageviews
+                        </button>
+                        <button class="export-btn" onclick="downloadCSV('events')">
+                            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Export Events
+                        </button>
+                    </div>
+                </div>
+
+            </div>
         </main>
     </div>
 
@@ -1496,6 +1860,46 @@
             }
         });
         return r.ok ? r.json() : [];
+    }
+
+    /* ── Supabase write helpers ── */
+    async function sbPatch(table, query, body) {
+        const r = await fetch(`${CONFIG.supabaseUrl}/rest/v1/${table}?${query}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': CONFIG.supabaseKey,
+                'Authorization': `Bearer ${CONFIG.supabaseKey}`,
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify(body)
+        });
+        return r.ok;
+    }
+
+    async function sbPost(table, body) {
+        const r = await fetch(`${CONFIG.supabaseUrl}/rest/v1/${table}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': CONFIG.supabaseKey,
+                'Authorization': `Bearer ${CONFIG.supabaseKey}`,
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(body)
+        });
+        return r.ok ? r.json() : null;
+    }
+
+    async function sbDelete(table, query) {
+        const r = await fetch(`${CONFIG.supabaseUrl}/rest/v1/${table}?${query}`, {
+            method: 'DELETE',
+            headers: {
+                'apikey': CONFIG.supabaseKey,
+                'Authorization': `Bearer ${CONFIG.supabaseKey}`
+            }
+        });
+        return r.ok;
     }
 
     /* ============================================================
@@ -1702,12 +2106,18 @@
         const from = getRangeISO(currentRange);
         const prevFrom = getPrevRangeISO(currentRange);
 
-        const [pageviews, prevPageviews, events, prevEvents] = await Promise.all([
+        let [pageviews, prevPageviews, events, prevEvents] = await Promise.all([
             sbFetch('pageviews', `select=*&created_at=gte.${from}&order=created_at.desc&limit=${CONFIG.maxRows}`),
             sbFetch('pageviews', `select=*&created_at=gte.${prevFrom}&created_at=lt.${from}&order=created_at.desc&limit=${CONFIG.maxRows}`),
             sbFetch('analytics_events', `select=*&created_at=gte.${from}&order=created_at.desc&limit=${CONFIG.maxRows}`),
             sbFetch('analytics_events', `select=*&created_at=gte.${prevFrom}&created_at=lt.${from}&order=created_at.desc&limit=${CONFIG.maxRows}`)
         ]);
+
+        // Filter out excluded IPs
+        if (_excludedIPs.size > 0) {
+            pageviews = pageviews.filter(r => !_excludedIPs.has(r.ip));
+            prevPageviews = prevPageviews.filter(r => !_excludedIPs.has(r.ip));
+        }
 
         updateMetrics(pageviews, prevPageviews, events, prevEvents);
         updateChart(pageviews);
@@ -1893,7 +2303,8 @@
     /* ============================================================
        LIVE ACTIVITY FEED
        ============================================================ */
-    const ADMIN_IP = '92.40.187.59';
+    let ADMIN_IP = '92.40.187.59';
+    let _excludedIPs = new Set();
 
     function updateLiveFeed(pv, ev) {
         const feed = document.getElementById('activityFeed');
@@ -1971,14 +2382,185 @@
     });
 
     /* ============================================================
-       NAV ITEMS
+       NAV ITEMS — with settings view switching
        ============================================================ */
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
+
+            const contentEl = document.querySelector('.content');
+            const settingsEl = document.getElementById('settingsView');
+            const headerTitle = document.querySelector('.header-title');
+            const headerRight = document.querySelector('.header-right');
+            const timeFilter = document.getElementById('timeFilter');
+
+            if (item.dataset.view === 'settings') {
+                contentEl.style.display = 'none';
+                settingsEl.classList.add('active');
+                headerTitle.textContent = 'Settings';
+                headerRight.style.display = 'none';
+                timeFilter.style.display = 'none';
+                loadSettings();
+            } else {
+                settingsEl.classList.remove('active');
+                contentEl.style.display = '';
+                headerTitle.textContent = 'Analytics Overview';
+                headerRight.style.display = '';
+                timeFilter.style.display = '';
+            }
         });
     });
+
+    /* ============================================================
+       SETTINGS — load, save, export
+       ============================================================ */
+    function showFeedback(id, msg, isError) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = msg;
+        el.classList.toggle('error', !!isError);
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    async function loadSettings() {
+        try {
+            const rows = await sbFetch('site_config', 'select=lock_password,admin_ip,refresh_interval,live_interval&id=eq.1');
+            if (rows.length) {
+                const cfg = rows[0];
+                document.getElementById('settingsLockPassword').value = '';
+                document.getElementById('settingsLockPassword').placeholder = '••••••••';
+                document.getElementById('settingsAdminIP').value = cfg.admin_ip || '';
+                document.getElementById('settingsRefreshInterval').value = cfg.refresh_interval || 60;
+                document.getElementById('settingsLiveInterval').value = cfg.live_interval || 15;
+            }
+        } catch (e) {
+            console.error('loadSettings error:', e);
+        }
+        await loadExcludedIPs();
+    }
+
+    async function loadExcludedIPs() {
+        try {
+            const rows = await sbFetch('excluded_ips', 'select=*&order=created_at.desc');
+            _excludedIPs = new Set(rows.map(r => r.ip));
+            renderExcludedIPs(rows);
+        } catch (e) {
+            console.error('loadExcludedIPs error:', e);
+        }
+    }
+
+    function renderExcludedIPs(rows) {
+        const list = document.getElementById('ipExclusionList');
+        if (!rows.length) {
+            list.innerHTML = '<div class="ip-list-empty">No excluded IPs</div>';
+            return;
+        }
+        list.innerHTML = rows.map(r => `
+            <div class="ip-item">
+                <div class="ip-item-info">
+                    <span class="ip-item-addr">${r.ip}</span>
+                    ${r.label ? `<span class="ip-item-label">${r.label}</span>` : ''}
+                </div>
+                <button class="ip-item-delete" onclick="removeExcludedIP(${r.id})" title="Remove">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+        `).join('');
+    }
+
+    async function saveLockPassword() {
+        const pw = document.getElementById('settingsLockPassword').value.trim();
+        if (!pw) { showFeedback('feedbackPassword', 'Enter a password', true); return; }
+        const ok = await sbPatch('site_config', 'id=eq.1', { lock_password: pw });
+        if (ok) {
+            showFeedback('feedbackPassword', 'Password updated');
+            document.getElementById('settingsLockPassword').value = '';
+        } else {
+            showFeedback('feedbackPassword', 'Save failed', true);
+        }
+    }
+
+    async function saveAdminIP() {
+        const ip = document.getElementById('settingsAdminIP').value.trim();
+        if (!ip) { showFeedback('feedbackAdminIP', 'Enter an IP', true); return; }
+        const ok = await sbPatch('site_config', 'id=eq.1', { admin_ip: ip });
+        if (ok) {
+            ADMIN_IP = ip;
+            showFeedback('feedbackAdminIP', 'Admin IP updated');
+        } else {
+            showFeedback('feedbackAdminIP', 'Save failed', true);
+        }
+    }
+
+    async function saveRefreshRate() {
+        const ri = parseInt(document.getElementById('settingsRefreshInterval').value) || 60;
+        const li = parseInt(document.getElementById('settingsLiveInterval').value) || 15;
+        const clampRI = Math.max(10, Math.min(600, ri));
+        const clampLI = Math.max(5, Math.min(120, li));
+        const ok = await sbPatch('site_config', 'id=eq.1', { refresh_interval: clampRI, live_interval: clampLI });
+        if (ok) {
+            CONFIG.refreshInterval = clampRI * 1000;
+            CONFIG.liveInterval = clampLI * 1000;
+            restartIntervals();
+            showFeedback('feedbackRefresh', `Updated: ${clampRI}s / ${clampLI}s`);
+        } else {
+            showFeedback('feedbackRefresh', 'Save failed', true);
+        }
+    }
+
+    async function addExcludedIP() {
+        const ip = document.getElementById('ipExclusionInput').value.trim();
+        const label = document.getElementById('ipExclusionLabel').value.trim();
+        if (!ip) { showFeedback('feedbackExcludeIP', 'Enter an IP', true); return; }
+        const result = await sbPost('excluded_ips', { ip, label });
+        if (result) {
+            document.getElementById('ipExclusionInput').value = '';
+            document.getElementById('ipExclusionLabel').value = '';
+            showFeedback('feedbackExcludeIP', 'IP excluded');
+            await loadExcludedIPs();
+            fetchAllData(); // re-filter data
+        } else {
+            showFeedback('feedbackExcludeIP', 'Failed — IP may already exist', true);
+        }
+    }
+
+    async function removeExcludedIP(id) {
+        const ok = await sbDelete('excluded_ips', `id=eq.${id}`);
+        if (ok) {
+            await loadExcludedIPs();
+            fetchAllData(); // re-filter data
+        }
+    }
+
+    async function downloadCSV(type) {
+        const from = getRangeISO(currentRange);
+        const table = type === 'pageviews' ? 'pageviews' : 'analytics_events';
+        const rows = await sbFetch(table, `select=*&created_at=gte.${from}&order=created_at.desc&limit=${CONFIG.maxRows}`);
+        if (!rows.length) { alert('No data to export'); return; }
+
+        const headers = Object.keys(rows[0]);
+        const csv = [
+            headers.join(','),
+            ...rows.map(r => headers.map(h => {
+                let v = r[h];
+                if (v === null || v === undefined) v = '';
+                v = String(v).replace(/"/g, '""');
+                return `"${v}"`;
+            }).join(','))
+        ].join('\n');
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `rikka_${type}_${currentRange}_${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
 
     /* ============================================================
        HOVER EFFECTS (original)
@@ -1991,15 +2573,40 @@
     /* ============================================================
        BOOT
        ============================================================ */
+    let _refreshTimer, _liveTimer;
+
+    function restartIntervals() {
+        clearInterval(_refreshTimer);
+        clearInterval(_liveTimer);
+        _refreshTimer = setInterval(fetchAllData, CONFIG.refreshInterval);
+        _liveTimer = setInterval(updateLiveCount, CONFIG.liveInterval);
+    }
+
     async function bootDashboard() {
         initChart();
+
+        // Load admin IP + excluded IPs from Supabase before first data fetch
+        try {
+            const cfgRows = await sbFetch('site_config', 'select=admin_ip,refresh_interval,live_interval&id=eq.1');
+            if (cfgRows.length) {
+                const cfg = cfgRows[0];
+                if (cfg.admin_ip) ADMIN_IP = cfg.admin_ip;
+                if (cfg.refresh_interval) CONFIG.refreshInterval = cfg.refresh_interval * 1000;
+                if (cfg.live_interval) CONFIG.liveInterval = cfg.live_interval * 1000;
+            }
+            const ipRows = await sbFetch('excluded_ips', 'select=ip');
+            _excludedIPs = new Set(ipRows.map(r => r.ip));
+        } catch (e) {
+            console.error('Config load error:', e);
+        }
+
         await fetchAllData();
         await updateLiveCount();
         fetchLockStatus(); // non-blocking — loads site lock state
         document.getElementById('loadingOverlay').classList.add('hidden');
 
-        setInterval(fetchAllData, CONFIG.refreshInterval);
-        setInterval(updateLiveCount, CONFIG.liveInterval);
+        _refreshTimer = setInterval(fetchAllData, CONFIG.refreshInterval);
+        _liveTimer = setInterval(updateLiveCount, CONFIG.liveInterval);
     }
 
     /* Start */
