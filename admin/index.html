@@ -639,13 +639,15 @@
 
         .breakdown-bar {
             height: 3px;
-            background: var(--border);
-            margin-top: 6px;
+            background: transparent;
+            margin-top: 4px;
+            margin-bottom: 4px;
             position: relative;
         }
 
         .breakdown-bar-fill {
             height: 100%;
+            border-radius: 2px;
             position: absolute;
             left: 0;
             top: 0;
@@ -1397,7 +1399,7 @@
         }
 
         .subscriber-list {
-            max-height: 300px;
+            max-height: 132px;
             overflow-y: auto;
             margin-top: 16px;
             scrollbar-width: none;
@@ -1416,6 +1418,10 @@
             border-bottom: 1px solid var(--border);
             font-family: var(--font-mono);
             font-size: 12px;
+        }
+
+        .subscriber-item:last-child {
+            border-bottom: none;
         }
 
         .subscriber-email {
@@ -1465,6 +1471,10 @@
             padding: 24px 0;
             text-align: center;
             font-family: var(--font-mono);
+        }
+
+        .subscriber-footer {
+            margin-top: 12px;
         }
 
         @media (max-width: 1024px) {
@@ -1799,16 +1809,16 @@
                     <section class="subscribers-panel">
                         <div class="panel-header">
                             <h2 class="panel-title">Email Subscribers</h2>
-                            <div style="display:flex;align-items:center;gap:10px;">
-                                <button class="copy-emails-btn" id="copyEmailsBtn" onclick="copyAllEmails()" title="Copy all emails to clipboard">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                    Copy Emails
-                                </button>
-                                <span class="subscriber-total" id="subscriberTotal">0 total</span>
-                            </div>
+                            <span class="subscriber-total" id="subscriberTotal">0 total</span>
                         </div>
                         <div class="subscriber-list" id="subscriberList">
                             <div class="subscriber-empty">No subscribers yet</div>
+                        </div>
+                        <div class="subscriber-footer">
+                            <button class="copy-emails-btn" id="copyEmailsBtn" onclick="copyAllEmails()" title="Copy all emails to clipboard">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                Copy
+                            </button>
                         </div>
                     </section>
 
@@ -2671,7 +2681,7 @@
     function resetCopyBtn() {
         const btn = document.getElementById('copyEmailsBtn');
         btn.classList.remove('copied');
-        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Emails';
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
     }
 
     /* ============================================================
