@@ -265,29 +265,12 @@
             color: var(--accent-rose);
         }
 
-        .lock-status-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            margin-left: auto;
-            transition: background 0.2s;
-        }
-
-        .site-lock-toggle[data-locked="false"] .lock-status-dot {
-            background: var(--accent-emerald);
-        }
-
-        .site-lock-toggle[data-locked="true"] .lock-status-dot {
-            background: var(--accent-rose);
-        }
-
         .sidebar.collapsed .site-lock-toggle {
             padding: 8px 0;
             justify-content: center;
         }
 
-        .sidebar.collapsed .lock-label,
-        .sidebar.collapsed .lock-status-dot {
+        .sidebar.collapsed .lock-label {
             display: none;
         }
 
@@ -1139,7 +1122,6 @@
                             <svg id="lockSvgLocked" viewBox="0 0 24 24" stroke="currentColor" style="display:none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                         </span>
                         <span class="lock-label" id="lockLabel">Unlocked</span>
-                        <span class="lock-status-dot"></span>
                     </div>
                     <a class="nav-item">
                         <span class="nav-icon">
