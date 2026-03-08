@@ -1375,6 +1375,30 @@
             font-weight: 500;
         }
 
+        .copy-emails-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            color: rgba(255,255,255,.6);
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .copy-emails-btn:hover {
+            color: #fff;
+            background: rgba(255,255,255,.1);
+            border-color: rgba(255,255,255,.15);
+        }
+        .copy-emails-btn.copied {
+            color: var(--accent-emerald);
+            border-color: var(--accent-emerald);
+        }
+
         .subscriber-list {
             max-height: 300px;
             overflow-y: auto;
@@ -1787,7 +1811,13 @@
                     <section class="subscribers-panel">
                         <div class="panel-header">
                             <h2 class="panel-title">Email Subscribers</h2>
-                            <span class="subscriber-total" id="subscriberTotal">0 total</span>
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <button class="copy-emails-btn" id="copyEmailsBtn" onclick="copyAllEmails()" title="Copy all emails to clipboard">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    Copy Emails
+                                </button>
+                                <span class="subscriber-total" id="subscriberTotal">0 total</span>
+                            </div>
                         </div>
                         <div class="subscriber-list" id="subscriberList">
                             <div class="subscriber-empty">No subscribers yet</div>
@@ -2628,6 +2658,32 @@
         if (ok) {
             fetchSubscribers();
         }
+    }
+
+    async function copyAllEmails() {
+        const btn = document.getElementById('copyEmailsBtn');
+        try {
+            const rows = await sbFetch('subscribers', 'email', { order: 'created_at.desc', limit: 10000 });
+            if (!rows || rows.length === 0) {
+                btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> No emails';
+                setTimeout(() => resetCopyBtn(), 2000);
+                return;
+            }
+            const emails = rows.map(r => r.email).join(', ');
+            await navigator.clipboard.writeText(emails);
+            btn.classList.add('copied');
+            btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied ' + rows.length;
+            setTimeout(() => resetCopyBtn(), 2500);
+        } catch (e) {
+            btn.innerHTML = 'Failed';
+            setTimeout(() => resetCopyBtn(), 2000);
+        }
+    }
+
+    function resetCopyBtn() {
+        const btn = document.getElementById('copyEmailsBtn');
+        btn.classList.remove('copied');
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Emails';
     }
 
     /* ============================================================
