@@ -436,6 +436,44 @@
             letter-spacing: 0.1em;
         }
 
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.4s ease;
+        }
+        .connection-status.online {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--accent-emerald);
+        }
+        .connection-status.offline {
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            color: var(--accent-rose);
+        }
+        .connection-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            transition: background 0.4s ease;
+        }
+        .connection-status.online .connection-dot {
+            background: var(--accent-emerald);
+            animation: pulse 2s infinite;
+        }
+        .connection-status.offline .connection-dot {
+            background: var(--accent-rose);
+            animation: none;
+        }
+
         /* Content Grid */
         .content {
             padding: 24px 32px;
@@ -1581,7 +1619,11 @@
                         <button data-range="90d">90D</button>
                     </div>
                 </div>
-                <div class="header-right">
+                <div class="header-right" style="display:flex;align-items:center;gap:10px;">
+                    <div class="connection-status offline" id="connStatus">
+                        <span class="connection-dot"></span>
+                        <span id="connLabel">Offline</span>
+                    </div>
                     <div class="live-indicator">
                         <span class="live-dot"></span>
                         <span class="live-text" id="liveCount">Live</span>
@@ -1993,15 +2035,32 @@
      *  pageviews / analytics_events are the real security
      *  boundary.  NEVER add POST / PATCH / DELETE here.
      *  ─────────────────────────────────────────────────────── */
+    let _sbConnected = false;
+    function setConnectionStatus(online) {
+        _sbConnected = online;
+        const el = document.getElementById('connStatus');
+        const label = document.getElementById('connLabel');
+        if (!el) return;
+        el.className = 'connection-status ' + (online ? 'online' : 'offline');
+        label.textContent = online ? 'Online' : 'Offline';
+    }
+
     async function sbFetch(table, query = '') {
-        const r = await fetch(`${CONFIG.supabaseUrl}/rest/v1/${table}?${query}`, {
-            method: 'GET',               // read-only — do not change
-            headers: {
-                'apikey': CONFIG.supabaseKey,
-                'Authorization': `Bearer ${CONFIG.supabaseKey}`
-            }
-        });
-        return r.ok ? r.json() : [];
+        try {
+            const r = await fetch(`${CONFIG.supabaseUrl}/rest/v1/${table}?${query}`, {
+                method: 'GET',               // read-only — do not change
+                headers: {
+                    'apikey': CONFIG.supabaseKey,
+                    'Authorization': `Bearer ${CONFIG.supabaseKey}`
+                }
+            });
+            if (r.ok) { setConnectionStatus(true); return r.json(); }
+            setConnectionStatus(false);
+            return [];
+        } catch (e) {
+            setConnectionStatus(false);
+            return [];
+        }
     }
 
     /* ── Server-side write helpers (via Netlify Functions) ──
