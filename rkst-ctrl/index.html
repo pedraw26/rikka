@@ -1790,6 +1790,14 @@
                                 <span class="conversion-value">—</span>
                                 <span class="conversion-change">—</span>
                             </div>
+                            <div class="conversion-item" id="convSocial">
+                                <div class="conversion-icon">
+                                    <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                                </div>
+                                <span class="conversion-label">Social Clicks</span>
+                                <span class="conversion-value">—</span>
+                                <span class="conversion-change">—</span>
+                            </div>
                             <div class="conversion-item dimmed" id="convMerch">
                                 <div class="conversion-icon">
                                     <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -2238,11 +2246,12 @@
     function eventCategory(type) {
         const map = {
             'spotify_click': 'spotify', 'youtube_click': 'youtube', 'soundcloud_click': 'soundcloud',
+            'instagram_click': 'social', 'tiktok_click': 'social',
             'email_signup': 'email', 'newsletter_signup': 'email',
             'song_play': 'plays', 'play_click': 'plays', 'audio_play': 'plays',
             'merch_click': 'merch', 'store_click': 'merch',
             'apple_music_click': 'spotify', 'deezer_click': 'spotify',
-            'social_click': 'youtube'
+            'social_click': 'social'
         };
         return map[type] || null;
     }
@@ -2481,8 +2490,8 @@
        UPDATE CONVERSIONS
        ============================================================ */
     function updateConversions(ev, prevEv, subs, prevSubs) {
-        const curr = { spotify: 0, youtube: 0, soundcloud: 0, email: 0, plays: 0, merch: 0 };
-        const prev = { spotify: 0, youtube: 0, soundcloud: 0, email: 0, plays: 0, merch: 0 };
+        const curr = { spotify: 0, youtube: 0, soundcloud: 0, social: 0, email: 0, plays: 0, merch: 0 };
+        const prev = { spotify: 0, youtube: 0, soundcloud: 0, social: 0, email: 0, plays: 0, merch: 0 };
 
         ev.forEach(e => {
             const cat = eventCategory(e.event_type);
@@ -2501,6 +2510,7 @@
             { id: 'convSpotify', key: 'spotify' },
             { id: 'convYoutube', key: 'youtube' },
             { id: 'convSoundcloud', key: 'soundcloud' },
+            { id: 'convSocial', key: 'social' },
             { id: 'convEmail', key: 'email' },
             { id: 'convPlays', key: 'plays' },
             { id: 'convMerch', key: 'merch' }
