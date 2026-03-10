@@ -436,42 +436,31 @@
             letter-spacing: 0.1em;
         }
 
-        .connection-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 9px;
-            font-weight: 700;
-            font-family: var(--font-mono);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
+        .sidebar-status {
             transition: all 0.4s ease;
         }
-        .connection-status.online {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: var(--accent-emerald);
-        }
-        .connection-status.offline {
-            background: rgba(244, 63, 94, 0.1);
-            border: 1px solid rgba(244, 63, 94, 0.3);
-            color: var(--accent-rose);
-        }
-        .connection-dot {
-            width: 6px;
-            height: 6px;
+        .sidebar-status .connection-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             transition: background 0.4s ease;
         }
-        .connection-status.online .connection-dot {
+        .sidebar-status.online .connection-dot {
             background: var(--accent-emerald);
+            box-shadow: 0 0 6px var(--accent-emerald);
             animation: pulse 2s infinite;
         }
-        .connection-status.offline .connection-dot {
+        .sidebar-status.online .nav-label {
+            color: var(--accent-emerald);
+        }
+        .sidebar-status.offline .connection-dot {
             background: var(--accent-rose);
+            box-shadow: 0 0 6px var(--accent-rose);
             animation: none;
+        }
+        .sidebar-status.offline .nav-label {
+            color: var(--accent-rose);
         }
 
         /* Content Grid */
@@ -1593,6 +1582,15 @@
                         <span class="nav-label">Settings</span>
                     </a>
                 </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Status</div>
+                    <div class="nav-item sidebar-status" id="connStatus" style="cursor:default;pointer-events:none;">
+                        <span class="nav-icon">
+                            <span class="connection-dot" id="connDot"></span>
+                        </span>
+                        <span class="nav-label" id="connLabel">Offline</span>
+                    </div>
+                </div>
             </nav>
             <div class="sidebar-footer">
                 <button class="signout-btn" onclick="_AUTH.revoke()">
@@ -1619,11 +1617,7 @@
                         <button data-range="90d">90D</button>
                     </div>
                 </div>
-                <div class="header-right" style="display:flex;align-items:center;gap:10px;">
-                    <div class="connection-status offline" id="connStatus">
-                        <span class="connection-dot"></span>
-                        <span id="connLabel">Offline</span>
-                    </div>
+                <div class="header-right">
                     <div class="live-indicator">
                         <span class="live-dot"></span>
                         <span class="live-text" id="liveCount">Live</span>
@@ -2041,7 +2035,8 @@
         const el = document.getElementById('connStatus');
         const label = document.getElementById('connLabel');
         if (!el) return;
-        el.className = 'connection-status ' + (online ? 'online' : 'offline');
+        el.className = 'nav-item sidebar-status ' + (online ? 'online' : 'offline');
+        el.style.cssText = 'cursor:default;pointer-events:none;';
         label.textContent = online ? 'Online' : 'Offline';
     }
 
