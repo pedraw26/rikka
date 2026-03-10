@@ -449,7 +449,6 @@
         .sidebar-status.online .connection-dot {
             background: var(--accent-emerald);
             box-shadow: 0 0 6px var(--accent-emerald);
-            animation: pulse 2s infinite;
         }
         .sidebar-status.online .nav-label {
             color: var(--accent-emerald);
@@ -2109,14 +2108,14 @@
 
     async function fnRemoveSubscriber(id) {
         try {
-            const r = await fetch(`${CONFIG.supabaseUrl}/rest/v1/rpc/admin_remove_subscriber`, {
+            const r = await fetch(`${CONFIG.supabaseUrl}/rest/v1/rpc/admin_delete_subscriber`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'apikey': CONFIG.supabaseKey,
                     'Authorization': `Bearer ${CONFIG.supabaseKey}`
                 },
-                body: JSON.stringify({ fn_secret: 'rkst_fn_8eac49f3cbc73c8b833d13db580d4ce14f21ad31071ce02a', sub_id: id })
+                body: JSON.stringify({ admin_key: 'rkst_fn_8eac49f3cbc73c8b833d13db580d4ce14f21ad31071ce02a', sub_id: id })
             });
             const j = await r.json();
             return j.ok === true;
@@ -2131,8 +2130,8 @@
        ============================================================ */
     async function fetchLockStatus() {
         try {
-            const rows = await sbFetch('site_config', 'select=site_locked&id=eq.1');
-            const locked = rows.length ? rows[0].site_locked : false;
+            const rows = await sbFetch('site_config', 'select=is_locked&id=eq.1');
+            const locked = rows.length ? rows[0].is_locked : false;
             updateLockUI(locked);
         } catch (e) {
             console.error('Lock status fetch error:', e);
@@ -2159,7 +2158,7 @@
         updateLockUI(newVal);
 
         try {
-            const ok = await fnAdminWrite({ site_locked: newVal });
+            const ok = await fnAdminWrite({ is_locked: newVal });
             if (!ok) {
                 updateLockUI(current); // revert on failure
                 console.error('Lock toggle failed');
@@ -2524,7 +2523,7 @@
     /* ============================================================
        LIVE ACTIVITY FEED
        ============================================================ */
-    let ADMIN_IP = '92.40.187.59';
+    let ADMIN_IP = null;
     let _excludedIPs = new Set();
 
     function updateLiveFeed(pv, ev) {
@@ -2535,7 +2534,7 @@
             const d = new Date(r.created_at);
             const time = d.toTimeString().split(' ')[0];
             const loc = r.country_name || countryName(r.country);
-            const isAdmin = r.ip === ADMIN_IP;
+            const isAdmin = ADMIN_IP && r.ip === ADMIN_IP;
             items.push({
                 time: d.getTime(),
                 timeStr: time,
@@ -2716,13 +2715,13 @@
     async function loadSettings() {
         try {
             // Only fetch non-sensitive fields — lock_password stays server-side
-            const rows = await sbFetch('site_config', 'select=admin_ip,refresh_interval,live_interval&id=eq.1');
+            const rows = await sbFetch('site_config', 'select=admin_ip,refresh_rate,live_interval&id=eq.1');
             if (rows.length) {
                 const cfg = rows[0];
                 document.getElementById('settingsLockPassword').value = '';
                 document.getElementById('settingsLockPassword').placeholder = 'Enter new password';
                 document.getElementById('settingsAdminIP').value = cfg.admin_ip || '';
-                document.getElementById('settingsRefreshInterval').value = cfg.refresh_interval || 60;
+                document.getElementById('settingsRefreshInterval').value = cfg.refresh_rate || 60;
                 document.getElementById('settingsLiveInterval').value = cfg.live_interval || 15;
             }
         } catch (e) {
@@ -2789,7 +2788,7 @@
         const li = parseInt(document.getElementById('settingsLiveInterval').value) || 15;
         const clampRI = Math.max(10, Math.min(600, ri));
         const clampLI = Math.max(5, Math.min(120, li));
-        const ok = await fnAdminWrite({ refresh_interval: clampRI, live_interval: clampLI });
+        const ok = await fnAdminWrite({ refresh_rate: clampRI, live_interval: clampLI });
         if (ok) {
             CONFIG.refreshInterval = clampRI * 1000;
             CONFIG.liveInterval = clampLI * 1000;
@@ -2880,11 +2879,11 @@
 
         // Load admin IP + excluded IPs from Supabase before first data fetch
         try {
-            const cfgRows = await sbFetch('site_config', 'select=admin_ip,refresh_interval,live_interval&id=eq.1');
+            const cfgRows = await sbFetch('site_config', 'select=admin_ip,refresh_rate,live_interval&id=eq.1');
             if (cfgRows.length) {
                 const cfg = cfgRows[0];
                 if (cfg.admin_ip) ADMIN_IP = cfg.admin_ip;
-                if (cfg.refresh_interval) CONFIG.refreshInterval = cfg.refresh_interval * 1000;
+                if (cfg.refresh_rate) CONFIG.refreshInterval = cfg.refresh_rate * 1000;
                 if (cfg.live_interval) CONFIG.liveInterval = cfg.live_interval * 1000;
             }
             const ipRows = await sbFetch('excluded_ips', 'select=ip');

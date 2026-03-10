@@ -36,7 +36,7 @@ exports.handler = async (event) => {
       }
 
       // Call SECURITY DEFINER RPC function
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_add_ip`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_add_excluded_ip`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ exports.handler = async (event) => {
           'Authorization': `Bearer ${SUPABASE_KEY}`
         },
         body: JSON.stringify({
-          fn_secret: FN_TOKEN,
+          admin_key: FN_TOKEN,
           ip_addr: trimmedIp,
           ip_label: (label || '').trim()
         })
@@ -64,14 +64,14 @@ exports.handler = async (event) => {
       }
 
       // Call SECURITY DEFINER RPC function
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_remove_ip`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_remove_excluded_ip`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'apikey': SUPABASE_KEY,
           'Authorization': `Bearer ${SUPABASE_KEY}`
         },
-        body: JSON.stringify({ fn_secret: FN_TOKEN, ip_id: Number(id) })
+        body: JSON.stringify({ admin_key: FN_TOKEN, ip_id: Number(id) })
       });
 
       if (!res.ok) {

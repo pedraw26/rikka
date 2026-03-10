@@ -6,8 +6,8 @@ const SUPABASE_URL = 'https://nbhciatylkklmawdppsn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iaGNpYXR5bGtrbG1hd2RwcHNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxMDAwNzMsImV4cCI6MjA4ODY3NjA3M30.c1QOlUJ-2E-dv7ZQ5ZOad5i7MJpjzwDd72iq-0hphUo';
 const FN_TOKEN = 'rkst_fn_8eac49f3cbc73c8b833d13db580d4ce14f21ad31071ce02a';
 
-// Only these fields can be updated — prevents arbitrary writes
-const ALLOWED_FIELDS = ['site_locked', 'lock_password', 'admin_ip', 'refresh_interval', 'live_interval'];
+// Only these fields can be updated — must match DB column names
+const ALLOWED_FIELDS = ['is_locked', 'lock_password', 'admin_ip', 'refresh_rate', 'live_interval'];
 
 exports.handler = async (event) => {
   const headers = {
@@ -45,8 +45,8 @@ exports.handler = async (event) => {
     }
 
     // Validate types before sending to RPC
-    if (sanitized.site_locked !== undefined && typeof sanitized.site_locked !== 'boolean') {
-      return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'site_locked must be boolean' }) };
+    if (sanitized.is_locked !== undefined && typeof sanitized.is_locked !== 'boolean') {
+      return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'is_locked must be boolean' }) };
     }
     if (sanitized.lock_password !== undefined && (typeof sanitized.lock_password !== 'string' || sanitized.lock_password.trim().length === 0)) {
       return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'lock_password must be non-empty string' }) };
@@ -54,12 +54,12 @@ exports.handler = async (event) => {
     if (sanitized.admin_ip !== undefined && (typeof sanitized.admin_ip !== 'string' || sanitized.admin_ip.trim().length === 0)) {
       return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'admin_ip must be non-empty string' }) };
     }
-    if (sanitized.refresh_interval !== undefined) {
-      const ri = Number(sanitized.refresh_interval);
+    if (sanitized.refresh_rate !== undefined) {
+      const ri = Number(sanitized.refresh_rate);
       if (isNaN(ri) || ri < 10 || ri > 600) {
-        return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'refresh_interval must be 10-600' }) };
+        return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'refresh_rate must be 10-600' }) };
       }
-      sanitized.refresh_interval = ri;
+      sanitized.refresh_rate = ri;
     }
     if (sanitized.live_interval !== undefined) {
       const li = Number(sanitized.live_interval);
@@ -77,7 +77,7 @@ exports.handler = async (event) => {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`
       },
-      body: JSON.stringify({ fn_secret: FN_TOKEN, payload: sanitized })
+      body: JSON.stringify({ admin_key: FN_TOKEN, config: sanitized })
     });
 
     if (!res.ok) {

@@ -195,13 +195,13 @@ exports.handler = async (event) => {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Valid email required' }) };
       }
 
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/subscribers`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/subscribers?on_conflict=email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'apikey': SUPABASE_ANON_KEY,
           'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          'Prefer': 'return=minimal'
+          'Prefer': 'return=minimal,resolution=ignore-duplicates'
         },
         body: JSON.stringify({
           email: data.email.trim().toLowerCase(),

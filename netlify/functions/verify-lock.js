@@ -37,7 +37,7 @@ exports.handler = async (event) => {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`
       },
-      body: JSON.stringify({ fn_secret: FN_TOKEN, attempt: password })
+      body: JSON.stringify({ attempt: password })
     });
 
     if (!res.ok) {
