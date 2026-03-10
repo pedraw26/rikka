@@ -1,8 +1,8 @@
 // Analytics tracking serverless function
 // Receives pageview data and stores it in Supabase
 
-const SUPABASE_URL = 'https://tueltwjjkvqvdnznnhuq.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1ZWx0d2pqa3ZxdmRuem5uaHVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MDEzMDAsImV4cCI6MjA4NzE3NzMwMH0.Vf55QMlAqxdpP5iVR7RzkljCn4G1GRyO_We_82xulYQ';
+const SUPABASE_URL = 'https://nbhciatylkklmawdppsn.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iaGNpYXR5bGtrbG1hd2RwcHNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxMDAwNzMsImV4cCI6MjA4ODY3NjA3M30.c1QOlUJ-2E-dv7ZQ5ZOad5i7MJpjzwDd72iq-0hphUo';
 
 // Parse user agent to extract browser, OS, device type
 function parseUserAgent(ua) {
